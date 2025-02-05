@@ -35,15 +35,11 @@ export default function Home() {
     };
   }, []);
   return (
-    <div className="min-h-screen flex w-full px-8 py-4 border-2">
+    <div className="min-h-screen flex w-full px-8 py-4 ">
       <m.div
-        initial={!hasAnimated ? { opacity: 0, y: 50 } : { opacity: 0 }}
+        initial={!hasAnimated && { y: 100, opacity: 0 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={
-          !hasAnimated
-            ? { delay: 0.3, duration: 0.5, ease: "easeInOut" }
-            : { duration: 0.5, ease: "easeInOut" }
-        }
+        transition={{ duration: 0.6, ease: "easeOut" }}
         onAnimationComplete={() => setHasAnimated(true)}
         className="space-y-2 h-full"
       >

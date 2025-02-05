@@ -1,6 +1,7 @@
 "use client";
 
 import SideBar from "@/components/shared/side-bar";
+import TopBar from "@/components/shared/top-bar";
 /* import useInactivityTimeout from "@/hooks/use-inactibe-timeout";
  */
 export default function RootLayout({
@@ -19,7 +20,10 @@ export default function RootLayout({
   return (
     <main className="flex bg-slate-50">
       <SideBar />
-      {children}
+      <div>
+        <TopBar />
+        {children}
+      </div>
       {/*   {isInactive && (
         <div className="inactivity-dialog">
           <p>Are you still there?</p>

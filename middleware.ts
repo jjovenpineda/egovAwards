@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export function middleware(request: NextRequest) {
-  const authToken = request.cookies.get("authToken");
+  /*   const authToken = request.cookies.get("authToken");
 
   if (!authToken) {
     if (
@@ -11,7 +11,7 @@ export function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL("/sign-in", request.url));
     }
   }
-  return NextResponse.next();
+  return NextResponse.next(); */
 }
 export const config = {
   matcher:

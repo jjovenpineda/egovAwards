@@ -25,15 +25,7 @@ export default function Page({ params }: { params: { content: string } }) {
   const [addClientDialog, setAddClientDialog] = useState<boolean>(false);
 
   return (
-    <m.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{
-        duration: 0.3,
-        ease: "easeInOut",
-      }}
-      className="min-h-screen flex w-full p-8"
-    >
+    <div className="min-h-screen flex w-full p-8">
       {content == "request" && (
         <div className="w-full max-w-3xl mx-auto h-min space-y-4 m-16">
           <div className="flex justify-between">
@@ -77,7 +69,7 @@ export default function Page({ params }: { params: { content: string } }) {
         isopen={addClientDialog}
         setIsOpen={() => setAddClientDialog(false)}
       />
-    </m.div>
+    </div>
   );
 }
 

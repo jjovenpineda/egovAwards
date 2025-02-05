@@ -41,7 +41,7 @@ export default function SignInPage() {
   ) => {
     setIsLoading(true);
 
-    await apiPost("/api/auth/login", values)
+    /*   await apiPost("/api/auth/login", values)
       .then((res) => {
         const { success, message, data } = res;
         if (success) {
@@ -67,7 +67,13 @@ export default function SignInPage() {
           description: "Invalid email or password",
           duration: 2000,
         });
-      });
+      }); */
+    /* router.push("/"); */
+
+    setTimeout(() => {
+      router.push("/");
+      setIsLoading(false);
+    }, 2000);
   };
   return (
     <div className="min-h-screen flex items-center justify-center">
@@ -91,7 +97,7 @@ export default function SignInPage() {
                       <LogIn color="black" />
                     </div>
                   </CardTitle>
-                  {/*           <CardDescription>You have 3 unread messages.</CardDescription>
+                  {/*     x      <CardDescription>You have 3 unread messages.</CardDescription>
                    */}{" "}
                 </CardHeader>
                 <CardContent className="grid gap-4">
@@ -194,11 +200,13 @@ export default function SignInPage() {
                 <CardFooter>
                   <Button
                     disabled={isLoading}
-                    className="bg-white-900 w-full bg-slate-900 normal-case text-white  hover:bg-slate-500"
+                    className={`bg-white-900 w-full mx-auto transition-all duration-300 ease-out bg-slate-900 normal-case text-white  hover:bg-slate-500 ${
+                      isLoading && "w-[50px] rounded-full"
+                    }`}
                     type="submit"
                   >
                     {isLoading ? (
-                      <Loader2 size={18} className="mr-1 animate-spin" />
+                      <Loader2 size={18} className=" animate-spin" />
                     ) : (
                       <span>Login</span>
                     )}

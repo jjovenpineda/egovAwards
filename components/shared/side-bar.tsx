@@ -71,14 +71,20 @@ export default function SideBar() {
     getInfo();
   }, []);
   return (
-    <div>
+    <m.div
+      animate={{ opacity: 1, x: 0, width: isCollapsed ? "55px" : "230px" }}
+      transition={{
+        duration: 0.4,
+        ease: "easeOut",
+      }}
+      className="w-[230px]"
+    >
       <m.div
-        initial={{ opacity: 0, x: -100, width: "55px" }}
-        animate={{ opacity: 1, x: 0, width: isCollapsed ? "55px" : "230px" }}
+        initial={{ opacity: 0, x: -100 }}
+        animate={{ opacity: 1, x: 0 }}
         transition={{
-          duration: 0.7,
-          width: { duration: 0.3 },
-          ease: "easeInOut",
+          duration: 0.4,
+          ease: "easeOut",
         }}
         className="flex flex-col bg-slate-800 sticky top-0 h-screen col-span-1 ring-1 ring-gray-900/5"
       >
@@ -238,6 +244,6 @@ export default function SideBar() {
           </Popover>
         </div>
       </m.div>
-    </div>
+    </m.div>
   );
 }
