@@ -19,8 +19,11 @@ export default function RootLayout({
   }; */
   return (
     <main className="flex bg-slate-50">
-      <SideBar />
       <div>
+        <SideBar />
+      </div>
+
+      <div className="w-full">
         <TopBar />
         {children}
       </div>

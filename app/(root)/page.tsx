@@ -5,6 +5,8 @@ import React, { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
+  CardDescription,
+  CardFooter,
   /*   CardFooter,
    */ CardHeader,
   CardTitle,
@@ -13,7 +15,16 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 import { m } from "motion/react";
 import { storage } from "@/utils/useStorage";
-
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 export default function Home() {
   const [hasAnimated, setHasAnimated] = useState(
     JSON.parse(storage.getItem("hasAnimated") || "false")
@@ -39,26 +50,46 @@ export default function Home() {
       <m.div
         initial={!hasAnimated && { y: 100, opacity: 0 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
         onAnimationComplete={() => setHasAnimated(true)}
-        className="space-y-2 h-full"
+        className="space-y-2 h-full w-full"
       >
-        <h1 className="main-title">List</h1>{" "}
-        <Card className="h-min">
-          <CardContent className="flex ">
-            {headers.map((header, index) => (
-              <Column
-                key={index}
-                title={header.item}
-                data={regions}
-                className={`${index < 3 && "border-r"}`}
-              />
-            ))}
-            <hr />
+        <h1 className="main-title">Home</h1>{" "}
+        <Card>
+          <CardHeader>
+            <CardTitle>Create project</CardTitle>
+            <CardDescription>
+              Deploy your new project in one-click.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form>
+              <div className="grid w-full items-center gap-4">
+                <div className="flex flex-col space-y-1.5">
+                  <Label htmlFor="name">Name</Label>
+                  <Input id="name" placeholder="Name of your project" />
+                </div>
+                <div className="flex flex-col space-y-1.5">
+                  <Label htmlFor="framework">Framework</Label>
+                  <Select>
+                    <SelectTrigger id="framework">
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent position="popper">
+                      <SelectItem value="next">Next.js</SelectItem>
+                      <SelectItem value="sveltekit">SvelteKit</SelectItem>
+                      <SelectItem value="astro">Astro</SelectItem>
+                      <SelectItem value="nuxt">Nuxt.js</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </form>
           </CardContent>
-          {/*  <CardFooter>
-              <Button>Export</Button>
-            </CardFooter> */}
+          <CardFooter className="flex justify-between">
+            <Button variant="outline">Cancel</Button>
+            <Button>Deploy</Button>
+          </CardFooter>
         </Card>
       </m.div>
     </div>
