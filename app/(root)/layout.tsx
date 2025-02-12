@@ -1,7 +1,11 @@
 "use client";
 
-import SideBar from "@/components/shared/side-bar";
-import TopBar from "@/components/shared/top-bar";
+import { Footer } from "@/components/shared/footer";
+import Header from "@/components/shared/header";
+import { m } from "motion/react";
+import { useEffect, useState } from "react";
+import { storage } from "@/utils/useStorage";
+
 /* import useInactivityTimeout from "@/hooks/use-inactibe-timeout";
  */
 export default function RootLayout({
@@ -9,24 +13,40 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  /* const { isInactive, resetInactivity } = useInactivityTimeout();
-    const handleUserResponse = (response: string) => {
-    if (response === "yes") {
-      resetInactivity();
-    } else {
-      localStorage.clear();
-    }
-  }; */
+  const [hasAnimated, setHasAnimated] = useState(
+    JSON.parse(storage.getItem("hasAnimated") || "false")
+  );
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      storage.removeItem("hasAnimated");
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []);
+  useEffect(() => {
+    storage.setItem("hasAnimated", JSON.stringify(hasAnimated));
+  }, [hasAnimated]);
+
   return (
-    <main className="flex bg-slate-50">
+    <main className="flex flex-col bg-slate-50">
       <div>
-        <SideBar />
+        <Header />
       </div>
 
-      <div className="w-full">
-        <TopBar />
+      <m.div
+        initial={!hasAnimated && { y: 100, opacity: 0 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        onAnimationComplete={() => setHasAnimated(true)}
+        className="w-full lg:px-16 py-14 "
+      >
         {children}
-      </div>
+      </m.div>
+      <Footer />
       {/*   {isInactive && (
         <div className="inactivity-dialog">
           <p>Are you still there?</p>
