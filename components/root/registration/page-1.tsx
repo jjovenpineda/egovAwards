@@ -18,7 +18,7 @@ import { Globe, Mail, Phone } from "lucide-react";
 export default function Page1() {
   return (
     <div>
-      <section className="space-y-4 pt-6 lg:pt-0">
+      <section className="space-y-2 pt-6 lg:pt-0">
         <h2 className="font-bold text-lg text-blue-900">ABOUT THE LGU</h2>
         <hr className="border border-blue-900"></hr>
       </section>

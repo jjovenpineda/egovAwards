@@ -14,15 +14,18 @@ import egov from "@/public/assets/images/egov.webp";
 
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { Input } from "../ui/input";
 export default function Header() {
-  const [isFixed, setIsFixed] = useState(false);
+  const [hasScroll, setHasScroll] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 0) {
-        setIsFixed(true);
+      if (window.scrollY > 50) {
+        setHasScroll(true);
+
+        console.log(" :");
       } else {
-        setIsFixed(false);
+        setHasScroll(false);
       }
     };
 
@@ -51,87 +54,99 @@ export default function Header() {
     setIsHidden(!isHidden);
   };
   return (
-    <div>
-      {" "}
-      <div className="border border-b-1 border-t-0 border-l-0 border-r-0 border-gray-200 w-full text-xs bg-slate-50 md:text-sm flex flex-col  md:justify-center items-center justify-end">
-        <button
-          className="w-full px-1 md:px-32 grid grid-cols-3 py-3 space-y-2"
-          onClick={toggleHidden}
-        >
-          <div className="flex mx-auto items-center justify-center max-w-32 col-span-3 gap-y-2 gap-x-5 md:order-2 md:col-span-1">
-            <Image src={gazette} alt="officialGazette Logo" />{" "}
-          </div>
-          <div className="flex items-center justify-start col-span-2 md:order-1 md:col-span-1">
-            <span className="font-semibold text-left text-textdescription">
-              A Philippines Government Agency Website
-            </span>
-          </div>
-
-          <div className="flex items-center justify-end md:order-3">
-            <Link
-              href="/"
-              className="flex items-center font-semibold text-left transition-colors text-blue-900 hover:text-blue-600"
+    <>
+      <AnimatePresence>
+        {!hasScroll && (
+          <m.div
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ opacity: 0, y: -100 }}
+            transition={{ duration: 0.5 }}
+            className={`border border-b-1 top-0 border-t-0 border-l-0 border-r-0 border-gray-200 w-full text-xs bg-slate-50 md:text-sm flex flex-col  md:justify-center items-center justify-end ${
+              hasScroll && "shadow-xl"
+            }`}
+          >
+            <button
+              className="w-full px-1 md:px-32 grid grid-cols-3 py-3 space-y-2"
+              onClick={toggleHidden}
             >
-              How to identify?
-              <ChevronRight
-                className={`transition-transform h-3 sm:w-4 sm:h-4 ${
-                  !isHidden ? "rotate-90" : ""
-                }`}
-              />
-            </Link>
-          </div>
-        </button>
-
-        <AnimatePresence>
-          {!isHidden && (
-            <m.div
-              initial={{ opacity: 0, height: 0, padding: 0 }}
-              animate={{ opacity: 1, height: !isHidden ? 100 : 0, padding: 15 }}
-              exit={{ opacity: 0, height: 0, padding: 0 }}
-              transition={{ duration: 0.5, ease: "easeInOut" }}
-              className="container  w-full md:px-32 grid grid-cols-1  gap-1 md:grid-cols-2 order-last col-span-3 space-y-2 "
-            >
-              <div className="w-full text-left ">
-                <p className="flex font-bold">
-                  <Landmark className="w-4 h-4 mr-1" />
-                  Official website links end with.gov.ph
-                </p>
-                <p className="ml-5s">
-                  Government agencies communicate via .gov.ph websites (e.g.
-                  https://dict.gov.ph).
-                  <Link
-                    className="inline-block ml-1 font-semibold text-blue-700 transition-colors hover:text-blue-500"
-                    href="/"
-                  >
-                    Trusted websites
-                  </Link>
-                </p>
+              <div className="flex mx-auto items-center justify-center max-w-32 col-span-3 gap-y-2 gap-x-5 md:order-2 md:col-span-1">
+                <Image src={gazette} alt="officialGazette Logo" />{" "}
               </div>
-              <div className="w-full text-left ">
-                <span className="flex font-bold">
-                  <Lock className="w-4 h-4 mr-1" />
-                  Secure websites use HTTPS
+              <div className="flex items-center justify-start col-span-2 md:order-1 md:col-span-1">
+                <span className="font-semibold text-left text-textdescription">
+                  A Philippines Government Agency Website
                 </span>
-                <p className="items-center ml-5 ">
-                  Look for a lock <Lock className="inline-block w-3 h-3 mx-1" />
-                  or https:// as an added precaution. Share sensitive
-                  information only on official, secure websites.
-                </p>
               </div>
-            </m.div>
-          )}
-        </AnimatePresence>
-      </div>
-      {/*  */}
-      <div>
+
+              <div className="flex items-center justify-end md:order-3">
+                <Link
+                  href="/"
+                  className="flex items-center font-semibold text-left transition-colors text-blue-900 hover:text-blue-600"
+                >
+                  How to identify?
+                  <ChevronRight
+                    className={`transition-transform h-3 sm:w-4 sm:h-4 ${
+                      !isHidden ? "rotate-90" : ""
+                    }`}
+                  />
+                </Link>
+              </div>
+            </button>
+
+            <AnimatePresence>
+              {!isHidden && (
+                <m.div
+                  initial={{ opacity: 0, height: 0, padding: 0 }}
+                  animate={{
+                    opacity: 1,
+                    height: !isHidden ? "auto" : 0,
+                  }}
+                  exit={{ opacity: 0, height: 0, padding: 0 }}
+                  transition={{ duration: 0.5, ease: "easeInOut" }}
+                  className="container  w-full md:px-32 grid grid-cols-1  gap-1 md:grid-cols-2 order-last col-span-3 space-y-2"
+                >
+                  <div className="w-full text-left px-4">
+                    <p className="flex font-bold">
+                      <Landmark className="w-4 h-4 mr-1" />
+                      Official website links end with.gov.ph
+                    </p>
+                    <p className="ml-5 ">
+                      Government agencies communicate via .gov.ph websites (e.g.
+                      https://dict.gov.ph).
+                      <Link
+                        className="inline-block ml-1 font-semibold text-blue-700 transition-colors hover:text-blue-500"
+                        href="/"
+                      >
+                        Trusted websites
+                      </Link>
+                    </p>
+                  </div>
+                  <div className="w-full text-left px-4">
+                    <span className="flex font-bold">
+                      <Lock className="w-4 h-4 mr-1" />
+                      Secure websites use HTTPS
+                    </span>
+                    <p className="items-center ml-5 ">
+                      Look for a lock{" "}
+                      <Lock className="inline-block w-3 h-3 mx-1" />
+                      or https:// as an added precaution. Share sensitive
+                      information only on official, secure websites.
+                    </p>
+                  </div>
+                </m.div>
+              )}
+            </AnimatePresence>
+          </m.div>
+        )}
+      </AnimatePresence>
+
+      <div className={`top-0 sticky z-50 ${hasScroll && "shadow-sm"}`}>
         <header
-          className={`${
-            isFixed ? "fixed" : "relative"
-          } w-full  backdrop-blur-md bg-white/30 top-0 z-20 flex flex-col  justify-between max-w-full    border-b-2 border-b-transparent `}
+          className={` w-full  bg-white  flex flex-col  justify-between max-w-full`}
         >
           <div className="flex justify-between items-center lg:px-32">
             <div className="flex gap-1 items-center">
-              <div className="w-32 lg:w-auto max-w-40">
+              <div className="w-32 lg:w-auto max-w-40 p-2">
                 <Image loading="lazy" alt="GovPH Logo Header" src={egov} />
               </div>
             </div>
@@ -177,71 +192,28 @@ export default function Header() {
               <div className="order:2 lg:order-2">
                 <form onSubmit={handleSearchSubmit}>
                   <div className="flex w-full justify-center gap-2 ">
-                    <div
-                      className={cn(
-                        "flex justify-between gap-4 h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                      )}
-                    >
-                      <input
-                        /*  type={type}
-                        ref={ref}
-                        {...props} */
-                        className="w-80"
-                      />
-                      <div className="flex gap-2 items-center">
-                        <Search className="text-muted-foreground" />
-                      </div>
+                    <div className="relative">
+                      <Input placeholder="Search" className="max-w-80 pr-10" />
+                      <Search className="text-muted-foreground absolute mr-2 right-0 top-1/2 transform -translate-y-1/2" />
                     </div>
                   </div>
                 </form>
               </div>
             </div>
           </div>
-          <div className=" xl:hidden">
-            <Sheet>
-              <SheetTrigger>
-                <div className="flex p-3 gap-3">
-                  <div>Menu</div>
-                  <div>
-                    <Menu size={30} />
-                  </div>
-                </div>
-              </SheetTrigger>
-              <SheetContent className="w-[300px]">
-                {/* <div className=" gap-3 flex flex-col">
-                  <div className="flex items-center">
-                    <MenuList />
-                  </div>
-                  <div className="">
-                    <Link
-                      href={"https://e.gov.ph/"}
-                      prefetch={false}
-                      target="_blank"
-                      className={buttonVariants({
-                        variant: "ghost",
-                        className:
-                          "w-full gap-1 bg-blue-700 text-white hover:bg-blue-600 hover:text-white  ",
-                      })}
-                    >
-                      Get the eGov Super App <ExternalLink />
-                    </Link>
-                  </div>
-                </div> */}
-              </SheetContent>
-            </Sheet>
-          </div>
-          <div
-            className={`${
-              isFixed
-                ? " border-t-transparent"
-                : "border border-b-1 border-t-1 border-l-0 border-r-0 border-gray-200 bg-slate-50"
-            }
-           hidden gap-10 xl:flex xl:flex-row xl:justify-between px-1 md:px-32  py-3 space-y-2`}
-          >
-            <div className="flex items-center">{/*    <MenuList /> */}</div>
-          </div>
+          <ul className="flex absolute invisible lg:relative lg:visible gap-6 p-2 px-32 bg-slate-50 font-bold text-sm border-2">
+            {links.map((item, index) => (
+              <li key={index}>{item.name}</li>
+            ))}
+          </ul>
         </header>
       </div>
-    </div>
+    </>
   );
 }
+const links = [
+  { name: "Home", url: "/" },
+  { name: "Registration Form", url: "/registration" },
+  { name: "About Us", url: "/about" },
+  { name: "Contact Us", url: "/contact" },
+];

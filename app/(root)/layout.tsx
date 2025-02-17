@@ -33,9 +33,7 @@ export default function RootLayout({
 
   return (
     <main className="flex flex-col bg-slate-50">
-      <div>
-        <Header />
-      </div>
+      <Header />
 
       <m.div
         initial={!hasAnimated && { y: 100, opacity: 0 }}

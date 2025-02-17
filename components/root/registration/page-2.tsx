@@ -43,11 +43,11 @@ const categories = [
 export default function Page2() {
   return (
     <div>
-      <section className="space-y-4 pt-6 lg:pt-0">
+      <section className="space-y-2 pt-6 lg:pt-0">
         <h2 className="font-bold text-lg text-blue-900">ABOUT THE ENTRY</h2>
         <hr className="border border-blue-900"></hr>
       </section>
-      <div className="py-6 space-y-4">
+      <div className="py-6 space-y-4 lg:w-1/2">
         <div>
           <Label className="font-semibold text-sm text-[#1F2937]">
             Project/Program Name
