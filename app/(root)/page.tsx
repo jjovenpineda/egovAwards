@@ -1,12 +1,8 @@
 "use client";
 
-import Registration from "@/components/root/registration/registration";
+import Registration from "@/components/root/registration/success-page";
 import React, { useEffect, useState } from "react";
 
 export default function Home() {
-  return (
-    <div className="">
-      <Registration />
-    </div>
-  );
+  return <div className=""></div>;
 }

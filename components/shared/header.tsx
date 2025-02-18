@@ -18,24 +18,6 @@ import { Input } from "../ui/input";
 export default function Header() {
   const [hasScroll, setHasScroll] = useState(false);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 50) {
-        setHasScroll(true);
-
-        console.log(" :");
-      } else {
-        setHasScroll(false);
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
-
   const router = useRouter();
   const [query, setQuery] = useState("");
 
@@ -55,103 +37,98 @@ export default function Header() {
   };
   return (
     <>
-      <AnimatePresence>
-        {!hasScroll && (
-          <m.div
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ opacity: 0, y: -100 }}
-            transition={{ duration: 0.5 }}
-            className={`border border-b-1 top-0 border-t-0 border-l-0 border-r-0 border-gray-200 w-full text-xs bg-slate-50 md:text-sm flex flex-col  md:justify-center items-center justify-end ${
-              hasScroll && "shadow-xl"
-            }`}
-          >
-            <button
-              className="w-full px-1 md:px-32 grid grid-cols-3 py-3 space-y-2"
-              onClick={toggleHidden}
+      <div
+        className={`border border-b-1 top-0 border-t-0 border-l-0 border-r-0 border-gray-200 w-full text-xs bg-slate-50 md:text-sm flex flex-col  md:justify-center items-center justify-end ${
+          hasScroll && "shadow-xl"
+        }`}
+      >
+        <button
+          className="w-full px-1 md:px-32 grid grid-cols-3 py-3 space-y-2"
+          onClick={toggleHidden}
+        >
+          <div className="flex mx-auto items-center justify-center max-w-32 col-span-3 gap-y-2 gap-x-5 md:order-2 md:col-span-1">
+            <Image src={gazette} alt="officialGazette Logo" />{" "}
+          </div>
+          <div className="flex items-center justify-start col-span-2 md:order-1 md:col-span-1">
+            <span className="font-semibold text-left text-textdescription">
+              A Philippines Government Agency Website
+            </span>
+          </div>
+
+          <div className="flex items-center justify-end md:order-3">
+            <Link
+              href="/"
+              className="flex items-center font-semibold text-left transition-colors text-blue-900 hover:text-blue-600"
             >
-              <div className="flex mx-auto items-center justify-center max-w-32 col-span-3 gap-y-2 gap-x-5 md:order-2 md:col-span-1">
-                <Image src={gazette} alt="officialGazette Logo" />{" "}
+              How to identify?
+              <ChevronRight
+                className={`transition-transform h-3 sm:w-4 sm:h-4 ${
+                  !isHidden ? "rotate-90" : ""
+                }`}
+              />
+            </Link>
+          </div>
+        </button>
+
+        <AnimatePresence>
+          {!isHidden && (
+            <m.div
+              initial={{ opacity: 0, height: 0, padding: 0 }}
+              animate={{
+                opacity: 1,
+                height: !isHidden ? "auto" : 0,
+              }}
+              exit={{ opacity: 0, height: 0, padding: 0 }}
+              transition={{ duration: 0.5, ease: "easeInOut" }}
+              className="container  w-full md:px-32 grid grid-cols-1  gap-1 md:grid-cols-2 order-last col-span-3 space-y-2"
+            >
+              <div className="w-full text-left px-4">
+                <p className="flex font-bold">
+                  <Landmark className="w-4 h-4 mr-1" />
+                  Official website links end with.gov.ph
+                </p>
+                <p className="ml-5 ">
+                  Government agencies communicate via .gov.ph websites (e.g.
+                  https://dict.gov.ph).
+                  <Link
+                    className="inline-block ml-1 font-semibold text-blue-700 transition-colors hover:text-blue-500"
+                    href="/"
+                  >
+                    Trusted websites
+                  </Link>
+                </p>
               </div>
-              <div className="flex items-center justify-start col-span-2 md:order-1 md:col-span-1">
-                <span className="font-semibold text-left text-textdescription">
-                  A Philippines Government Agency Website
+              <div className="w-full text-left px-4">
+                <span className="flex font-bold">
+                  <Lock className="w-4 h-4 mr-1" />
+                  Secure websites use HTTPS
                 </span>
+                <p className="items-center ml-5 ">
+                  Look for a lock <Lock className="inline-block w-3 h-3 mx-1" />
+                  or https:// as an added precaution. Share sensitive
+                  information only on official, secure websites.
+                </p>
               </div>
-
-              <div className="flex items-center justify-end md:order-3">
-                <Link
-                  href="/"
-                  className="flex items-center font-semibold text-left transition-colors text-blue-900 hover:text-blue-600"
-                >
-                  How to identify?
-                  <ChevronRight
-                    className={`transition-transform h-3 sm:w-4 sm:h-4 ${
-                      !isHidden ? "rotate-90" : ""
-                    }`}
-                  />
-                </Link>
-              </div>
-            </button>
-
-            <AnimatePresence>
-              {!isHidden && (
-                <m.div
-                  initial={{ opacity: 0, height: 0, padding: 0 }}
-                  animate={{
-                    opacity: 1,
-                    height: !isHidden ? "auto" : 0,
-                  }}
-                  exit={{ opacity: 0, height: 0, padding: 0 }}
-                  transition={{ duration: 0.5, ease: "easeInOut" }}
-                  className="container  w-full md:px-32 grid grid-cols-1  gap-1 md:grid-cols-2 order-last col-span-3 space-y-2"
-                >
-                  <div className="w-full text-left px-4">
-                    <p className="flex font-bold">
-                      <Landmark className="w-4 h-4 mr-1" />
-                      Official website links end with.gov.ph
-                    </p>
-                    <p className="ml-5 ">
-                      Government agencies communicate via .gov.ph websites (e.g.
-                      https://dict.gov.ph).
-                      <Link
-                        className="inline-block ml-1 font-semibold text-blue-700 transition-colors hover:text-blue-500"
-                        href="/"
-                      >
-                        Trusted websites
-                      </Link>
-                    </p>
-                  </div>
-                  <div className="w-full text-left px-4">
-                    <span className="flex font-bold">
-                      <Lock className="w-4 h-4 mr-1" />
-                      Secure websites use HTTPS
-                    </span>
-                    <p className="items-center ml-5 ">
-                      Look for a lock{" "}
-                      <Lock className="inline-block w-3 h-3 mx-1" />
-                      or https:// as an added precaution. Share sensitive
-                      information only on official, secure websites.
-                    </p>
-                  </div>
-                </m.div>
-              )}
-            </AnimatePresence>
-          </m.div>
-        )}
-      </AnimatePresence>
+            </m.div>
+          )}
+        </AnimatePresence>
+      </div>
 
       <div className={`top-0 sticky z-50 ${hasScroll && "shadow-sm"}`}>
         <header
           className={` w-full  bg-white  flex flex-col  justify-between max-w-full`}
         >
-          <div className="flex justify-between items-center lg:px-32">
-            <div className="flex gap-1 items-center">
-              <div className="w-32 lg:w-auto max-w-40 p-2">
+          <div className="flex flex-wrap justify-between items-center lg:px-32">
+            <div className="flex gap-1 items-center mx-auto sm:mx-0">
+              <div className="absolute invisible sm:block sm:visible max-w-32 p-2">
                 <Image loading="lazy" alt="GovPH Logo Header" src={egov} />
               </div>
             </div>
-            <div className="flex p-2 lg:p-0 flex-col lg:flex-row gap-4 justify-end items-end lg:items-center lg:w-1/2 text-xs lg:text-sm font-semibold">
-              <div className=" gap-2 flex order-1 lg:flex-col lg:order-1">
+            <div className="relative flex p-2 lg:p-0 flex-col w-full lg:flex-row gap-4 justify-end items-end lg:items-center lg:w-1/2 text-xs lg:text-sm font-semibold">
+              <div className="visible sm:invisible max-w-28 p-2 absolute left-0">
+                <Image loading="lazy" alt="GovPH Logo Header" src={egov} />
+              </div>
+              <div className=" gap-2 flex flex-wrap justify-end order-1 lg:flex-col lg:order-1">
                 <div className="flex items-center gap-2">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -185,8 +162,7 @@ export default function Header() {
                       d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"
                     />
                   </svg>
-
-                  <h1>information@dict.gov.ph</h1>
+                  <h1 className="break-all w-full">information@dict.gov.ph</h1>{" "}
                 </div>
               </div>
               <div className="order:2 lg:order-2">
@@ -201,11 +177,21 @@ export default function Header() {
               </div>
             </div>
           </div>
-          <ul className="flex absolute invisible lg:relative lg:visible gap-6 p-2 px-32 bg-slate-50 font-bold text-sm border-2">
+          <div className="flex flex-wrap absolute invisible lg:relative lg:visible gap-6 p-1 lg:px-32 bg-slate-50 font-bold text-sm border-2">
             {links.map((item, index) => (
-              <li key={index}>{item.name}</li>
+              <Link
+                href={
+                  item.query
+                    ? { pathname: item.url, query: item.query }
+                    : { pathname: item.url }
+                }
+                key={index}
+                className="cursor-pointer hover:bg-blue-100 p-1.5 active:bg-blue-200 rounded-sm transition-all duration-300 ease-in-out"
+              >
+                {item.name}
+              </Link>
             ))}
-          </ul>
+          </div>
         </header>
       </div>
     </>
@@ -213,7 +199,7 @@ export default function Header() {
 }
 const links = [
   { name: "Home", url: "/" },
-  { name: "Registration Form", url: "/registration" },
+  { name: "Registration Form", url: "/registration", query: { page: "1" } },
   { name: "About Us", url: "/about" },
   { name: "Contact Us", url: "/contact" },
 ];

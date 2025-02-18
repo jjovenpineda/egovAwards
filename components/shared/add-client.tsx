@@ -54,7 +54,6 @@ export default function AddClient({
   const getLibrary = async () => {
     await apiGet("/api/psgc/get")
       .then((res) => {
-        console.log("res :", res);
         const { success, message, data } = res;
 
         if (success) {
@@ -78,7 +77,7 @@ export default function AddClient({
   };
   useEffect(() => {
     getLibrary();
-  });
+  }, []);
   const handleSubmit = async (
     values: IRequest,
     { setFieldError }: FormikHelpers<IRequest>

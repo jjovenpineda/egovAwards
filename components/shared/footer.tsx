@@ -7,10 +7,10 @@ import dict from "@/public/assets/images/dict.webp";
 
 export function Footer() {
   return (
-    <div className="bg-gray-800">
-      <div className="container relative mx-auto px-20 py-16 text-sm text-white">
+    <div className="bg-gray-800 z-10">
+      <div className="container relative mx-auto px-10 lg:px-20 py-8 lg:py-16 text-sm text-white">
         <div className="flex max-w-full flex-col items-center justify-evenly flex-wrap gap-8 md:gap-20  md:flex-row ">
-          <div className="max-w-40 hidden xl:block">
+          <div className="max-w-40 hidden 2xl:block">
             <Image
               src={republika}
               alt=""
@@ -19,13 +19,19 @@ export function Footer() {
           </div>
           <div className="flex max-w-full flex-col justify-evenly gap-8  xl:gap-40 md:flex-row ">
             <div className="">
-              <Image src={dict} className="max-w-[134px] object-cover" alt="" />
-              <p className="w-[195px] h-auto">
+              <Image
+                src={dict}
+                className="max-w-[143px] w-min pb-2"
+                alt=""
+                loading="lazy"
+              />
+
+              <p className=" h-auto">
                 All content is in the public domain unless otherwise stated.
               </p>
             </div>
 
-            <div className="flex flex-col gap-2 text-xs w-64 h-36">
+            <div className="flex flex-col gap-2 text-xs max-w-64 ">
               <div className="font-bold uppercase text-sm ">About Us</div>
               <div className=" ">
                 <p className="">

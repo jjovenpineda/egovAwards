@@ -61,7 +61,7 @@ export default function Summary() {
   }
   return (
     <div className="space-y-14 lg:w-3/4">
-      <section className="space-y-8">
+      {/*    <section className="space-y-8">
         <div className="space-y-3">
           <p className="text-[#1E3A8A] text-base">
             <strong>11th eGOV Awards:</strong> Excellence in Governance Through
@@ -75,7 +75,7 @@ export default function Summary() {
             submit.
           </p>
         </div>
-      </section>
+      </section> */}
       <section>
         <div className=" space-y-2 pt-6 lg:pt-0">
           <div className="flex justify-between items-center">
