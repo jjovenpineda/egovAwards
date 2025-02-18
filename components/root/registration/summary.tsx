@@ -1,6 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { Edit } from "lucide-react";
-import React from "react";
+import React, { useState } from "react";
+import Page1 from "./page-1";
+import ModalWrapper from "./modal-wrapper";
+import Page2 from "./page-2";
+import Page3 from "./page-3";
+import Page4 from "./page-4";
+import Page5 from "./page-5";
+import Page6 from "./page-6";
+import Page7 from "./page-7";
 
 export default function Summary() {
   const aboutTheLguLabels = [
@@ -59,6 +67,14 @@ export default function Summary() {
     label: string;
     value: string;
   }
+  const [page1Modal, setPage1Modal] = useState(false);
+  const [page2Modal, setPage2Modal] = useState(false);
+  const [page3Modal, setPage3Modal] = useState(false);
+  const [page4Modal, setPage4Modal] = useState(false);
+  const [page5Modal, setPage5Modal] = useState(false);
+  const [page6Modal, setPage6Modal] = useState(false);
+  const [page7Modal, setPage7Modal] = useState(false);
+
   return (
     <div className="space-y-14 lg:w-3/4">
       {/*    <section className="space-y-8">
@@ -80,9 +96,22 @@ export default function Summary() {
         <div className=" space-y-2 pt-6 lg:pt-0">
           <div className="flex justify-between items-center">
             <h2 className="font-bold text-lg text-blue-900">ABOUT THE LGU </h2>
-            <Button variant={"primary"} className="bg-blue-900" size={"sm"}>
+            <Button
+              onClick={() => setPage1Modal(!page1Modal)}
+              variant={"primary"}
+              className="bg-blue-900"
+              size={"sm"}
+            >
               <Edit /> Edit
             </Button>
+
+            <ModalWrapper
+              isEdit={true}
+              isOpen={page1Modal}
+              onClose={() => setPage1Modal(false)}
+            >
+              <Page1 />
+            </ModalWrapper>
           </div>
           <hr className="p-2 "></hr>
         </div>
@@ -105,9 +134,21 @@ export default function Summary() {
             <h2 className="font-bold text-lg text-blue-900">
               ABOUT THE ENTRY{" "}
             </h2>
-            <Button variant={"primary"} className="bg-blue-900" size={"sm"}>
+            <Button
+              onClick={() => setPage2Modal(!page2Modal)}
+              variant={"primary"}
+              className="bg-blue-900"
+              size={"sm"}
+            >
               <Edit /> Edit
             </Button>
+            <ModalWrapper
+              isEdit={true}
+              isOpen={page2Modal}
+              onClose={() => setPage2Modal(false)}
+            >
+              <Page2 />
+            </ModalWrapper>
           </div>
           <hr className="p-2 "></hr>
         </div>
@@ -131,9 +172,21 @@ export default function Summary() {
             <h2 className="font-bold text-lg text-blue-900">
               IMPACT OF THE PROJECT
             </h2>
-            <Button variant={"primary"} className="bg-blue-900" size={"sm"}>
+            <Button
+              onClick={() => setPage3Modal(!page3Modal)}
+              variant={"primary"}
+              className="bg-blue-900"
+              size={"sm"}
+            >
               <Edit /> Edit
             </Button>
+            <ModalWrapper
+              isEdit={true}
+              isOpen={page3Modal}
+              onClose={() => setPage3Modal(false)}
+            >
+              <Page3 />
+            </ModalWrapper>
           </div>
           <hr className="p-2 "></hr>
         </div>
@@ -163,11 +216,76 @@ export default function Summary() {
         <div className=" space-y-2 pt-6 lg:pt-0">
           <div className="flex justify-between items-center">
             <h2 className="font-bold text-lg text-blue-900">
-              SUSTAINABILITY AND REPLICABILITY OF THE PROJECT
+              RELEVANCE OF THE PROJECT{" "}
             </h2>
-            <Button variant={"primary"} className="bg-blue-900" size={"sm"}>
+            <Button
+              onClick={() => setPage4Modal(!page4Modal)}
+              variant={"primary"}
+              className="bg-blue-900"
+              size={"sm"}
+            >
               <Edit /> Edit
             </Button>
+            <ModalWrapper
+              isEdit={true}
+              isOpen={page4Modal}
+              onClose={() => setPage4Modal(false)}
+            >
+              <Page4 />
+            </ModalWrapper>
+          </div>
+          <hr className="p-2 "></hr>
+        </div>
+        <div className="space-y-3">
+          <h2 className="text-slate-900 text-base">
+            Describe the specific problem or challenge in your local government
+            unit was the project designed to address.
+          </h2>
+          <h2 className="text-slate-900 text-base">
+            How does the project directly address and mitigate the identified
+            problem or challenge?
+          </h2>
+          <h2 className="text-slate-900 text-base">
+            What measurable improvements or outcomes have been observed since
+            the implementation of the project in relation to the problem it aims
+            to solve?
+          </h2>
+          <p className="text-slate-500 text-base font-light leading-normal">
+            Forth momentary rice cattle call international nurse ornament loss
+            spring excessive bury pig dream ticket bunch taxi battery rule term
+            plaster east angry stretch then pupil scatter importance examine
+            arch permission board sport wake tin day ready shine salt reasonable
+            ripe repair competition inform eager paper influential railroad male
+            brush reward fit handkerchief from hurt ruin shine bread add strong
+            first effort persuasion ability manage you rock robbery condition
+            car forbid wide whisper castle attend monkey disturb library enter
+            salesman overflow flesh liar jaw raise crop thirst hard rather sir
+            control stamp failure arrange miss care resistance marriage film
+            staple.
+          </p>
+        </div>
+      </section>
+      <section>
+        <div className=" space-y-2 pt-6 lg:pt-0">
+          <div className="flex justify-between items-center">
+            <h2 className="font-bold text-lg text-blue-900">
+              SUSTAINABILITY AND REPLICABILITY OF THE PROJECT{" "}
+            </h2>
+            <Button
+              onClick={() => setPage5Modal(!page5Modal)}
+              variant={"primary"}
+              className="bg-blue-900"
+              size={"sm"}
+            >
+              <Edit /> Edit
+            </Button>
+            <ModalWrapper
+              isEdit={true}
+              isOpen={page5Modal}
+              onClose={() => setPage5Modal(false)}
+            >
+              <Page5 />
+            </ModalWrapper>
           </div>
           <hr className="p-2 "></hr>
         </div>
@@ -206,9 +324,21 @@ export default function Summary() {
             <h2 className="font-bold text-lg text-blue-900">
               INNOVATION ASPECT OF THE PROJECT
             </h2>
-            <Button variant={"primary"} className="bg-blue-900" size={"sm"}>
+            <Button
+              onClick={() => setPage6Modal(!page6Modal)}
+              variant={"primary"}
+              className="bg-blue-900"
+              size={"sm"}
+            >
               <Edit /> Edit
             </Button>
+            <ModalWrapper
+              isEdit={true}
+              isOpen={page6Modal}
+              onClose={() => setPage6Modal(false)}
+            >
+              <Page6 />
+            </ModalWrapper>
           </div>
           <hr className="p-2 "></hr>
         </div>
@@ -244,9 +374,21 @@ export default function Summary() {
             <h2 className="font-bold text-lg text-blue-900">
               ALIGNMENT WITH GOALS
             </h2>
-            <Button variant={"primary"} className="bg-blue-900" size={"sm"}>
+            <Button
+              onClick={() => setPage7Modal(!page7Modal)}
+              variant={"primary"}
+              className="bg-blue-900"
+              size={"sm"}
+            >
               <Edit /> Edit
             </Button>
+            <ModalWrapper
+              isEdit={true}
+              isOpen={page7Modal}
+              onClose={() => setPage7Modal(false)}
+            >
+              <Page7 />
+            </ModalWrapper>
           </div>
           <hr className="p-2 "></hr>
         </div>

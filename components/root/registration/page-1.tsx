@@ -15,6 +15,8 @@ import fb from "@/public/assets/svgs/fb.svg";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Globe, Mail, Phone } from "lucide-react";
+import ModalWrapper from "./modal-wrapper";
+import { Button } from "@/components/ui/button";
 export default function Page1() {
   return (
     <div>

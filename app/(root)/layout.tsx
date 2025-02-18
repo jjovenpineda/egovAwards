@@ -32,18 +32,20 @@ export default function RootLayout({
   }, [hasAnimated]);
 
   return (
-    <main className="flex flex-col bg-slate-50">
-      <Header />
+    <main className="min-h-screen  overflow-hidden flex justify-between flex-col">
+      <div>
+        <Header />
 
-      <m.div
-        initial={!hasAnimated && { y: 100, opacity: 0 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        onAnimationComplete={() => setHasAnimated(true)}
-        className="w-full lg:px-16 py-14 "
-      >
-        {children}
-      </m.div>
+        <m.div
+          initial={!hasAnimated && { y: 100, opacity: 0 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          onAnimationComplete={() => setHasAnimated(true)}
+          className="w-full lg:px-16 py-14 "
+        >
+          {children}
+        </m.div>
+      </div>
       <Footer />
       {/*   {isInactive && (
         <div className="inactivity-dialog">

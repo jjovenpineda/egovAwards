@@ -42,7 +42,7 @@ const categories = [
 ];
 export default function Page2() {
   return (
-    <div>
+    <div className="">
       <section className="space-y-2 pt-6 lg:pt-0">
         <h2 className="font-bold text-lg text-blue-900">ABOUT THE ENTRY</h2>
         <hr className="border border-blue-900"></hr>
@@ -94,7 +94,7 @@ export default function Page2() {
             </p>
           </div>
         </div>
-        <div className="space-y-3 py-20">
+        <div className="space-y-3 pt-20 pb-10">
           <div className="text-sm text-slate-800">
             <h3 className="font-semibold">
               Upload Supporting Documents (Maximum of 5 documents)

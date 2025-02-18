@@ -109,7 +109,7 @@ export default function Page() {
               <Lottie animationData={test} loop={false} />
             </div>
             <h2 className=" font-bold text-2xl">SUBMIT APPLICATION!</h2>
-            <p className="font-medium text-base text-slate-900">
+            <p className="font-medium text-base text-center text-slate-900">
               Are you sure you want to submit your application?
             </p>
           </div>

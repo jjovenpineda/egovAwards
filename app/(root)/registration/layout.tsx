@@ -3,5 +3,5 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return <main className="flex flex-col bg-slate-50">{children}</main>;
+  return <main className="flex flex-col">{children}</main>;
 }
