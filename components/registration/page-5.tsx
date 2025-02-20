@@ -8,9 +8,9 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { File, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import RichTextEditor from "@/components/rich-text-editor";
-import Tiptap from "@/components/rich-text-editor";
-import Editor from "@/components/rich-text-editor";
+import RichTextEditor from "@/components/shared/rich-text-editor";
+import Tiptap from "@/components/shared/rich-text-editor";
+import Editor from "@/components/shared/rich-text-editor";
 import { debounce } from "lodash";
 const categories = [
   {
@@ -46,7 +46,7 @@ const categories = [
       "G2E Government solutions providing Education and Training to citizens",
   },
 ];
-export default function Page4() {
+export default function Page5() {
   const [content, setContent] = useState("");
   const [count, setCount] = useState(0);
 
@@ -69,24 +69,23 @@ export default function Page4() {
     <div>
       <section className="space-y-2 pt-6 lg:pt-0">
         <h2 className="font-bold text-lg text-blue-900">
-          RELEVANCE OF THE PROJECT{" "}
+          SUSTAINABILITY AND REPLICABILITY OF THE PROJECT{" "}
         </h2>
         <hr className="border border-blue-900"></hr>
       </section>
       <div className=" my-10">
         <div className="space-y-2">
           <p className="text-base">
-            Describe the specific problem or challenge in your local government
-            unit that the the project was designed to address.
+            Describe how you ensure the project long-term sustainability and the
+            strategies in place to maintain the project over the years.
           </p>
           <p className="text-base">
-            How does the project directly address and mitigate the identified
-            problem or challenge?
+            What measures have been implemented to continuously update and
+            improve the project to keep pace with technological advancements?
           </p>
           <p className="text-base">
-            What measurable improvements or outcomes have been observed since
-            the implementation of the project in relation to the problem it aims
-            to solve?
+            How does the project incorporate community engagement and
+            capacity-building to ensure ongoing local support and ownership?
           </p>
         </div>
         <p className="text-red-500">

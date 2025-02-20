@@ -8,9 +8,9 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { File, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import RichTextEditor from "@/components/rich-text-editor";
-import Tiptap from "@/components/rich-text-editor";
-import Editor from "@/components/rich-text-editor";
+import RichTextEditor from "@/components/shared/rich-text-editor";
+import Tiptap from "@/components/shared/rich-text-editor";
+import Editor from "@/components/shared/rich-text-editor";
 import { debounce } from "lodash";
 import { Checkbox } from "@/components/ui/checkbox";
 const goals = [

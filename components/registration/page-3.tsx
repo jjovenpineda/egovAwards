@@ -1,17 +1,16 @@
 "use client";
 
 import React, { useCallback, useEffect, useState } from "react";
-
+import debounce from "lodash/debounce";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { File, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import RichTextEditor from "@/components/rich-text-editor";
-import Tiptap from "@/components/rich-text-editor";
-import Editor from "@/components/rich-text-editor";
-import { debounce } from "lodash";
+import RichTextEditor from "@/components/shared/rich-text-editor";
+import Tiptap from "@/components/shared/rich-text-editor";
+import Editor from "@/components/shared/rich-text-editor";
 const categories = [
   {
     id: "r1",
@@ -46,7 +45,7 @@ const categories = [
       "G2E Government solutions providing Education and Training to citizens",
   },
 ];
-export default function Page5() {
+export default function Page3() {
   const [content, setContent] = useState("");
   const [count, setCount] = useState(0);
 
@@ -65,36 +64,29 @@ export default function Page5() {
   useEffect(() => {
     wordCounter(content);
   }, [content]);
+
   return (
     <div>
       <section className="space-y-2 pt-6 lg:pt-0">
         <h2 className="font-bold text-lg text-blue-900">
-          SUSTAINABILITY AND REPLICABILITY OF THE PROJECT{" "}
+          IMPACT OF THE PROJECT
         </h2>
         <hr className="border border-blue-900"></hr>
       </section>
       <div className=" my-10">
-        <div className="space-y-2">
-          <p className="text-base">
-            Describe how you ensure the project long-term sustainability and the
-            strategies in place to maintain the project over the years.
-          </p>
-          <p className="text-base">
-            What measures have been implemented to continuously update and
-            improve the project to keep pace with technological advancements?
-          </p>
-          <p className="text-base">
-            How does the project incorporate community engagement and
-            capacity-building to ensure ongoing local support and ownership?
-          </p>
-        </div>
+        <p className="text-base">
+          Describe the ways in which the project has enhanced the quality of
+          life for residents or increased effectiveness, transparency and
+          accountability in local governance? (You may cite several major
+          impacts)
+        </p>
         <p className="text-red-500">
           Please limit your answers to 500 - 1000 words
         </p>
-        <div className="my-2">
+        <div className="my-2 rounded-full">
           <Editor onChange={(e) => setContent(e)} />
         </div>
-        {/*  <div
+        {/* <div
           dangerouslySetInnerHTML={{ __html: content }}
           className="prose max-w-none"
         /> */}

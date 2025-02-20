@@ -40,12 +40,17 @@ export function Footer() {
                 </p>
               </div>
               <div>
-                <Link href="/" className="hover:text-gray-300 hover:underline">
+                <Link
+                  draggable="false"
+                  href="/"
+                  className="hover:text-gray-300 hover:underline"
+                >
                   GOVPH
                 </Link>
               </div>
               <div>
                 <Link
+                  draggable="false"
                   href="https://data.gov.ph/"
                   target="_blank"
                   className="hover:text-gray-300 hover:underline"
@@ -55,6 +60,7 @@ export function Footer() {
               </div>
               <div>
                 <Link
+                  draggable="false"
                   href="https://www.officialgazette.gov.ph/"
                   target="_blank"
                   className="hover:text-gray-300 hover:underline"
@@ -63,7 +69,11 @@ export function Footer() {
                 </Link>
               </div>
               <div>
-                <Link href="/" className="hover:text-gray-300 hover:underline">
+                <Link
+                  draggable="false"
+                  href="/"
+                  className="hover:text-gray-300 hover:underline"
+                >
                   FAQs
                 </Link>
               </div>
@@ -74,6 +84,7 @@ export function Footer() {
               </div>
               <div className=" ">
                 <Link
+                  draggable="false"
                   href="https://op-proper.gov.ph/"
                   target="_blank"
                   className="hover:text-gray-300 hover:underline"
@@ -83,6 +94,7 @@ export function Footer() {
               </div>
               <div>
                 <Link
+                  draggable="false"
                   href="https://www.ovp.gov.ph/"
                   target="_blank"
                   className="hover:text-gray-300 hover:underline"
@@ -92,6 +104,7 @@ export function Footer() {
               </div>
               <div>
                 <Link
+                  draggable="false"
                   href="https://legacy.senate.gov.ph/"
                   target="_blank"
                   className="hover:text-gray-300 hover:underline"
@@ -101,6 +114,7 @@ export function Footer() {
               </div>
               <div>
                 <Link
+                  draggable="false"
                   href="https://www.congress.gov.ph/"
                   target="_blank"
                   className="hover:text-gray-300 hover:underline"
@@ -110,6 +124,7 @@ export function Footer() {
               </div>
               <div>
                 <Link
+                  draggable="false"
                   href="https://sc.judiciary.gov.ph/"
                   target="_blank"
                   className="hover:text-gray-300 hover:underline"
@@ -119,6 +134,7 @@ export function Footer() {
               </div>
               <div>
                 <Link
+                  draggable="false"
                   href="https://ca.judiciary.gov.ph/"
                   target="_blank"
                   className="hover:text-gray-300 hover:underline"
@@ -128,6 +144,7 @@ export function Footer() {
               </div>
               <div>
                 <Link
+                  draggable="false"
                   href="https://sb.judiciary.gov.ph/"
                   target="_blank"
                   className="hover:text-gray-300 hover:underline"

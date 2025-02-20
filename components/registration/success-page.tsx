@@ -14,15 +14,15 @@ export default function SuccessPage() {
     <div className="relative">
       <div className="mx-10 lg:mx-16 flex flex-col gap-6 ">
         <div className="gap-3 flex flex-col items-center justify-center">
-          <Image src={success} alt="" />
-          <h2 className="font-bold  text-2xl lg:text-3xl text-blue-900">
+          <Image src={success} alt="" className="mr-4" />
+          <h2 className="font-bold  text-2xl text-center lg:text-3xl text-blue-900">
             Submission Successful!{" "}
           </h2>
           <div className="text-blue-500">
             <h3 className="text-sm font-medium">REFERENCE NUMBER </h3>
             <h3 className="font-[900] text-3xl">25G2BCAL</h3>
           </div>
-          <p className="font-semibold text-sm lg:text-base">
+          <p className="font-semibold text-center text-sm lg:text-base">
             Thank you for submitting your application.
           </p>
           <p className="font-[300] text-sm lg:text-base text-center text-slate-700">
@@ -32,9 +32,10 @@ export default function SuccessPage() {
             questions, feel free to reach out!
           </p>
           <Link
+            draggable="false"
             href={{
               pathname: "/registration",
-              query: { page: 1 },
+              query: { action: "register", page: 1 },
             }}
             className="flex active items-center justify-center text-sm rounded-md bg-[#2563EB]  py-2 px-4 font-semibold text-white hover:bg-[#3674fa] transition-colos duration-300"
           >
@@ -51,14 +52,14 @@ export default function SuccessPage() {
           </Button>
         </div>
       </div>
-      <m.div
+      {/*  <m.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5, duration: 1, ease: "easeInOut" }}
-        className="-top-14 absolute -left-16 scale-110 pointer-events-none"
+        className=" absolute inset-0 pointer-events-none"
       >
-        <Image src={bg} alt="" className=" object-cover" />
-      </m.div>
+        <Image src={bg} alt="" fill className=" object-cover" />
+      </m.div> */}
     </div>
   );
 }

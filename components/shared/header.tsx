@@ -57,6 +57,7 @@ export default function Header() {
 
           <div className="flex items-center justify-end md:order-3">
             <Link
+              draggable="false"
               href="/"
               className="flex items-center font-semibold text-left transition-colors text-blue-900 hover:text-blue-600"
             >
@@ -91,6 +92,7 @@ export default function Header() {
                   Government agencies communicate via .gov.ph websites (e.g.
                   https://dict.gov.ph).
                   <Link
+                    draggable="false"
                     className="inline-block ml-1 font-semibold text-blue-700 transition-colors hover:text-blue-500"
                     href="/"
                   >
@@ -180,6 +182,7 @@ export default function Header() {
           <div className="flex flex-wrap absolute invisible lg:relative lg:visible gap-6 p-1 lg:px-32 bg-slate-50 font-bold text-sm border-2">
             {links.map((item, index) => (
               <Link
+                draggable="false"
                 href={
                   item.query
                     ? { pathname: item.url, query: item.query }
@@ -199,7 +202,11 @@ export default function Header() {
 }
 const links = [
   { name: "Home", url: "/" },
-  { name: "Registration Form", url: "/registration", query: { page: "1" } },
+  {
+    name: "Registration Form",
+    url: "/registration",
+    query: { action: "login", page: 1 },
+  },
   { name: "About Us", url: "/about" },
   { name: "Contact Us", url: "/contact" },
 ];
