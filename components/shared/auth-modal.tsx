@@ -33,6 +33,7 @@ import Link from "next/link";
 import { DialogClose } from "../ui/dialog";
 import dynamic from "next/dynamic";
 import Loaders from "../ui/loaders";
+import { PSGC } from "@/constants";
 interface IAuthModal {
   action: string | null;
   page: number;
@@ -124,7 +125,7 @@ export default function AuthModal({ action, page }: IAuthModal) {
         className="max-w-[438px] min-h-[55vh] mx-auto"
       >
         {![4, 5, 6].includes(page) && action != "reset" && (
-          <TabsList className="grid w-full grid-cols-2 h-auto bg-slate-100">
+          <TabsList className="grid w-full grid-cols-2 h-11 bg-slate-100">
             <Link
               draggable="false"
               href={{
@@ -596,12 +597,11 @@ export default function AuthModal({ action, page }: IAuthModal) {
                                 </SelectTrigger>
                                 <SelectContent>
                                   <SelectGroup>
-                                    <SelectItem value="apple">
-                                      lorem ipsum
-                                    </SelectItem>
-                                    <SelectItem value="banana">
-                                      Dolor sit amet
-                                    </SelectItem>
+                                    {PSGC.regions.map((region, index) => (
+                                      <SelectItem key={index} value={region.id}>
+                                        {region.name}
+                                      </SelectItem>
+                                    ))}
                                   </SelectGroup>
                                 </SelectContent>
                               </Select>

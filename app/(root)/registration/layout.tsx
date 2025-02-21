@@ -16,17 +16,16 @@ export default function RootLayout({
   return (
     <main className="flex flex-col">
       {" "}
-      {action != "register" ||
-        (action == "register" && page == 9 && (
-          <m.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5, duration: 1, ease: "easeInOut" }}
-            className="absolute inset-0 pointer-events-none -z-50"
-          >
-            <Image src={bg} alt="" fill className="object-cover" />
-          </m.div>
-        ))}
+      {(action != "register" || (action == "register" && page == 9)) && (
+        <m.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5, duration: 1, ease: "easeInOut" }}
+          className="absolute inset-0 pointer-events-none -z-50"
+        >
+          <Image src={bg} alt="" fill className="object-cover" />
+        </m.div>
+      )}
       {children}
     </main>
   );

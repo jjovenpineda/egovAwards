@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Globe, Mail, Phone } from "lucide-react";
 import ModalWrapper from "./modal-wrapper";
 import { Button } from "@/components/ui/button";
+import { PSGC } from "@/constants";
 export default function Page1() {
   return (
     <div>
@@ -27,18 +28,18 @@ export default function Page1() {
       <div className="space-y-10 lg:space-y-16 py-6">
         <section className="grid lg:grid-cols-2 lg:gap-x-8 lg:gap-y-4 gap-2">
           <div className="lg:col-span-2 lg:w-1/2 lg:pr-4 ">
-            <Label className="font-semibold text-sm text-[#1F2937]">LGU</Label>
+            <Label className="text-sm font-semibold text-slate-900">LGU</Label>
             <Select>
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="h-[46px]">
                 <SelectValue placeholder="Select LGU" />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
-                  <SelectItem value="apple">Apple</SelectItem>
-                  <SelectItem value="banana">Banana</SelectItem>
-                  <SelectItem value="blueberry">Blueberry</SelectItem>
-                  <SelectItem value="grapes">Grapes</SelectItem>
-                  <SelectItem value="pineapple">Pineapple</SelectItem>
+                  {PSGC.regions.map((region, index) => (
+                    <SelectItem key={index} value={region.id}>
+                      {region.name}
+                    </SelectItem>
+                  ))}
                 </SelectGroup>
               </SelectContent>
             </Select>
