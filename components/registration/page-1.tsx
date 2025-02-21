@@ -30,7 +30,7 @@ export default function Page1() {
           <div className="lg:col-span-2 lg:w-1/2 lg:pr-4 ">
             <Label className="text-sm font-semibold text-slate-900">LGU</Label>
             <Select>
-              <SelectTrigger className="h-[46px]">
+              <SelectTrigger>
                 <SelectValue placeholder="Select LGU" />
               </SelectTrigger>
               <SelectContent>
@@ -50,7 +50,7 @@ export default function Page1() {
             </Label>
             <Select>
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select LGU" />
+                <SelectValue placeholder="Select Region" />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>

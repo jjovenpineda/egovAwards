@@ -3,7 +3,7 @@
 import { Footer } from "@/components/shared/footer";
 import Header from "@/components/shared/header";
 import { m } from "motion/react";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { storage } from "@/utils/useStorage";
 
 /* import useInactivityTimeout from "@/hooks/use-inactibe-timeout";
@@ -43,7 +43,7 @@ export default function RootLayout({
           onAnimationComplete={() => setHasAnimated(true)}
           className="w-full lg:px-16 py-14 "
         >
-          {children}
+          <Suspense> {children}</Suspense>
         </m.div>
       </div>
       <Footer />

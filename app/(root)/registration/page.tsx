@@ -1,8 +1,6 @@
 "use client";
-
-import React, { useState } from "react";
-
-import dynamic from "next/dynamic";
+export const dynamic = "force-dynamic"; // Ensure it's dynamic
+import React, { Suspense, useState } from "react";
 
 import { useSearchParams } from "next/navigation";
 
@@ -18,7 +16,11 @@ export default function Page() {
         {["login", "signup", "reset"].includes(action || "") && (
           <AuthModal action={action} page={page} />
         )}
-        {action === "register" && <Registration action={action} page={page} />}
+        {action === "register" && (
+          <Suspense>
+            <Registration action={action} page={page} />
+          </Suspense>
+        )}
       </section>
     </div>
   );

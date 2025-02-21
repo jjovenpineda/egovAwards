@@ -1,9 +1,11 @@
 "use client";
+export const dynamic = "force-dynamic"; // Ensure it's dynamic
 
 import { m } from "motion/react";
 import Image from "next/image";
 import bg from "@/public/assets/images/bg-gradient.webp";
 import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
 export default function RootLayout({
   children,

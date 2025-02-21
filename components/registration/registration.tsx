@@ -1,4 +1,5 @@
 "use client";
+
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight, Send } from "lucide-react";
 import React, { useState } from "react";
@@ -23,11 +24,12 @@ import dynamic from "next/dynamic";
 
 import Link from "next/link";
 import SuccessPage from "@/components/registration/success-page";
-const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
-interface IRegistration {
+/* const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
+ */ interface IRegistration {
   action: string;
   page: number;
 }
+
 export default function Registration({ action, page }: IRegistration) {
   const [submitDialog, setSubmitDialog] = useState(false);
   return (
@@ -48,6 +50,11 @@ export default function Registration({ action, page }: IRegistration) {
       )}
 
       <section>
+        {/*   <Formik
+                        initialValues={{ email: "", password: "" }}
+                        validationSchema={validationSchema}
+                        onSubmit={handleSubmit}
+                      > */}
         {
           [
             <Page1 />,
@@ -61,7 +68,7 @@ export default function Registration({ action, page }: IRegistration) {
             <SuccessPage />,
           ][page - 1]
         }
-        {/*console.log(pages[0]); concept */}
+        {/*  </Formik> */}
       </section>
 
       {page < 9 && page != 0 && (
@@ -111,7 +118,8 @@ export default function Registration({ action, page }: IRegistration) {
         <DialogContent className="sm:max-w-md p-0 overflow-hidden border-0">
           <div className="flex flex-col items-center justify-center gap-2 m-4">
             <div className="size-36">
-              <Lottie animationData={test} loop={false} />
+              {/*               <Lottie animationData={test} loop={false} />
+               */}{" "}
             </div>
             <h2 className=" font-bold text-2xl">SUBMIT APPLICATION!</h2>
             <p className="font-medium text-base text-center text-slate-900">
