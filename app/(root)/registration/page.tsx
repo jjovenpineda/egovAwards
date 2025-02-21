@@ -16,11 +16,7 @@ export default function Page() {
         {["login", "signup", "reset"].includes(action || "") && (
           <AuthModal action={action} page={page} />
         )}
-        {action === "register" && (
-          <Suspense>
-            <Registration action={action} page={page} />
-          </Suspense>
-        )}
+        {action === "register" && <Registration action={action} page={page} />}
       </section>
     </div>
   );

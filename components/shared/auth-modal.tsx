@@ -60,9 +60,7 @@ export default function AuthModal({ action, page }: IAuthModal) {
   useEffect(() => {
     if (page === 6 && action === "signup") {
       setTimeout(
-        () =>
-          (window.location.href =
-            "http://localhost:3000/registration?action=register&page=1"),
+        () => (window.location.href = "/registration?action=register&page=1"),
         5000
       );
     }
@@ -997,7 +995,7 @@ export default function AuthModal({ action, page }: IAuthModal) {
                                   ) {
                                     setTimeout(() => {
                                       window.location.href =
-                                        "http://localhost:3000/registration?action=signup&page=6";
+                                        "/registration?action=signup&page=6";
                                     }, 3000);
                                   }
                                 }}
