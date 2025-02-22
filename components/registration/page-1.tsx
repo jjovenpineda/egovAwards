@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Select,
   SelectContent,
@@ -18,7 +18,27 @@ import { Globe, Mail, Phone } from "lucide-react";
 import ModalWrapper from "./modal-wrapper";
 import { Button } from "@/components/ui/button";
 import { PSGC } from "@/constants";
-export default function Page1() {
+import { ErrorMessage, Field } from "formik";
+interface Iprops {
+  setFieldValue: Function;
+  values: any;
+}
+export default function Page1({ setFieldValue, values }: Iprops) {
+  const findLGU = () => {
+    const region = PSGC.regions.find((region) =>
+      values.lgu.startsWith(region.id)
+    );
+    const province = region?.provinces.find((province) =>
+      province.lgus.find((lgu) => lgu.id === values.lgu)
+    );
+    region &&
+      province &&
+      (setFieldValue("province", province.id),
+      setFieldValue("region", region.id));
+  };
+  useEffect(() => {
+    findLGU();
+  }, [values.lgu]);
   return (
     <div>
       <section className="space-y-2 pt-6 lg:pt-0">
@@ -29,71 +49,113 @@ export default function Page1() {
         <section className="grid lg:grid-cols-2 lg:gap-x-8 lg:gap-y-4 gap-2">
           <div className="lg:col-span-2 lg:w-1/2 lg:pr-4 ">
             <Label className="text-sm font-semibold text-slate-900">LGU</Label>
-            <Select>
+            <Select
+              onValueChange={(e) => setFieldValue("lgu", e)}
+              defaultValue={values.lgu}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Select LGU" />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
-                  {PSGC.regions.map((region, index) => (
-                    <SelectItem key={index} value={region.id}>
-                      {region.name}
-                    </SelectItem>
-                  ))}
+                  {PSGC.regions.map((region) =>
+                    region.provinces.map((province) =>
+                      province.lgus.map((lgu, index) => (
+                        <SelectItem key={index} value={lgu.id}>
+                          {lgu.name}
+                        </SelectItem>
+                      ))
+                    )
+                  )}
                 </SelectGroup>
               </SelectContent>
             </Select>
           </div>
-          <div>
-            <Label className="font-semibold text-sm text-[#1F2937]">
-              Region
-            </Label>
-            <Select>
+          <div className="flex flex-col-reverse">
+            <Select
+              disabled={values.lgu ? false : true}
+              value={values.province}
+              onValueChange={(e) => setFieldValue("province", e)}
+            >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select Region" />
               </SelectTrigger>
               <SelectContent>
-                <SelectGroup>
-                  <SelectItem value="apple">Apple</SelectItem>
-                  <SelectItem value="banana">Banana</SelectItem>
-                  <SelectItem value="blueberry">Blueberry</SelectItem>
-                  <SelectItem value="grapes">Grapes</SelectItem>
-                  <SelectItem value="pineapple">Pineapple</SelectItem>
-                </SelectGroup>
+                {PSGC.regions
+                  .filter((region) => values.lgu.startsWith(region.id))
+                  .map((i) =>
+                    i.provinces.map((province, index) => (
+                      <SelectItem key={index} value={province.id}>
+                        {province.name}
+                      </SelectItem>
+                    ))
+                  )}
               </SelectContent>
             </Select>
-          </div>
-          <div>
-            <Label className="font-semibold text-sm text-[#1F2937]">
+            <Label className="peer-disabled:opacity-50 font-semibold text-sm text-[#1F2937]">
               Province
             </Label>
-            <Select>
+          </div>
+          <div className="flex flex-col-reverse">
+            <Select
+              disabled={values.province ? false : true}
+              value={values.region}
+              onValueChange={(e) => setFieldValue("region", e)}
+            >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select LGU" />
+                <SelectValue placeholder="Select Region" />
               </SelectTrigger>
               <SelectContent>
-                <SelectGroup>
-                  <SelectItem value="apple">Apple</SelectItem>
-                  <SelectItem value="banana">Banana</SelectItem>
-                  <SelectItem value="blueberry">Blueberry</SelectItem>
-                  <SelectItem value="grapes">Grapes</SelectItem>
-                  <SelectItem value="pineapple">Pineapple</SelectItem>
-                </SelectGroup>
+                {PSGC.regions
+                  .filter((i) => values.lgu.startsWith(i.id))
+                  .map((region, index) => (
+                    <SelectItem key={index} value={region.id}>
+                      {region.name}
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
+            <Label className="peer-disabled:opacity-50 font-semibold text-sm text-[#1F2937]">
+              Region
+            </Label>
           </div>
 
           <div>
             <Label className="font-semibold text-sm text-[#1F2937]">
               Name of LCE
             </Label>
-            <Input placeholder="Enter Name of LCE" />
+            <Field
+              type="text"
+              autoComplete="off"
+              name="nameOfLCE"
+              placeholder="Enter Name of LCE"
+              as={Input}
+              className=" space-y-8 rounded-md bg-white "
+            />
+            <ErrorMessage
+              name="nameOfLCE"
+              component="div"
+              className=" text-xs text-red-500"
+            />
           </div>
+
           <div>
             <Label className="font-semibold text-sm text-[#1F2937]">
-              Name of Office in LGU
+              Name of LCE
             </Label>
-            <Input placeholder="Enter Name of LCE" />
+            <Field
+              type="text"
+              autoComplete="off"
+              name="nameOfOffice"
+              placeholder="Enter Name of Office in LCE"
+              as={Input}
+              className=" space-y-8 rounded-md bg-white "
+            />
+            <ErrorMessage
+              name="nameOfOffice"
+              component="div"
+              className=" text-xs text-red-500"
+            />
           </div>
         </section>
         <section className="grid lg:grid-cols-2 lg:gap-x-8 lg:gap-y-4 gap-2">
@@ -101,38 +163,81 @@ export default function Page1() {
             <Label className="font-semibold text-sm text-[#1F2937]">
               Contact Person
             </Label>
-            <Input placeholder="Enter Contact Person" />
+            <Field
+              type="text"
+              autoComplete="off"
+              name="contactPerson"
+              placeholder="Enter Contact Person"
+              as={Input}
+              className=" space-y-8 rounded-md bg-white "
+            />
+            <ErrorMessage
+              name="contactPerson"
+              component="div"
+              className=" text-xs text-red-500"
+            />
           </div>
           <div>
             <Label className="font-semibold text-sm text-[#1F2937]">
               Email
             </Label>
             <div className="relative">
-              <Input placeholder="Enter Email" className="pl-9" />
+              <Field
+                type="email"
+                autoComplete="off"
+                name="email"
+                placeholder="Enter Email"
+                as={Input}
+                className=" space-y-8 rounded-md bg-white pl-9"
+              />
               <Mail
                 size={15}
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
               />
             </div>
+            <ErrorMessage
+              name="email"
+              component="div"
+              className=" text-xs text-red-500"
+            />
           </div>
           <div>
             <Label className="font-semibold text-sm text-[#1F2937]">
               Office Number
             </Label>
             <div className="relative">
-              <Input placeholder="(02) 000 000" className="pl-9" />
+              <Field
+                type="number"
+                autoComplete="off"
+                name="officeNumber"
+                placeholder="(02) 000 000"
+                as={Input}
+                className=" space-y-8 rounded-md bg-white pl-9"
+              />
               <Phone
                 size={15}
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
               />
             </div>
+            <ErrorMessage
+              name="officeNumber"
+              component="div"
+              className=" text-xs text-red-500"
+            />
           </div>
           <div>
             <Label className="font-semibold text-sm text-[#1F2937]">
               Mobile Number
             </Label>
             <div className="relative">
-              <Input placeholder="9876543210" className="pl-[70px]" />
+              <Field
+                type="number"
+                autoComplete="off"
+                name="mobileNumber"
+                placeholder="9876543210"
+                as={Input}
+                className=" space-y-8 rounded-md bg-white pl-[70px]"
+              />
               <span className="absolute left-10 top-1/2 -translate-y-1/2 text-sm text-slate-500">
                 +63
               </span>
@@ -142,6 +247,11 @@ export default function Page1() {
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
               />
             </div>
+            <ErrorMessage
+              name="mobileNumber"
+              component="div"
+              className=" text-xs text-red-500"
+            />
           </div>
         </section>
         <section className="grid lg:grid-cols-2 lg:gap-x-8 lg:gap-y-4 gap-2">
@@ -150,12 +260,25 @@ export default function Page1() {
               Website
             </Label>
             <div className="relative">
-              <Input placeholder="Enter Website" className="pl-9" />
+              <Field
+                type="text"
+                autoComplete="off"
+                name="website"
+                placeholder="Enter Website"
+                as={Input}
+                className=" space-y-8 rounded-md bg-white pl-9"
+              />
               <Globe
                 size={15}
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
               />
             </div>
+
+            <ErrorMessage
+              name="website"
+              component="div"
+              className=" text-xs text-red-500"
+            />
           </div>
 
           <div>
@@ -163,13 +286,26 @@ export default function Page1() {
               Facebook Page
             </Label>
             <div className="relative">
-              <Input placeholder="Enter Website" className="pl-9" />
+              <Field
+                type="text"
+                autoComplete="off"
+                name="facebookPage"
+                placeholder="Enter Website"
+                as={Input}
+                className=" space-y-8 rounded-md bg-white pl-9"
+              />{" "}
               <Image
                 src={fb}
                 alt=""
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
               />
             </div>
+
+            <ErrorMessage
+              name="facebookPage"
+              component="div"
+              className=" text-xs text-red-500"
+            />
           </div>
         </section>
         <div className="lg:w-1/2 lg:pr-4">
@@ -178,30 +314,21 @@ export default function Page1() {
             Governance Awards from 2012 to 2022.{" "}
           </p>
 
-          <Input placeholder="Enter times in joining eGOV, DCA, DGA" />
+          <Field
+            type="text"
+            autoComplete="off"
+            name="egovAwardsCount"
+            placeholder="Enter times in joining eGOV, DCA, DGA"
+            as={Input}
+            className=" space-y-8 rounded-md bg-white"
+          />
+          <ErrorMessage
+            name="egovAwardsCount"
+            component="div"
+            className=" text-xs text-red-500"
+          />
         </div>
       </div>
     </div>
   );
 }
-
-const lgus = [
-  {
-    name: "Quezon City",
-    region: "National Capital Region",
-    province: "Metro Manila",
-    type: "Highly Urbanized City",
-  },
-  {
-    name: "Cebu City",
-    region: "Region VII - Central Visayas",
-    province: "Cebu",
-    type: "Highly Urbanized City",
-  },
-  {
-    name: "Davao City",
-    region: "Region XI - Davao Region",
-    province: "Davao del Sur",
-    type: "Highly Urbanized City",
-  },
-];

@@ -11,7 +11,6 @@ import Page5 from "@/components/registration/page-5";
 import Page6 from "@/components/registration/page-6";
 import Page7 from "@/components/registration/page-7";
 import Summary from "@/components/registration/summary";
-import test from "@/public/assets/triangle-warning.json";
 import {
   Dialog,
   DialogClose,
@@ -20,138 +19,220 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import dynamic from "next/dynamic";
+import * as Yup from "yup";
 
 import Link from "next/link";
 import SuccessPage from "@/components/registration/success-page";
+import { Form, Formik, FormikHelpers } from "formik";
 /* const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
  */ interface IRegistration {
   action: string;
   page: number;
 }
+const validationSchema = Yup.object().shape({
+  email: Yup.string().email("Invalid email").required("Email is required"),
+  password: Yup.string().required("Password is required"),
 
+  /*   documents: Yup.array()
+    .of(
+      Yup.mixed().test(
+        "fileSize",
+        "File size must be less than 3MB",
+        (file) => {
+          return file ? file.size <= 3 * 1024 * 1024 : true;
+        }
+      )
+    )
+    .max(5, "You can upload up to 5 files only"), */
+});
+const handleSubmit = async (
+  values: any /* { region: string } */,
+  { setFieldError }: FormikHelpers<any /* { region: string } */>
+) => {
+  console.log("values :", values);
+
+  /*  setIsLoading(true); */
+
+  /*   await apiPost("/api/auth/login", values)
+      .then((res) => {
+        const { success, message, data } = res;
+        if (success) {
+          window.localStorage.setItem(
+            "account",
+            data && encrypt(JSON.stringify(data))
+          );
+          setCookie("authToken", encrypt(data.token) ?? "");
+          router.push("/");
+        }
+        toast({
+          title: "Login Success!",
+          description: message,
+          duration: 2000,
+        });
+      })
+      .catch((e) => {
+        console.log(e);
+        setFieldError("password", "Please check your credentials");
+        setIsLoading(false);
+        toast({
+          title: "Login failed",
+          description: "Invalid email or password",
+          duration: 2000,
+        });
+      }); */
+  /* router.push("/"); */
+
+  /*   setTimeout(() => {
+    router.push("/");
+    setIsLoading(false);
+  }, 2000); */
+};
+const initialValues = {
+  lgu: "",
+  province: "",
+  region: "",
+  nameOfLCE: "",
+  nameOfOffice: "",
+  contactPerson: "",
+  email: "",
+  officeNumber: "",
+  mobileNumber: "",
+  website: "",
+  facebookPage: "",
+  egovAwardsCount: "",
+  projectName: "",
+  projectCategory: "",
+  projectPeriod: "",
+  projectURL: "",
+  documents: [new File([""], "", { type: "" })] as File[],
+};
 export default function Registration({ action, page }: IRegistration) {
   const [submitDialog, setSubmitDialog] = useState(false);
   return (
-    <div className="mx-10 lg:mx-16 flex flex-col gap-6 ">
-      {page < 9 && page != 0 && (
-        <section className="space-y-8">
-          <div className="space-y-3">
-            <h1 className="font-bold text-3xl texxt-slate-900">
-              Registration Form
-            </h1>
-            <p className="text-[#1E3A8A] text-base">
-              <strong>11th eGOV Awards:</strong> Excellence in Governance
-              Through Information and Communications Technology Awards
-              Application Form
-            </p>
-          </div>
-        </section>
-      )}
-
-      <section>
-        {/*   <Formik
-                        initialValues={{ email: "", password: "" }}
-                        validationSchema={validationSchema}
-                        onSubmit={handleSubmit}
-                      > */}
-        {
-          [
-            <Page1 />,
-            <Page2 />,
-            <Page3 />,
-            <Page4 />,
-            <Page5 />,
-            <Page6 />,
-            <Page7 />,
-            <Summary />,
-            <SuccessPage />,
-          ][page - 1]
-        }
-        {/*  </Formik> */}
-      </section>
-
-      {page < 9 && page != 0 && (
-        <section className="flex justify-between items-center">
-          <Link
-            draggable="false"
-            href={{
-              pathname: "/registration",
-              query: { action: "register", page: page - 1 },
-            }}
-            className={`text-slate-900 border border-black flex gap-2 text-xs items-center hover:bg-slate-200 p-2.5 px-6 rounded-md transition-colors duration-300 ${
-              page === 1 ? "invisible " : "visible"
-            }`}
-          >
-            <ArrowLeft size={15} /> Back
-          </Link>
-          {page < 8 ? (
-            <Link
-              draggable="false"
-              href={{
-                pathname: "/registration",
-                query: { action: "register", page: page + 1 },
-              }}
-              className="bg-[#1F2937] flex gap-2 text-xs items-center transition-colors duration-300  hover:bg-slate-700 text-white p-2.5 px-6 rounded-md "
-            >
-              <ArrowRight size={15} />
-              Next
-            </Link>
-          ) : (
-            <Button
-              onClick={() => {
-                setSubmitDialog(true);
-              }}
-            >
-              <Send />
-              Submit
-            </Button>
+    <Formik
+      initialValues={initialValues}
+      validationSchema={"" /* validationSchema */}
+      onSubmit={handleSubmit}
+    >
+      {({ setFieldValue, values }) => (
+        <Form className="mx-10 lg:mx-16 flex flex-col gap-6 ">
+          {page < 9 && page != 0 && (
+            <section className="space-y-8">
+              <div className="space-y-3">
+                <h1 className="font-bold text-3xl texxt-slate-900">
+                  Registration Form
+                </h1>
+                <p className="text-[#1E3A8A] text-base">
+                  <strong>11th eGOV Awards:</strong> Excellence in Governance
+                  Through Information and Communications Technology Awards
+                  Application Form
+                </p>
+              </div>
+            </section>
           )}
-        </section>
-      )}
 
-      <Dialog open={submitDialog} onOpenChange={setSubmitDialog}>
-        <DialogHeader>
-          <DialogTitle></DialogTitle>
-          <DialogDescription></DialogDescription>
-        </DialogHeader>
-        <DialogContent className="sm:max-w-md p-0 overflow-hidden border-0">
-          <div className="flex flex-col items-center justify-center gap-2 m-4">
-            <div className="size-36">
-              {/*               <Lottie animationData={test} loop={false} />
-               */}{" "}
-            </div>
-            <h2 className=" font-bold text-2xl">SUBMIT APPLICATION!</h2>
-            <p className="font-medium text-base text-center text-slate-900">
-              Are you sure you want to submit your application?
-            </p>
-          </div>
+          <section>
+            <>
+              {
+                [
+                  <Page1 values={values} setFieldValue={setFieldValue} />,
+                  <Page2 values={values} setFieldValue={setFieldValue} />,
+                  <Page3 />,
+                  <Page4 />,
+                  <Page5 />,
+                  <Page6 />,
+                  <Page7 />,
+                  <Summary />,
+                  <SuccessPage />,
+                ][page - 1]
+              }
+              {/*  <Button type="submit">Submit</Button> */}
+            </>
+          </section>
 
-          <div className="flex w-full">
-            <DialogClose asChild>
-              <button
-                type="button"
-                className="w-full rounded-0 bg-slate-100 text-slate-900 p-3 hover:bg-slate-200 font-medium transition-colors duration-300"
+          {page < 9 && page != 0 && (
+            <section className="flex justify-between items-center">
+              <Link
+                draggable="false"
+                href={{
+                  pathname: "/registration",
+                  query: { action: "register", page: page - 1 },
+                }}
+                className={`text-slate-900 border border-black flex gap-2 text-xs items-center hover:bg-slate-200 p-2.5 px-6 rounded-md transition-colors duration-300 ${
+                  page === 1 ? "invisible " : "visible"
+                }`}
               >
-                Cancel
-              </button>
-            </DialogClose>
-            <Link
-              draggable="false"
-              href={{
-                pathname: "/registration",
-                query: { action: "register", page: page + 1 },
-              }}
-              onClick={() => {
-                setSubmitDialog(false);
-              }}
-              className="w-full flex items-center justify-center rounded-0 bg-[#2563EB] p-3 text-white font-medium hover:bg-[#3674fa] transition-colos duration-300"
-            >
-              Submit
-            </Link>
-          </div>
-        </DialogContent>
-      </Dialog>
-    </div>
+                <ArrowLeft size={15} /> Back
+              </Link>
+              {page < 8 ? (
+                <Link
+                  draggable="false"
+                  href={{
+                    pathname: "/registration",
+                    query: { action: "register", page: page + 1 },
+                  }}
+                  className="bg-[#1F2937] flex gap-2 text-xs items-center transition-colors duration-300  hover:bg-slate-700 text-white p-2.5 px-6 rounded-md "
+                >
+                  <ArrowRight size={15} />
+                  Next
+                </Link>
+              ) : (
+                <Button
+                  onClick={() => {
+                    setSubmitDialog(true);
+                  }}
+                >
+                  <Send />
+                  Submit
+                </Button>
+              )}
+            </section>
+          )}
+
+          <Dialog open={submitDialog} onOpenChange={setSubmitDialog}>
+            <DialogHeader>
+              <DialogTitle></DialogTitle>
+              <DialogDescription></DialogDescription>
+            </DialogHeader>
+            <DialogContent className="sm:max-w-md p-0 overflow-hidden border-0">
+              <div className="flex flex-col items-center justify-center gap-2 m-4">
+                <div className="size-36">
+                  {/*               <Lottie animationData={test} loop={false} />
+                   */}{" "}
+                </div>
+                <h2 className=" font-bold text-2xl">SUBMIT APPLICATION!</h2>
+                <p className="font-medium text-base text-center text-slate-900">
+                  Are you sure you want to submit your application?
+                </p>
+              </div>
+
+              <div className="flex w-full">
+                <DialogClose asChild>
+                  <button
+                    type="button"
+                    className="w-full rounded-0 bg-slate-100 text-slate-900 p-3 hover:bg-slate-200 font-medium transition-colors duration-300"
+                  >
+                    Cancel
+                  </button>
+                </DialogClose>
+                <Link
+                  draggable="false"
+                  href={{
+                    pathname: "/registration",
+                    query: { action: "register", page: page + 1 },
+                  }}
+                  onClick={() => {
+                    setSubmitDialog(false);
+                  }}
+                  className="w-full flex items-center justify-center rounded-0 bg-[#2563EB] p-3 text-white font-medium hover:bg-[#3674fa] transition-colos duration-300"
+                >
+                  Submit
+                </Link>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </Form>
+      )}
+    </Formik>
   );
 }

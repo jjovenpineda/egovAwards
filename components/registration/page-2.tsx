@@ -6,6 +6,12 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { File, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
+import FileViewer from "../shared/file-viewer";
+import pdf from "@/public/assets/svgs/pdf.svg";
+import { ArrayHelpers, ErrorMessage, Field, FieldArray } from "formik";
+import { AnimatePresence, m } from "motion/react";
+import { toast } from "@/hooks/use-toast";
 const categories = [
   {
     id: "r1",
@@ -40,7 +46,32 @@ const categories = [
       "G2E Government solutions providing Education and Training to citizens",
   },
 ];
-export default function Page2() {
+interface Iprops {
+  setFieldValue: Function;
+  values: any;
+}
+export default function Page2({ setFieldValue, values }: Iprops) {
+  const [diplicateFile, setDiplicateFile] = React.useState(false);
+  const handleFileChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    index: number,
+    arrayHelpers: any
+  ) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      if (values.documents.map((e: any) => e.name).includes(files[0].name)) {
+        setDiplicateFile(true);
+        toast({
+          title: "Duplicate File",
+          description: "This file has already been uploaded.",
+          variant: "destructive",
+          duration: 2000,
+        });
+      } else {
+        setFieldValue(`documents.${index}`, files[0]);
+      }
+    }
+  };
   return (
     <div className="">
       <section className="space-y-2 pt-6 lg:pt-0">
@@ -52,13 +83,28 @@ export default function Page2() {
           <Label className="font-semibold text-sm text-[#1F2937]">
             Project/Program Name
           </Label>
-          <Input placeholder="Enter Project/Program Name" />
+          <Field
+            type="text"
+            autoComplete="off"
+            name="projectName"
+            placeholder="Enter Project/Program Name"
+            as={Input}
+            className=" space-y-8 rounded-md bg-white "
+          />
+          <ErrorMessage
+            name="projectName"
+            component="div"
+            className=" text-xs text-red-500"
+          />
         </div>
         <div>
           <h2 className="font-semibold py-2 text-sm text-[#1F2937]">
             Choose Category for Project
           </h2>
-          <RadioGroup defaultValue="comfortable">
+          <RadioGroup
+            onValueChange={(e) => setFieldValue("projectCategory", e)}
+            defaultValue={values.projectCategory}
+          >
             {categories.map((category) => (
               <div key={category.id} className="flex items-center space-x-2">
                 <RadioGroupItem value={category.value} id={category.id} />
@@ -71,6 +117,11 @@ export default function Page2() {
               </div>
             ))}
           </RadioGroup>
+          <ErrorMessage
+            name="projectCategory"
+            component="div"
+            className=" text-xs text-red-500"
+          />
         </div>
         <div className="flex flex-col gap-2">
           <div>
@@ -82,13 +133,37 @@ export default function Page2() {
                 (*Must be existing for a minimum of one year)
               </p>
             </div>
-            <Input placeholder="Enter Project/Program Name" />
+            <Field
+              type="text"
+              autoComplete="off"
+              name="projectPeriod"
+              placeholder="Enter Project Period"
+              as={Input}
+              className=" space-y-8 rounded-md bg-white "
+            />
+            <ErrorMessage
+              name="projectPeriod"
+              component="div"
+              className=" text-xs text-red-500"
+            />
           </div>
           <div>
             <Label className="font-semibold text-sm text-[#1F2937]">
               Project URL{" "}
             </Label>
-            <Input placeholder="Enter Project/Program Name" />
+            <Field
+              type="text"
+              autoComplete="off"
+              name="projectURL"
+              placeholder="Enter Project URL"
+              as={Input}
+              className=" space-y-8 rounded-md bg-white "
+            />
+            <ErrorMessage
+              name="projectURL"
+              component="div"
+              className=" text-xs text-red-500"
+            />
             <p className="text-slate-500 text-sm">
               Please provide any link for virtual access to the project.
             </p>
@@ -106,23 +181,96 @@ export default function Page2() {
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <div className="flex w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
-              <File size={15} />
-              Document A.pdf
-            </div>
-            <Trash2 size={18} color="red" />
+            <FieldArray
+              name="documents"
+              render={(arrayHelpers: ArrayHelpers) => (
+                <div className="flex flex-col gap-2 w-full relative">
+                  <AnimatePresence>
+                    {values.documents &&
+                      values.documents.length > 0 &&
+                      values.documents.map((item: any, index: any) => {
+                        const fileURL = item.name && URL.createObjectURL(item);
+
+                        return (
+                          <m.div
+                            initial={{
+                              opacity: 0,
+                            }}
+                            animate={{
+                              opacity: 1,
+                            }}
+                            key={item.lastModified}
+                            className="overflow-hidden"
+                          >
+                            {item.name ? (
+                              <m.div
+                                exit={{
+                                  opacity: 0,
+                                  x: 50,
+                                }}
+                                transition={{ duration: 0.5 }}
+                                className="flex items-center gap-2 "
+                              >
+                                {" "}
+                                <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
+                                  <div className="flex items-center gap-2">
+                                    <Image src={pdf} alt="" />
+                                    {item.name}
+                                  </div>
+                                  <FileViewer url={fileURL} />
+                                </div>
+                                <Trash2
+                                  size={18}
+                                  color="red"
+                                  className="shrink-0"
+                                  onClick={() => arrayHelpers.remove(index)}
+                                />
+                              </m.div>
+                            ) : (
+                              <Input
+                                value={values.documents[index].name}
+                                type="file"
+                                accept="application/pdf"
+                                placeholder="Enter Project/Program Name"
+                                className="w-full"
+                                onChange={(e) =>
+                                  handleFileChange(e, index, arrayHelpers)
+                                }
+                              />
+                            )}
+                          </m.div>
+                        );
+                      })}
+                  </AnimatePresence>
+                  {values.documents.length < 5 && (
+                    <>
+                      <p className="text-slate-500 text-sm">
+                        Files must not exceed 3MB in size.{" "}
+                      </p>
+                      <Button
+                        variant={"primary"}
+                        size={"sm"}
+                        type="button"
+                        onClick={() =>
+                          arrayHelpers.push({
+                            name: "",
+                            lastModified: Date.now(),
+                            type: "application/pdf",
+                            size: 1,
+                          })
+                        }
+                        className="w-fit"
+                      >
+                        {" "}
+                        <Plus />
+                        Add Document
+                      </Button>
+                    </>
+                  )}
+                </div>
+              )}
+            />
           </div>
-          <div>
-            <Input type="file" placeholder="Enter Project/Program Name" />
-            <p className="text-slate-500 text-sm">
-              Files must not exceed 3MB in size.{" "}
-            </p>
-          </div>
-          <Button variant={"primary"} size={"sm"}>
-            {" "}
-            <Plus />
-            Add Document
-          </Button>
         </div>
       </div>
     </div>
