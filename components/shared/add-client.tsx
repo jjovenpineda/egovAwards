@@ -83,7 +83,6 @@ export default function AddClient({
     { setFieldError }: FormikHelpers<IRequest>
   ) => {
     setIsLoading(true);
-    console.log("values :", values);
 
     /*  await apiPost("/api/auth/apiAccess/create", values);
     console.log(values);

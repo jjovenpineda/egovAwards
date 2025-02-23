@@ -10,42 +10,24 @@ import Editor from "@/components/shared/rich-text-editor";
 import Image from "next/image";
 import FileViewer from "../shared/file-viewer";
 import { Trash2 } from "lucide-react";
+import { handleFileChange, WordCounter } from "./registration";
 interface Iprops {
   setFieldValue: Function;
   values: any;
 }
 export default function Page5({ setFieldValue, values }: Iprops) {
   const [count, setCount] = useState(0);
-  const [selected, setSelected] = useState("");
+  const [fileType, setFileType] = useState("");
   const [fileURL, setFileURL] = useState<string>("");
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files && files.length > 0) {
-      setFieldValue("sustainability", files[0]);
-    }
-  };
-  const wordCounter = useCallback(
-    debounce((value: string) => {
-      const plainText = value.replace(/<[^>]*>/g, "");
-      const words = plainText
-        .trim()
-        .split(/\s+/)
-        .filter((word) => word.length > 0).length;
-      setCount(words);
-      if (words <= 0) {
-        setSelected("");
-      }
-    }, 500),
-    []
-  );
 
   useEffect(() => {
     if (values.sustainability instanceof File) {
-      setSelected("file");
+      setFileType("file");
       setFileURL(URL.createObjectURL(values.sustainability));
     } else if (typeof values.sustainability === "string") {
-      wordCounter(values.sustainability);
-      setSelected("text");
+      WordCounter(values.sustainability, setCount, setFileType, () => {
+        setFieldValue("sustainability", "");
+      });
     }
   }, [values.sustainability]);
 
@@ -77,10 +59,14 @@ export default function Page5({ setFieldValue, values }: Iprops) {
         </p>
         <div
           className={`my-2 rounded-full ${
-            selected === "file" && "opacity-50 cursor-not-allowed"
+            fileType === "file" &&
+            "opacity-50 pointer-events-none cursor-not-allowed"
           }`}
         >
-          <Editor onChange={(e) => setFieldValue("sustainability", e)} />
+          <Editor
+            defaultValue={values.sustainability}
+            onChange={(e) => setFieldValue("sustainability", e)}
+          />
         </div>
 
         <div className="flex justify-end">
@@ -96,7 +82,6 @@ export default function Page5({ setFieldValue, values }: Iprops) {
         <div className="flex flex-wrap gap-2 items-center my-10">
           <p>or Upload File </p>
           <div>
-            const fileURL = item.name && URL.createObjectURL(item); return (
             <div className="overflow-hidden">
               {values.sustainability instanceof File ? (
                 <div className="flex items-center gap-2 ">
@@ -119,11 +104,13 @@ export default function Page5({ setFieldValue, values }: Iprops) {
                 <Input
                   value={values.sustainability.name}
                   type="file"
-                  disabled={selected == "text"}
+                  disabled={fileType == "text"}
                   accept="application/pdf"
                   placeholder="Enter Project/Program Name"
                   className="w-full"
-                  onChange={(e) => handleFileChange(e)}
+                  onChange={(e) =>
+                    handleFileChange(e, "sustainability", setFieldValue)
+                  }
                 />
               )}
             </div>

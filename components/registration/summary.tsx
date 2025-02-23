@@ -101,6 +101,7 @@ export default function Summary({ setFieldValue, values }: Iprops) {
           <div className="flex justify-between items-center">
             <h2 className="font-bold text-lg text-blue-900">ABOUT THE LGU </h2>
             <Button
+              type="button"
               onClick={() => setPage1Modal(!page1Modal)}
               variant={"primary"}
               className="bg-blue-900"
@@ -114,6 +115,7 @@ export default function Summary({ setFieldValue, values }: Iprops) {
               isOpen={page1Modal}
               onClose={() => setPage1Modal(false)}
               setFieldValue={setFieldValue}
+              values={values}
             >
               <Page1 values={values} setFieldValue={setFieldValue} />
             </ModalWrapper>
@@ -144,6 +146,7 @@ export default function Summary({ setFieldValue, values }: Iprops) {
               variant={"primary"}
               className="bg-blue-900"
               size={"sm"}
+              type="button"
             >
               <Edit /> Edit
             </Button>
@@ -152,6 +155,7 @@ export default function Summary({ setFieldValue, values }: Iprops) {
               isOpen={page2Modal}
               onClose={() => setPage2Modal(false)}
               setFieldValue={setFieldValue}
+              values={values}
             >
               <Page2 values={values} setFieldValue={setFieldValue} />
             </ModalWrapper>
@@ -183,6 +187,7 @@ export default function Summary({ setFieldValue, values }: Iprops) {
               variant={"primary"}
               className="bg-blue-900"
               size={"sm"}
+              type="button"
             >
               <Edit /> Edit
             </Button>
@@ -191,6 +196,7 @@ export default function Summary({ setFieldValue, values }: Iprops) {
               isOpen={page3Modal}
               onClose={() => setPage3Modal(false)}
               setFieldValue={setFieldValue}
+              values={values}
             >
               <Page3 values={values} setFieldValue={setFieldValue} />
             </ModalWrapper>
@@ -230,6 +236,7 @@ export default function Summary({ setFieldValue, values }: Iprops) {
               variant={"primary"}
               className="bg-blue-900"
               size={"sm"}
+              type="button"
             >
               <Edit /> Edit
             </Button>
@@ -238,6 +245,7 @@ export default function Summary({ setFieldValue, values }: Iprops) {
               isOpen={page4Modal}
               onClose={() => setPage4Modal(false)}
               setFieldValue={setFieldValue}
+              values={values}
             >
               <Page4 values={values} setFieldValue={setFieldValue} />
             </ModalWrapper>
@@ -284,6 +292,7 @@ export default function Summary({ setFieldValue, values }: Iprops) {
               variant={"primary"}
               className="bg-blue-900"
               size={"sm"}
+              type="button"
             >
               <Edit /> Edit
             </Button>
@@ -292,6 +301,7 @@ export default function Summary({ setFieldValue, values }: Iprops) {
               isOpen={page5Modal}
               onClose={() => setPage5Modal(false)}
               setFieldValue={setFieldValue}
+              values={values}
             >
               <Page5 values={values} setFieldValue={setFieldValue} />
             </ModalWrapper>
@@ -338,6 +348,7 @@ export default function Summary({ setFieldValue, values }: Iprops) {
               variant={"primary"}
               className="bg-blue-900"
               size={"sm"}
+              type="button"
             >
               <Edit /> Edit
             </Button>
@@ -346,6 +357,7 @@ export default function Summary({ setFieldValue, values }: Iprops) {
               isOpen={page6Modal}
               onClose={() => setPage6Modal(false)}
               setFieldValue={setFieldValue}
+              values={values}
             >
               <Page6 values={values} setFieldValue={setFieldValue} />
             </ModalWrapper>
@@ -389,6 +401,7 @@ export default function Summary({ setFieldValue, values }: Iprops) {
               variant={"primary"}
               className="bg-blue-900"
               size={"sm"}
+              type="button"
             >
               <Edit /> Edit
             </Button>
@@ -397,6 +410,7 @@ export default function Summary({ setFieldValue, values }: Iprops) {
               isOpen={page7Modal}
               onClose={() => setPage7Modal(false)}
               setFieldValue={setFieldValue}
+              values={values}
             >
               <Page7 values={values} setFieldValue={setFieldValue} />
             </ModalWrapper>

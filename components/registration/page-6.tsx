@@ -10,42 +10,24 @@ import Editor from "@/components/shared/rich-text-editor";
 import Image from "next/image";
 import FileViewer from "../shared/file-viewer";
 import { Trash2 } from "lucide-react";
+import { handleFileChange, WordCounter } from "./registration";
 interface Iprops {
   setFieldValue: Function;
   values: any;
 }
 export default function Page5({ setFieldValue, values }: Iprops) {
   const [count, setCount] = useState(0);
-  const [selected, setSelected] = useState("");
+  const [fileType, setFileType] = useState("");
   const [fileURL, setFileURL] = useState<string>("");
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files && files.length > 0) {
-      setFieldValue("innovation", files[0]);
-    }
-  };
-  const wordCounter = useCallback(
-    debounce((value: string) => {
-      const plainText = value.replace(/<[^>]*>/g, "");
-      const words = plainText
-        .trim()
-        .split(/\s+/)
-        .filter((word) => word.length > 0).length;
-      setCount(words);
-      if (words <= 0) {
-        setSelected("");
-      }
-    }, 500),
-    []
-  );
 
   useEffect(() => {
     if (values.innovation instanceof File) {
-      setSelected("file");
+      setFileType("file");
       setFileURL(URL.createObjectURL(values.innovation));
     } else if (typeof values.innovation === "string") {
-      wordCounter(values.innovation);
-      setSelected("text");
+      WordCounter(values.innovation, setCount, setFileType, () => {
+        setFieldValue("innovation", "");
+      });
     }
   }, [values.innovation]);
 
@@ -74,10 +56,14 @@ export default function Page5({ setFieldValue, values }: Iprops) {
         </p>
         <div
           className={`my-2 rounded-full ${
-            selected === "file" && "opacity-50 cursor-not-allowed"
+            fileType === "file" &&
+            "opacity-50 pointer-events-none cursor-not-allowed"
           }`}
         >
-          <Editor onChange={(e) => setFieldValue("innovation", e)} />
+          <Editor
+            defaultValue={values.innovation}
+            onChange={(e) => setFieldValue("innovation", e)}
+          />
         </div>
 
         <div className="flex justify-end">
@@ -115,11 +101,13 @@ export default function Page5({ setFieldValue, values }: Iprops) {
                 <Input
                   value={values.innovation.name}
                   type="file"
-                  disabled={selected == "text"}
+                  disabled={fileType == "text"}
                   accept="application/pdf"
                   placeholder="Enter Project/Program Name"
                   className="w-full"
-                  onChange={(e) => handleFileChange(e)}
+                  onChange={(e) =>
+                    handleFileChange(e, "innovation", setFieldValue)
+                  }
                 />
               )}
             </div>

@@ -7,10 +7,12 @@ const SunEditor = dynamic(() => import("suneditor-react"), {
 });
 interface Props {
   onChange: (content: string) => void;
+  defaultValue: string;
 }
-const Editor = ({ onChange }: Props) => {
+const Editor = ({ onChange, defaultValue }: Props) => {
   return (
     <SunEditor
+      defaultValue={defaultValue}
       onChange={onChange}
       setOptions={{
         showPathLabel: false,

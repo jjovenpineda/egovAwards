@@ -21,6 +21,7 @@ interface ModalProps {
   onClose: () => void;
   children: React.ReactNode;
   setFieldValue: Function;
+  values: any;
 }
 export default function ModalWrapper({
   isEdit,
@@ -28,6 +29,7 @@ export default function ModalWrapper({
   onClose,
   children,
   setFieldValue,
+  values,
 }: ModalProps) {
   const loadCachedData = () => {
     const cachedData = localStorage.getItem("formData");
@@ -35,18 +37,24 @@ export default function ModalWrapper({
       const parsedData = JSON.parse(cachedData);
 
       Object.keys(parsedData).forEach((key) => {
-        setFieldValue(key, parsedData[key]);
+        const value = parsedData[key];
+
+        if (!(value instanceof Object)) {
+          setFieldValue(key, value);
+        }
       });
     }
   };
   useEffect(() => {
     storage.setItem("isPaused", true);
   }, []);
+
   return (
     <>
       {isEdit ? (
         <Dialog open={isOpen} onOpenChange={onClose}>
           <DialogContent
+            x={false}
             className="lg:max-w-[80%] h-[90%] overflow-auto px-10 lg:px-20"
             onInteractOutside={(event) => event.preventDefault()}
           >
@@ -70,7 +78,9 @@ export default function ModalWrapper({
               <Button
                 type="button"
                 onClick={() => {
-                  onClose(), storage.setItem("isPaused", false);
+                  onClose(),
+                    storage.setItem("isPaused", false),
+                    storage.setItem("formData", JSON.stringify(values));
                 }}
               >
                 <Save /> Save

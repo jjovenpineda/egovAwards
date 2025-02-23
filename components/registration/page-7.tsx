@@ -11,6 +11,7 @@ import { Field, FieldArray } from "formik";
 import pdf from "@/public/assets/svgs/pdf.svg";
 import FileViewer from "../shared/file-viewer";
 import { Trash2 } from "lucide-react";
+import { handleFileChange, WordCounter } from "./registration";
 
 const goals = [
   {
@@ -124,56 +125,32 @@ interface Iprops {
 export default function Page7({ setFieldValue, values }: Iprops) {
   const [content, setContent] = useState("");
   const [count, setCount] = useState(0);
-  const [selected1, setSelected1] = useState("");
-  const [selected2, setSelected2] = useState("");
-  const [fileURL, setFileURL] = useState<string>("");
+  const [FileType1, setFileType1] = useState("");
+  const [FileType2, setFileType2] = useState("");
 
   const [fileURL1, setFileURL1] = useState<string>("");
   const [fileURL2, setFileURL2] = useState<string>("");
 
-  const wordCounter = useCallback(
-    debounce((value: string) => {
-      const plainText = value.replace(/<[^>]*>/g, "");
-      const words = plainText
-        .trim()
-        .split(/\s+/)
-        .filter((word) => word.length > 0).length;
-      setCount(words);
-      if (words <= 0) {
-        setSelected1("");
-        setSelected2("");
-      }
-    }, 500),
-    []
-  );
-  const handleFileChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-    target: string
-  ) => {
-    const files = event.target.files;
-    if (files && files.length > 0) {
-      setFieldValue(target, files[0]);
-    }
-  };
   useEffect(() => {
-    const handleFileOrText = (
-      value: any,
-      setSelected: any,
-      setFileURL: any
-    ) => {
-      if (value instanceof File) {
-        setSelected("file");
-        setFileURL(URL.createObjectURL(value));
-      } else if (typeof value === "string") {
-        wordCounter(value);
-        setSelected("text");
-      }
-    };
-
-    handleFileOrText(values.goaltext1, setSelected1, setFileURL1);
-    handleFileOrText(values.goaltext2, setSelected2, setFileURL2);
-  }, [values.goaltext1, values.goaltext2]);
-
+    if (values.goaltext1 instanceof File) {
+      setFileType1("file");
+      setFileURL1(URL.createObjectURL(values.goaltext1));
+    } else if (typeof values.goaltext1 === "string") {
+      WordCounter(values.goaltext1, setCount, setFileType1, () => {
+        setFieldValue("goaltext1", "");
+      });
+    }
+  }, [values.goaltext1]);
+  useEffect(() => {
+    if (values.goaltext2 instanceof File) {
+      setFileType2("file");
+      setFileURL2(URL.createObjectURL(values.goaltext2));
+    } else if (typeof values.goaltext2 === "string") {
+      WordCounter(values.goaltext2, setCount, setFileType2, () => {
+        setFieldValue("goaltext2", "");
+      });
+    }
+  }, [values.goaltext2]);
   return (
     <div>
       <section className="space-y-2 pt-6 lg:pt-0">
@@ -258,10 +235,14 @@ export default function Page7({ setFieldValue, values }: Iprops) {
         </p>
         <div
           className={`my-2 rounded-full ${
-            selected1 === "file" && "opacity-50 cursor-not-allowed"
+            FileType1 === "file" &&
+            "opacity-50 pointer-events-none cursor-not-allowed"
           }`}
         >
-          <Editor onChange={(e) => setFieldValue("goaltext1", e)} />
+          <Editor
+            defaultValue={values.goaltext1}
+            onChange={(e) => setFieldValue("goaltext1", e)}
+          />
         </div>
 
         <div className="flex justify-end">
@@ -286,7 +267,7 @@ export default function Page7({ setFieldValue, values }: Iprops) {
                       <Image src={pdf} alt="" />
                       {values.goaltext1.name}
                     </div>
-                    <FileViewer url={fileURL} />
+                    <FileViewer url={fileURL1} />
                   </div>
                   <Trash2
                     size={18}
@@ -299,11 +280,13 @@ export default function Page7({ setFieldValue, values }: Iprops) {
                 <Input
                   value={values.goaltext1.name}
                   type="file"
-                  disabled={selected1 == "text"}
+                  disabled={FileType1 == "text"}
                   accept="application/pdf"
                   placeholder="Enter Project/Program Name"
                   className="w-full"
-                  onChange={(e) => handleFileChange(e, "goaltext1")}
+                  onChange={(e) =>
+                    handleFileChange(e, "goaltext1", setFieldValue)
+                  }
                 />
               )}
             </div>
@@ -326,10 +309,14 @@ export default function Page7({ setFieldValue, values }: Iprops) {
         </p>
         <div
           className={`my-2 rounded-full ${
-            selected2 === "file" && "opacity-50 cursor-not-allowed"
+            FileType2 === "file" &&
+            "opacity-50 pointer-events-none  cursor-not-allowed"
           }`}
         >
-          <Editor onChange={(e) => setFieldValue("goaltext2", e)} />{" "}
+          <Editor
+            defaultValue={values.goaltext2}
+            onChange={(e) => setFieldValue("goaltext2", e)}
+          />{" "}
         </div>
 
         <div className="flex justify-end">
@@ -354,7 +341,7 @@ export default function Page7({ setFieldValue, values }: Iprops) {
                       <Image src={pdf} alt="" />
                       {values.goaltext2.name}
                     </div>
-                    <FileViewer url={fileURL} />
+                    <FileViewer url={fileURL2} />
                   </div>
                   <Trash2
                     size={18}
@@ -367,11 +354,13 @@ export default function Page7({ setFieldValue, values }: Iprops) {
                 <Input
                   value={values.goaltext2.name}
                   type="file"
-                  disabled={selected2 == "text"}
+                  disabled={FileType2 == "text"}
                   accept="application/pdf"
                   placeholder="Enter Project/Program Name"
                   className="w-full"
-                  onChange={(e) => handleFileChange(e, "goaltext2")}
+                  onChange={(e) =>
+                    handleFileChange(e, "goaltext2", setFieldValue)
+                  }
                 />
               )}
             </div>

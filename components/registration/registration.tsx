@@ -51,7 +51,7 @@ const handleSubmit = async (
   values: any /* { region: string } */,
   { setFieldError }: FormikHelpers<any /* { region: string } */>
 ) => {
-  console.log("values :", values);
+  console.log("values zz:", values);
 
   /*  setIsLoading(true); */
 
@@ -115,6 +115,36 @@ const initialValues = {
   goaltext1: "",
   goaltext2: "",
 };
+export const WordCounter = (
+  value: string,
+  setCount: (count: number) => void,
+  setFileType: (value: string) => void,
+  reset: Function
+) => {
+  const plainText = value.replace(/<[^>]*>/g, "");
+  const words = plainText
+    .trim()
+    .split(/\s+/)
+    .filter((word) => word.length > 0).length;
+
+  setCount(words);
+  if (words <= 0) {
+    reset();
+    setFileType("");
+  } else {
+    setFileType("text");
+  }
+};
+export const handleFileChange = (
+  event: React.ChangeEvent<HTMLInputElement>,
+  name: string,
+  setFieldValue: Function
+) => {
+  const files = event.target.files;
+  if (files && files.length > 0) {
+    setFieldValue(name, files[0]);
+  }
+};
 export default function Registration({ action, page }: IRegistration) {
   const [submitDialog, setSubmitDialog] = useState(false);
   const cachedData = storage.getItem("formData");
@@ -132,11 +162,10 @@ export default function Registration({ action, page }: IRegistration) {
           if (!isPaused) {
             const handler = setTimeout(() => {
               storage.setItem("formData", JSON.stringify(values));
-              console.log("values :", values);
             }, 2000);
             return () => clearTimeout(handler);
           }
-        }, [values, storage.getItem("isPaused")]);
+        }, [values]);
 
         return (
           <Form className="mx-10 lg:mx-16 flex flex-col gap-6 ">
