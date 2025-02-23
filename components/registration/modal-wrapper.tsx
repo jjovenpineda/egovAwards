@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -14,18 +14,34 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Save, X } from "lucide-react";
+import { storage } from "@/utils/useStorage";
 interface ModalProps {
   isEdit: boolean;
   isOpen: boolean;
   onClose: () => void;
   children: React.ReactNode;
+  setFieldValue: Function;
 }
 export default function ModalWrapper({
   isEdit,
   isOpen,
   onClose,
   children,
+  setFieldValue,
 }: ModalProps) {
+  const loadCachedData = () => {
+    const cachedData = localStorage.getItem("formData");
+    if (cachedData) {
+      const parsedData = JSON.parse(cachedData);
+
+      Object.keys(parsedData).forEach((key) => {
+        setFieldValue(key, parsedData[key]);
+      });
+    }
+  };
+  useEffect(() => {
+    storage.setItem("isPaused", true);
+  }, []);
   return (
     <>
       {isEdit ? (
@@ -43,13 +59,20 @@ export default function ModalWrapper({
               <Button
                 variant={"outline"}
                 className="outline outline-1"
-                type="submit"
-                onClick={() => onClose()}
+                type="button"
+                onClick={() => {
+                  onClose(), loadCachedData();
+                }}
               >
                 <X />
                 Close
               </Button>
-              <Button type="submit">
+              <Button
+                type="button"
+                onClick={() => {
+                  onClose(), storage.setItem("isPaused", false);
+                }}
+              >
                 <Save /> Save
               </Button>
             </DialogFooter>

@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Edit } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Page1 from "./page-1";
 import ModalWrapper from "./modal-wrapper";
 import Page2 from "./page-2";
@@ -9,8 +9,12 @@ import Page4 from "./page-4";
 import Page5 from "./page-5";
 import Page6 from "./page-6";
 import Page7 from "./page-7";
-
-export default function Summary() {
+import { storage } from "@/utils/useStorage";
+interface Iprops {
+  setFieldValue: Function;
+  values: any;
+}
+export default function Summary({ setFieldValue, values }: Iprops) {
   const aboutTheLguLabels = [
     { label: "LGU Name", value: "lguName" },
     { label: "Province", value: "province" },
@@ -109,8 +113,9 @@ export default function Summary() {
               isEdit={true}
               isOpen={page1Modal}
               onClose={() => setPage1Modal(false)}
+              setFieldValue={setFieldValue}
             >
-              <Page1 />
+              <Page1 values={values} setFieldValue={setFieldValue} />
             </ModalWrapper>
           </div>
           <hr className="p-2 "></hr>
@@ -146,8 +151,9 @@ export default function Summary() {
               isEdit={true}
               isOpen={page2Modal}
               onClose={() => setPage2Modal(false)}
+              setFieldValue={setFieldValue}
             >
-              <Page2 />
+              <Page2 values={values} setFieldValue={setFieldValue} />
             </ModalWrapper>
           </div>
           <hr className="p-2 "></hr>
@@ -184,8 +190,9 @@ export default function Summary() {
               isEdit={true}
               isOpen={page3Modal}
               onClose={() => setPage3Modal(false)}
+              setFieldValue={setFieldValue}
             >
-              <Page3 />
+              <Page3 values={values} setFieldValue={setFieldValue} />
             </ModalWrapper>
           </div>
           <hr className="p-2 "></hr>
@@ -230,8 +237,9 @@ export default function Summary() {
               isEdit={true}
               isOpen={page4Modal}
               onClose={() => setPage4Modal(false)}
+              setFieldValue={setFieldValue}
             >
-              <Page4 />
+              <Page4 values={values} setFieldValue={setFieldValue} />
             </ModalWrapper>
           </div>
           <hr className="p-2 "></hr>
@@ -283,8 +291,9 @@ export default function Summary() {
               isEdit={true}
               isOpen={page5Modal}
               onClose={() => setPage5Modal(false)}
+              setFieldValue={setFieldValue}
             >
-              <Page5 />
+              <Page5 values={values} setFieldValue={setFieldValue} />
             </ModalWrapper>
           </div>
           <hr className="p-2 "></hr>
@@ -336,8 +345,9 @@ export default function Summary() {
               isEdit={true}
               isOpen={page6Modal}
               onClose={() => setPage6Modal(false)}
+              setFieldValue={setFieldValue}
             >
-              <Page6 />
+              <Page6 values={values} setFieldValue={setFieldValue} />
             </ModalWrapper>
           </div>
           <hr className="p-2 "></hr>
@@ -386,8 +396,9 @@ export default function Summary() {
               isEdit={true}
               isOpen={page7Modal}
               onClose={() => setPage7Modal(false)}
+              setFieldValue={setFieldValue}
             >
-              <Page7 />
+              <Page7 values={values} setFieldValue={setFieldValue} />
             </ModalWrapper>
           </div>
           <hr className="p-2 "></hr>

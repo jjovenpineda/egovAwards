@@ -141,7 +141,7 @@ export default function Page1({ setFieldValue, values }: Iprops) {
 
           <div>
             <Label className="font-semibold text-sm text-[#1F2937]">
-              Name of LCE
+              Name of Office in LGU{" "}
             </Label>
             <Field
               type="text"

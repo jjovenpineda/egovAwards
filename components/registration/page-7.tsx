@@ -2,17 +2,16 @@
 
 import React, { useCallback, useEffect, useState } from "react";
 
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { File, Plus, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import RichTextEditor from "@/components/shared/rich-text-editor";
-import Tiptap from "@/components/shared/rich-text-editor";
+import Image from "next/image";
 import Editor from "@/components/shared/rich-text-editor";
 import { debounce } from "lodash";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Field, FieldArray } from "formik";
+import pdf from "@/public/assets/svgs/pdf.svg";
+import FileViewer from "../shared/file-viewer";
+import { Trash2 } from "lucide-react";
+
 const goals = [
   {
     id: 1,
@@ -118,9 +117,19 @@ const goals = [
     selected: true,
   },
 ];
-export default function Page7() {
+interface Iprops {
+  setFieldValue: Function;
+  values: any;
+}
+export default function Page7({ setFieldValue, values }: Iprops) {
   const [content, setContent] = useState("");
   const [count, setCount] = useState(0);
+  const [selected1, setSelected1] = useState("");
+  const [selected2, setSelected2] = useState("");
+  const [fileURL, setFileURL] = useState<string>("");
+
+  const [fileURL1, setFileURL1] = useState<string>("");
+  const [fileURL2, setFileURL2] = useState<string>("");
 
   const wordCounter = useCallback(
     debounce((value: string) => {
@@ -130,13 +139,41 @@ export default function Page7() {
         .split(/\s+/)
         .filter((word) => word.length > 0).length;
       setCount(words);
+      if (words <= 0) {
+        setSelected1("");
+        setSelected2("");
+      }
     }, 500),
     []
   );
-
+  const handleFileChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    target: string
+  ) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      setFieldValue(target, files[0]);
+    }
+  };
   useEffect(() => {
-    wordCounter(content);
-  }, [content]);
+    const handleFileOrText = (
+      value: any,
+      setSelected: any,
+      setFileURL: any
+    ) => {
+      if (value instanceof File) {
+        setSelected("file");
+        setFileURL(URL.createObjectURL(value));
+      } else if (typeof value === "string") {
+        wordCounter(value);
+        setSelected("text");
+      }
+    };
+
+    handleFileOrText(values.goaltext1, setSelected1, setFileURL1);
+    handleFileOrText(values.goaltext2, setSelected2, setFileURL2);
+  }, [values.goaltext1, values.goaltext2]);
+
   return (
     <div>
       <section className="space-y-2 pt-6 lg:pt-0">
@@ -153,24 +190,49 @@ export default function Page7() {
           </strong>{" "}
           (Select all that apply.)
         </p>
-        <div className="grid lg:grid-cols-2 xl:grid-cols-3 gap-x-2">
-          {goals.map((goal) => (
-            <div key={goal.id} className="flex gap-3">
-              <Checkbox id={goal.title} className="m-1" />
 
-              <div>
-                <Label
-                  htmlFor={goal.title}
-                  className="font-bold text-base text-slate-900"
-                >
-                  {goal.title}
-                </Label>
-                <h3></h3>
-                <p className="text-slate-500 text-base">{goal.description}</p>
-              </div>
+        <FieldArray
+          name="goals"
+          render={(arrayHelpers) => (
+            <div className="grid items-start lg:grid-cols-2 xl:grid-cols-3 gap-x-2 w-full">
+              {goals.map((goal, index) => (
+                <div key={index} className="flex items-start gap-3">
+                  <Field
+                    type="checkbox"
+                    name="goals"
+                    className=" mt-1.5"
+                    id={goal.title}
+                    value={goal.title}
+                    checked={values.goals.includes(goal.title)}
+                    onChange={(e: any) => {
+                      if (e.target.checked) {
+                        arrayHelpers.push(goal.title);
+                      } else {
+                        const idx = values.goals.indexOf(goal.title);
+                        arrayHelpers.remove(idx);
+                      }
+                    }}
+                  />
+                  <div className="flex flex-col cursor-pointer">
+                    <Label
+                      htmlFor={goal.title}
+                      className="font-bold text-base text-slate-900"
+                    >
+                      {goal.title}
+                    </Label>
+
+                    <Label
+                      htmlFor={goal.title}
+                      className="text-slate-500 text-base"
+                    >
+                      {goal.description}
+                    </Label>
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          )}
+        />
       </section>
       <section className=" my-10">
         <div className="space-y-2">
@@ -194,13 +256,14 @@ export default function Page7() {
         <p className="text-red-500">
           Please limit your answers to 500 - 1000 words
         </p>
-        <div className="my-2">
-          <Editor onChange={(e) => setContent(e)} />
+        <div
+          className={`my-2 rounded-full ${
+            selected1 === "file" && "opacity-50 cursor-not-allowed"
+          }`}
+        >
+          <Editor onChange={(e) => setFieldValue("goaltext1", e)} />
         </div>
-        {/*  <div
-          dangerouslySetInnerHTML={{ __html: content }}
-          className="prose max-w-none"
-        /> */}
+
         <div className="flex justify-end">
           <div
             className={` text-sm ${
@@ -214,7 +277,36 @@ export default function Page7() {
         <div className="flex flex-wrap gap-2 items-center my-10">
           <p>or Upload File </p>
           <div>
-            <Input type="file" placeholder="Enter Project/Program Name" />
+            <div className="overflow-hidden">
+              {values.goaltext1 instanceof File ? (
+                <div className="flex items-center gap-2 ">
+                  {" "}
+                  <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
+                    <div className="flex items-center gap-2">
+                      <Image src={pdf} alt="" />
+                      {values.goaltext1.name}
+                    </div>
+                    <FileViewer url={fileURL} />
+                  </div>
+                  <Trash2
+                    size={18}
+                    color="red"
+                    className="shrink-0"
+                    onClick={() => setFieldValue("goaltext1", "")}
+                  />
+                </div>
+              ) : (
+                <Input
+                  value={values.goaltext1.name}
+                  type="file"
+                  disabled={selected1 == "text"}
+                  accept="application/pdf"
+                  placeholder="Enter Project/Program Name"
+                  className="w-full"
+                  onChange={(e) => handleFileChange(e, "goaltext1")}
+                />
+              )}
+            </div>
             <p className="text-slate-500 text-sm">
               Files must not exceed 3MB in size.{" "}
             </p>
@@ -232,13 +324,14 @@ export default function Page7() {
         <p className="text-red-500">
           Please limit your answers to 500 - 1000 words
         </p>
-        <div className="my-2">
-          <Editor onChange={(e) => setContent(e)} />
+        <div
+          className={`my-2 rounded-full ${
+            selected2 === "file" && "opacity-50 cursor-not-allowed"
+          }`}
+        >
+          <Editor onChange={(e) => setFieldValue("goaltext2", e)} />{" "}
         </div>
-        {/*  <div
-          dangerouslySetInnerHTML={{ __html: content }}
-          className="prose max-w-none"
-        /> */}
+
         <div className="flex justify-end">
           <div
             className={` text-sm ${
@@ -252,7 +345,36 @@ export default function Page7() {
         <div className="flex flex-wrap gap-2 items-center my-10">
           <p>or Upload File </p>
           <div>
-            <Input type="file" placeholder="Enter Project/Program Name" />
+            <div className="overflow-hidden">
+              {values.goaltext2 instanceof File ? (
+                <div className="flex items-center gap-2 ">
+                  {" "}
+                  <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
+                    <div className="flex items-center gap-2">
+                      <Image src={pdf} alt="" />
+                      {values.goaltext2.name}
+                    </div>
+                    <FileViewer url={fileURL} />
+                  </div>
+                  <Trash2
+                    size={18}
+                    color="red"
+                    className="shrink-0"
+                    onClick={() => setFieldValue("goaltext2", "")}
+                  />
+                </div>
+              ) : (
+                <Input
+                  value={values.goaltext2.name}
+                  type="file"
+                  disabled={selected2 == "text"}
+                  accept="application/pdf"
+                  placeholder="Enter Project/Program Name"
+                  className="w-full"
+                  onChange={(e) => handleFileChange(e, "goaltext2")}
+                />
+              )}
+            </div>
             <p className="text-slate-500 text-sm">
               Files must not exceed 3MB in size.{" "}
             </p>

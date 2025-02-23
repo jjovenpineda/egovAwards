@@ -2,53 +2,28 @@
 
 import React, { useCallback, useEffect, useState } from "react";
 import debounce from "lodash/debounce";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { File, Plus, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import RichTextEditor from "@/components/shared/rich-text-editor";
-import Tiptap from "@/components/shared/rich-text-editor";
-import Editor from "@/components/shared/rich-text-editor";
-const categories = [
-  {
-    id: "r1",
-    value: "1",
-    label:
-      "G2A Government Solutions Providing Access through Interoperability to Stakeholders",
-  },
-  {
-    id: "r2",
-    value: "2",
-    label: "G2B Government Solutions to Improve Business Climate",
-  },
-  {
-    id: "r3",
-    value: "3",
-    label: "G2B Government Solutions to Improve Business Climate",
-  },
-  {
-    id: "r4",
-    value: "4",
-    label: "G2C Governments Solutions to Serve Citizens Needs",
-  },
-  {
-    id: "r5",
-    value: "5",
-    label: "G2D Government Solutions to Harnessing Data for Specific Use Cases",
-  },
-  {
-    id: "r6",
-    value: "6",
-    label:
-      "G2E Government solutions providing Education and Training to citizens",
-  },
-];
-export default function Page3() {
-  const [content, setContent] = useState("");
-  const [count, setCount] = useState(0);
+import pdf from "@/public/assets/svgs/pdf.svg";
 
+import Editor from "@/components/shared/rich-text-editor";
+import Image from "next/image";
+import FileViewer from "../shared/file-viewer";
+import { Trash2 } from "lucide-react";
+interface Iprops {
+  setFieldValue: Function;
+  values: any;
+}
+export default function Page3({ setFieldValue, values }: Iprops) {
+  const [count, setCount] = useState(0);
+  const [selected, setSelected] = useState("");
+  const [fileURL, setFileURL] = useState<string>("");
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      setFieldValue("impact", files[0]);
+    }
+  };
   const wordCounter = useCallback(
     debounce((value: string) => {
       const plainText = value.replace(/<[^>]*>/g, "");
@@ -57,13 +32,22 @@ export default function Page3() {
         .split(/\s+/)
         .filter((word) => word.length > 0).length;
       setCount(words);
+      if (words <= 0) {
+        setSelected("");
+      }
     }, 500),
     []
   );
 
   useEffect(() => {
-    wordCounter(content);
-  }, [content]);
+    if (values.impact instanceof File) {
+      setSelected("file");
+      setFileURL(URL.createObjectURL(values.impact));
+    } else if (typeof values.impact === "string") {
+      wordCounter(values.impact);
+      setSelected("text");
+    }
+  }, [values.impact]);
 
   return (
     <div>
@@ -83,13 +67,14 @@ export default function Page3() {
         <p className="text-red-500">
           Please limit your answers to 500 - 1000 words
         </p>
-        <div className="my-2 rounded-full">
-          <Editor onChange={(e) => setContent(e)} />
+        <div
+          className={`my-2 rounded-full ${
+            selected === "file" && "opacity-50 cursor-not-allowed"
+          }`}
+        >
+          <Editor onChange={(e) => setFieldValue("impact", e)} />
         </div>
-        {/* <div
-          dangerouslySetInnerHTML={{ __html: content }}
-          className="prose max-w-none"
-        /> */}
+
         <div className="flex justify-end">
           <div
             className={` text-sm ${
@@ -103,7 +88,37 @@ export default function Page3() {
         <div className="flex flex-wrap gap-2 items-center my-10">
           <p>or Upload File </p>
           <div>
-            <Input type="file" placeholder="Enter Project/Program Name" />
+            <div className="overflow-hidden">
+              {values.impact instanceof File ? (
+                <div className="flex items-center gap-2 ">
+                  {" "}
+                  <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
+                    <div className="flex items-center gap-2">
+                      <Image src={pdf} alt="" />
+                      {values.impact.name}
+                    </div>
+                    <FileViewer url={fileURL} />
+                  </div>
+                  <Trash2
+                    size={18}
+                    color="red"
+                    className="shrink-0"
+                    onClick={() => setFieldValue("impact", "")}
+                  />
+                </div>
+              ) : (
+                <Input
+                  value={values.impact.name}
+                  type="file"
+                  disabled={selected == "text"}
+                  accept="application/pdf"
+                  placeholder="Enter Project/Program Name"
+                  className="w-full"
+                  onChange={(e) => handleFileChange(e)}
+                />
+              )}
+            </div>
+
             <p className="text-slate-500 text-sm">
               Files must not exceed 3MB in size.{" "}
             </p>

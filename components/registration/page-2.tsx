@@ -51,7 +51,6 @@ interface Iprops {
   values: any;
 }
 export default function Page2({ setFieldValue, values }: Iprops) {
-  const [diplicateFile, setDiplicateFile] = React.useState(false);
   const handleFileChange = (
     event: React.ChangeEvent<HTMLInputElement>,
     index: number,
@@ -60,7 +59,6 @@ export default function Page2({ setFieldValue, values }: Iprops) {
     const files = event.target.files;
     if (files && files.length > 0) {
       if (values.documents.map((e: any) => e.name).includes(files[0].name)) {
-        setDiplicateFile(true);
         toast({
           title: "Duplicate File",
           description: "This file has already been uploaded.",

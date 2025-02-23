@@ -29,7 +29,7 @@ export default function FileViewer({ url }: any) {
             <iframe src={url} className="w-full h-full" />
           </div>
           <DialogFooter>
-            <DialogClose asChild>
+            <DialogClose asChild className="w-full">
               <Button type="button">Close</Button>
             </DialogClose>
           </DialogFooter>
