@@ -159,7 +159,7 @@ export default function Registration({ action, page }: IRegistration) {
           if (!isPaused) {
             const handler = setTimeout(() => {
               storage.setItem("formData", values);
-            }, 2000);
+            }, 1000);
             return () => clearTimeout(handler);
           }
         }, [values]);
@@ -202,6 +202,7 @@ export default function Registration({ action, page }: IRegistration) {
             {page < 9 && page != 0 && (
               <section className="flex justify-between items-center">
                 <Link
+                  onClick={() => storage.setItem("isPaused", false)}
                   draggable="false"
                   href={{
                     pathname: "/registration",

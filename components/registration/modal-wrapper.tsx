@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Save, X } from "lucide-react";
 import { storage } from "@/utils/useStorage";
+import { object } from "yup";
 interface ModalProps {
   isEdit: boolean;
   isOpen: boolean;
@@ -33,12 +34,57 @@ export default function ModalWrapper({
 }: ModalProps) {
   const loadCachedData = () => {
     const cachedData = storage.getItem("formData");
-
     if (cachedData && typeof cachedData === "object") {
-      Object.entries(cachedData).forEach(([key, value]) => {
-        setFieldValue(key, value);
+      Object.entries(cachedData).forEach(([key, value]: any) => {
+        if (key === "documents" && Array.isArray(value)) {
+          return null;
+        } else if (
+          typeof value === "object" &&
+          value !== null &&
+          key != "goals"
+        ) {
+          const filteredObject = Object.fromEntries(
+            Object.entries(value).map(([subKey, subValue]) => [
+              subKey,
+              subValue,
+            ])
+          );
+          console.log(key);
+
+          console.log(filteredObject.text);
+
+          setFieldValue(`${key}.text`, filteredObject.text);
+        } else if (!(value instanceof File)) {
+          setFieldValue(key, value);
+        }
       });
     }
+  };
+
+  const saveData = () => {
+    if (values && typeof values === "object") {
+      Object.entries(values).forEach(([key, value]: any) => {
+        if (key === "documents" && Array.isArray(value)) {
+          return null;
+        } else if (
+          typeof value === "object" &&
+          value !== null &&
+          key != "goals"
+        ) {
+          const filteredObject = Object.fromEntries(
+            Object.entries(value).map(([subKey, subValue]) => [
+              subKey,
+              subValue instanceof File ? value[subKey] : subValue, // Keep existing File object, update others
+            ])
+          );
+
+          setFieldValue(key, filteredObject);
+        } else if (!(value instanceof File)) {
+          setFieldValue(key, value);
+        }
+      });
+    }
+    storage.setItem("formData", values);
   };
   useEffect(() => {
     storage.setItem("isPaused", true);
@@ -74,9 +120,7 @@ export default function ModalWrapper({
                 type="button"
                 className="mb-2"
                 onClick={() => {
-                  onClose(),
-                    storage.setItem("isPaused", false),
-                    storage.setItem("formData", JSON.stringify(values));
+                  onClose(), saveData();
                 }}
               >
                 <Save /> Save
