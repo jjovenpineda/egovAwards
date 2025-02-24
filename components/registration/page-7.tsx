@@ -125,31 +125,25 @@ interface Iprops {
 export default function Page7({ setFieldValue, values }: Iprops) {
   const [content, setContent] = useState("");
   const [count, setCount] = useState(0);
-  const [FileType1, setFileType1] = useState("");
-  const [FileType2, setFileType2] = useState("");
 
   const [fileURL1, setFileURL1] = useState<string>("");
   const [fileURL2, setFileURL2] = useState<string>("");
 
   useEffect(() => {
-    if (values.goaltext1 instanceof File) {
-      setFileType1("file");
-      setFileURL1(URL.createObjectURL(values.goaltext1));
-    } else if (typeof values.goaltext1 === "string") {
-      WordCounter(values.goaltext1, setCount, setFileType1, () => {
-        setFieldValue("goaltext1", "");
-      });
+    if (values.goaltext1.file instanceof File) {
+      setFileURL1(URL.createObjectURL(values.goaltext1.file));
     }
+    WordCounter(values.goaltext1.text, setCount, () => {
+      setFieldValue("goaltext1.text", "");
+    });
   }, [values.goaltext1]);
   useEffect(() => {
-    if (values.goaltext2 instanceof File) {
-      setFileType2("file");
-      setFileURL2(URL.createObjectURL(values.goaltext2));
-    } else if (typeof values.goaltext2 === "string") {
-      WordCounter(values.goaltext2, setCount, setFileType2, () => {
-        setFieldValue("goaltext2", "");
-      });
+    if (values.goaltext2.file instanceof File) {
+      setFileURL2(URL.createObjectURL(values.goaltext2.file));
     }
+    WordCounter(values.goaltext2.text, setCount, () => {
+      setFieldValue("goaltext2.text", "");
+    });
   }, [values.goaltext2]);
   return (
     <div>
@@ -233,15 +227,10 @@ export default function Page7({ setFieldValue, values }: Iprops) {
         <p className="text-red-500">
           Please limit your answers to 500 - 1000 words
         </p>
-        <div
-          className={`my-2 rounded-full ${
-            FileType1 === "file" &&
-            "opacity-50 pointer-events-none cursor-not-allowed"
-          }`}
-        >
+        <div className="my-2 rounded-full ">
           <Editor
-            defaultValue={values.goaltext1}
-            onChange={(e) => setFieldValue("goaltext1", e)}
+            defaultValue={values.goaltext1.text}
+            onChange={(e) => setFieldValue("goaltext1.text", e)}
           />
         </div>
 
@@ -259,13 +248,13 @@ export default function Page7({ setFieldValue, values }: Iprops) {
           <p>or Upload File </p>
           <div>
             <div className="overflow-hidden">
-              {values.goaltext1 instanceof File ? (
+              {values.goaltext1.file ? (
                 <div className="flex items-center gap-2 ">
                   {" "}
                   <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
                     <div className="flex items-center gap-2">
                       <Image src={pdf} alt="" />
-                      {values.goaltext1.name}
+                      {values.goaltext1.file.name}
                     </div>
                     <FileViewer url={fileURL1} />
                   </div>
@@ -273,23 +262,23 @@ export default function Page7({ setFieldValue, values }: Iprops) {
                     size={18}
                     color="red"
                     className="shrink-0"
-                    onClick={() => setFieldValue("goaltext1", "")}
+                    onClick={() => setFieldValue("goaltext1.file", null)}
                   />
                 </div>
               ) : (
                 <Input
                   value={values.goaltext1.name}
                   type="file"
-                  disabled={FileType1 == "text"}
                   accept="application/pdf"
                   placeholder="Enter Project/Program Name"
                   className="w-full"
                   onChange={(e) =>
-                    handleFileChange(e, "goaltext1", setFieldValue)
+                    handleFileChange(e, "goaltext1.file", setFieldValue)
                   }
                 />
               )}
             </div>
+
             <p className="text-slate-500 text-sm">
               Files must not exceed 3MB in size.{" "}
             </p>
@@ -307,16 +296,11 @@ export default function Page7({ setFieldValue, values }: Iprops) {
         <p className="text-red-500">
           Please limit your answers to 500 - 1000 words
         </p>
-        <div
-          className={`my-2 rounded-full ${
-            FileType2 === "file" &&
-            "opacity-50 pointer-events-none  cursor-not-allowed"
-          }`}
-        >
+        <div className="my-2 rounded-full ">
           <Editor
-            defaultValue={values.goaltext2}
-            onChange={(e) => setFieldValue("goaltext2", e)}
-          />{" "}
+            defaultValue={values.goaltext2.text}
+            onChange={(e) => setFieldValue("goaltext2.text", e)}
+          />
         </div>
 
         <div className="flex justify-end">
@@ -333,13 +317,13 @@ export default function Page7({ setFieldValue, values }: Iprops) {
           <p>or Upload File </p>
           <div>
             <div className="overflow-hidden">
-              {values.goaltext2 instanceof File ? (
+              {values.goaltext2.file ? (
                 <div className="flex items-center gap-2 ">
                   {" "}
                   <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
                     <div className="flex items-center gap-2">
                       <Image src={pdf} alt="" />
-                      {values.goaltext2.name}
+                      {values.goaltext2.file.name}
                     </div>
                     <FileViewer url={fileURL2} />
                   </div>
@@ -347,23 +331,23 @@ export default function Page7({ setFieldValue, values }: Iprops) {
                     size={18}
                     color="red"
                     className="shrink-0"
-                    onClick={() => setFieldValue("goaltext2", "")}
+                    onClick={() => setFieldValue("goaltext2.file", null)}
                   />
                 </div>
               ) : (
                 <Input
                   value={values.goaltext2.name}
                   type="file"
-                  disabled={FileType2 == "text"}
                   accept="application/pdf"
                   placeholder="Enter Project/Program Name"
                   className="w-full"
                   onChange={(e) =>
-                    handleFileChange(e, "goaltext2", setFieldValue)
+                    handleFileChange(e, "goaltext2.file", setFieldValue)
                   }
                 />
               )}
             </div>
+
             <p className="text-slate-500 text-sm">
               Files must not exceed 3MB in size.{" "}
             </p>

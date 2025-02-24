@@ -51,7 +51,7 @@ const handleSubmit = async (
   values: any /* { region: string } */,
   { setFieldError }: FormikHelpers<any /* { region: string } */>
 ) => {
-  console.log("values zz:", values);
+  console.log("Submit Values:", values);
 
   /*  setIsLoading(true); */
 
@@ -107,18 +107,18 @@ const initialValues = {
   projectPeriod: "",
   projectURL: "",
   documents: [new File([""], "", { type: "" })] as File[],
-  impact: "",
-  relevance: "",
-  sustainability: "",
-  innovation: "",
+  impact: { text: "", file: null },
+  relevance: { text: "", file: null },
+  sustainability: { text: "", file: null },
+  innovation: { text: "", file: null },
   goals: [],
-  goaltext1: "",
-  goaltext2: "",
+  goaltext1: { text: "", file: null },
+  goaltext2: { text: "", file: null },
 };
 export const WordCounter = (
   value: string,
   setCount: (count: number) => void,
-  setFileType: (value: string) => void,
+
   reset: Function
 ) => {
   const plainText = value.replace(/<[^>]*>/g, "");
@@ -130,9 +130,6 @@ export const WordCounter = (
   setCount(words);
   if (words <= 0) {
     reset();
-    setFileType("");
-  } else {
-    setFileType("text");
   }
 };
 export const handleFileChange = (
@@ -151,7 +148,7 @@ export default function Registration({ action, page }: IRegistration) {
 
   return (
     <Formik
-      initialValues={cachedData ? JSON.parse(cachedData) : initialValues}
+      initialValues={/* cachedData ? cachedData :  */ initialValues}
       validationSchema={"" /* validationSchema */}
       onSubmit={handleSubmit}
     >
@@ -161,7 +158,7 @@ export default function Registration({ action, page }: IRegistration) {
 
           if (!isPaused) {
             const handler = setTimeout(() => {
-              storage.setItem("formData", JSON.stringify(values));
+              storage.setItem("formData", values);
             }, 2000);
             return () => clearTimeout(handler);
           }
@@ -178,7 +175,6 @@ export default function Registration({ action, page }: IRegistration) {
                   <p className="text-[#1E3A8A] text-base">
                     <strong>11th eGOV Awards:</strong> Excellence in Governance
                     Through Information and Communications Technology Awards
-                    Application Form
                   </p>
                 </div>
               </section>

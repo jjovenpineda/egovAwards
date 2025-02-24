@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
-import debounce from "lodash/debounce";
+import React, { useEffect, useState } from "react";
 
 import { Input } from "@/components/ui/input";
 import pdf from "@/public/assets/svgs/pdf.svg";
@@ -17,22 +16,17 @@ interface Iprops {
 }
 export default function Page3({ setFieldValue, values }: Iprops) {
   const [count, setCount] = useState(0);
-  const [fileType, setFileType] = useState("");
   const [fileURL, setFileURL] = useState<string>("");
 
   useEffect(() => {
-    if (values.impact instanceof File) {
-      setFileType("file");
-      setFileURL(URL.createObjectURL(values.impact));
-    } else if (typeof values.impact === "string") {
-      WordCounter(values.impact, setCount, setFileType, () => {
-        setFieldValue("impact", "");
-      });
+    if (values.impact.file instanceof File) {
+      setFileURL(URL.createObjectURL(values.impact.file));
     }
+    WordCounter(values.impact.text, setCount, () => {
+      setFieldValue("impact.text", "");
+    });
   }, [values.impact]);
-  useEffect(() => {
-    console.log(fileType);
-  }, [fileType]);
+
   return (
     <div>
       <section className="space-y-2 pt-6 lg:pt-0">
@@ -51,15 +45,10 @@ export default function Page3({ setFieldValue, values }: Iprops) {
         <p className="text-red-500">
           Please limit your answers to 500 - 1000 words
         </p>
-        <div
-          className={`my-2 rounded-full ${
-            fileType === "file" &&
-            "opacity-50 pointer-events-none cursor-not-allowed"
-          }`}
-        >
+        <div className="my-2 rounded-full ">
           <Editor
-            defaultValue={values.impact}
-            onChange={(e) => setFieldValue("impact", e)}
+            defaultValue={values.impact.text}
+            onChange={(e) => setFieldValue("impact.text", e)}
           />
         </div>
 
@@ -77,13 +66,13 @@ export default function Page3({ setFieldValue, values }: Iprops) {
           <p>or Upload File </p>
           <div>
             <div className="overflow-hidden">
-              {values.impact instanceof File ? (
+              {values.impact.file ? (
                 <div className="flex items-center gap-2 ">
                   {" "}
                   <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
                     <div className="flex items-center gap-2">
                       <Image src={pdf} alt="" />
-                      {values.impact.name}
+                      {values.impact.file.name}
                     </div>
                     <FileViewer url={fileURL} />
                   </div>
@@ -91,18 +80,19 @@ export default function Page3({ setFieldValue, values }: Iprops) {
                     size={18}
                     color="red"
                     className="shrink-0"
-                    onClick={() => setFieldValue("impact", "")}
+                    onClick={() => setFieldValue("impact.file", null)}
                   />
                 </div>
               ) : (
                 <Input
                   value={values.impact.name}
                   type="file"
-                  disabled={fileType == "text"}
                   accept="application/pdf"
                   placeholder="Enter Project/Program Name"
                   className="w-full"
-                  onChange={(e) => handleFileChange(e, "impact", setFieldValue)}
+                  onChange={(e) =>
+                    handleFileChange(e, "impact.file", setFieldValue)
+                  }
                 />
               )}
             </div>

@@ -3,24 +3,29 @@ import { Edit } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import Page1 from "./page-1";
 import ModalWrapper from "./modal-wrapper";
-import Page2 from "./page-2";
+import Page2, { categories } from "./page-2";
 import Page3 from "./page-3";
 import Page4 from "./page-4";
 import Page5 from "./page-5";
 import Page6 from "./page-6";
 import Page7 from "./page-7";
+import Image from "next/image";
+import pdf from "@/public/assets/svgs/pdf.svg";
+
 import { storage } from "@/utils/useStorage";
+import { PSGC } from "@/constants";
+import FileViewer from "../shared/file-viewer";
 interface Iprops {
   setFieldValue: Function;
   values: any;
 }
 export default function Summary({ setFieldValue, values }: Iprops) {
   const aboutTheLguLabels = [
-    { label: "LGU Name", value: "lguName" },
+    { label: "LGU Name", value: "lgu" },
     { label: "Province", value: "province" },
     { label: "Region", value: "region" },
     { label: "Name of LCE", value: "nameOfLCE" },
-    { label: "Name of Office in LGU", value: "officeInLGU" },
+    { label: "Name of Office in LGU", value: "nameOfOffice" },
     { label: "Contact Person", value: "contactPerson" },
     { label: "Email", value: "email" },
     { label: "Mobile Number", value: "mobileNumber" },
@@ -29,37 +34,18 @@ export default function Summary({ setFieldValue, values }: Iprops) {
     {
       label:
         "Number of times in joining eGOV, Digital Cities Awards, Digital Governance Awards from 2012 to 2022",
-      value: "participationCount",
+      value: "egovAwardsCount",
     },
   ];
 
   const aboutTheEntryLabels: AboutTheEntryLabel[] = [
-    { label: "Project/Program Name", value: "projectProgramName" },
+    { label: "Project/Program Name", value: "projectName" },
     { label: "Choose Category for Project", value: "projectCategory" },
     { label: "Project Period", value: "projectPeriod" },
     { label: "Project URL", value: "projectURL" },
-    { label: "Supporting Documents", value: "supportingDocuments" },
+    { label: "Supporting Documents", value: "documents" },
   ];
-  const aboutTheLguDetails = {
-    lguName: "Calabanga",
-    province: "Camarines Sur",
-    region: "Region V - Bicol",
-    nameOfLCE: "Eugene S. Severo",
-    officeInLGU: "IT Department",
-    contactPerson: "Juan Dela Cruz",
-    email: "juandelacruz@calabanga.com",
-    mobileNumber: "+639876543210",
-    officeNumber: "(02) 123 456",
-    facebookPage: "Calabanga Facebook",
-    participationCount: 2,
-  };
-  const aboutTheEntryDetails: AboutTheEntryDetails = {
-    projectProgramName: "Example Project",
-    projectCategory: "Development",
-    projectPeriod: "January 2025 - December 2025",
-    projectURL: "https://www.exampleproject.com",
-    supportingDocuments: ["Document 1", "Document 2"],
-  };
+
   interface AboutTheEntryDetails {
     projectProgramName: string;
     projectCategory: string;
@@ -123,16 +109,37 @@ export default function Summary({ setFieldValue, values }: Iprops) {
           <hr className="p-2 "></hr>
         </div>
         <div className="grid text-base w-full grid-cols-2 md:grid-cols-[_40%,_60%] md:gap-2">
-          {aboutTheLguLabels.map((item, index) => (
-            <React.Fragment key={index}>
-              <div className="flex justify-between">
-                {item.label} <span className="mr-4">:</span>
-              </div>
-              <div className="mb-2 font-medium text-slate-500">
-                {aboutTheLguDetails[item.value]}
-              </div>
-            </React.Fragment>
-          ))}
+          {aboutTheLguLabels.map((item, index) => {
+            const region = PSGC.regions.find((region) =>
+              values.lgu.startsWith(region.id)
+            );
+            const province = PSGC.regions
+              .find((region) => values.lgu.startsWith(region.id))
+              ?.provinces.find((province) =>
+                values.lgu.startsWith(province.id)
+              );
+            const lgu = PSGC.regions
+              .find((region) => values.lgu.startsWith(region.id))
+              ?.provinces.find((province) => values.lgu.startsWith(province.id))
+              ?.lgus.find((lgu) => lgu.id === values.lgu);
+
+            return (
+              <React.Fragment key={index}>
+                <div className="flex justify-between">
+                  {item.label} <span className="mr-4">:</span>
+                </div>
+                <div className="mb-2 font-medium text-slate-500">
+                  {item.value == "region"
+                    ? region?.name
+                    : item.value == "province"
+                    ? province?.name
+                    : item.value == "lgu"
+                    ? lgu?.name
+                    : values[item.value]}
+                </div>
+              </React.Fragment>
+            );
+          })}
         </div>
       </section>
       <section>
@@ -163,19 +170,58 @@ export default function Summary({ setFieldValue, values }: Iprops) {
           <hr className="p-2 "></hr>
         </div>
         <div className="grid w-full grid-cols-2 text-base md:grid-cols-[_40%,_60%] md:gap-2">
-          {aboutTheEntryLabels.map((item, index) => (
-            <React.Fragment key={index}>
-              <div className="flex justify-between ">
-                {item.label} <span className="mr-4">:</span>
-              </div>
-              <div className="mb-2 font-medium text-slate-500">
-                {aboutTheEntryDetails[item.value]}
-              </div>
-            </React.Fragment>
-          ))}
+          {aboutTheEntryLabels.map((item, index) => {
+            const category = categories.find(
+              (cat) => cat.value === values.projectCategory
+            );
+            return (
+              <React.Fragment key={index}>
+                <div className="flex justify-between ">
+                  {item.label}{" "}
+                  {item.value != "documents" && <span className="mr-4">:</span>}
+                </div>
+
+                {item.value == "documents" ? (
+                  <div className="mb-2 font-medium text-slate-500 col-span-2">
+                    <div className="flex flex-wrap gap-2 w-full ">
+                      {values.documents.length > 0 &&
+                        values.documents.map((item: any, index: any) => {
+                          const fileURL =
+                            item.name && URL.createObjectURL(item);
+                          return (
+                            <div
+                              key={index}
+                              className="flex items-center gap-2 w-fit"
+                            >
+                              {" "}
+                              <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
+                                <div className="flex items-center gap-2">
+                                  <Image src={pdf} alt="" />
+                                  {item.name}
+                                </div>
+                                <FileViewer url={fileURL} />
+                              </div>
+                            </div>
+                          );
+                        })}
+                    </div>{" "}
+                  </div>
+                ) : item.value == "projectCategory" ? (
+                  <div className="mb-2 font-medium text-slate-500">
+                    {category?.label}
+                  </div>
+                ) : (
+                  <div className="mb-2 font-medium text-slate-500">
+                    {values[item.value]}
+                  </div>
+                )}
+                {/*     {values[item.value]} */}
+              </React.Fragment>
+            );
+          })}
         </div>
       </section>
-            {" "}
+          
       <section>
         <div className=" space-y-2 pt-6 lg:pt-0">
           <div className="flex justify-between items-center">

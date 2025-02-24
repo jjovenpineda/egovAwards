@@ -32,16 +32,11 @@ export default function ModalWrapper({
   values,
 }: ModalProps) {
   const loadCachedData = () => {
-    const cachedData = localStorage.getItem("formData");
-    if (cachedData) {
-      const parsedData = JSON.parse(cachedData);
+    const cachedData = storage.getItem("formData");
 
-      Object.keys(parsedData).forEach((key) => {
-        const value = parsedData[key];
-
-        if (!(value instanceof Object)) {
-          setFieldValue(key, value);
-        }
+    if (cachedData && typeof cachedData === "object") {
+      Object.entries(cachedData).forEach(([key, value]) => {
+        setFieldValue(key, value);
       });
     }
   };
@@ -63,7 +58,7 @@ export default function ModalWrapper({
               <DialogDescription></DialogDescription>
             </DialogHeader>
             {children}
-            <DialogFooter>
+            <DialogFooter className="">
               <Button
                 variant={"outline"}
                 className="outline outline-1"
@@ -77,6 +72,7 @@ export default function ModalWrapper({
               </Button>
               <Button
                 type="button"
+                className="mb-2"
                 onClick={() => {
                   onClose(),
                     storage.setItem("isPaused", false),

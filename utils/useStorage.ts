@@ -3,12 +3,22 @@ const isBrowser: boolean = typeof window !== "undefined";
 export const storage = {
   setItem: (key: string, value: any) => {
     if (isBrowser) {
-      window.localStorage.setItem(key, value);
+      try {
+        window.localStorage.setItem(key, JSON.stringify(value));
+      } catch (error) {
+        console.error("Error saving to localStorage:", error);
+      }
     }
   },
   getItem: (key: string) => {
     if (isBrowser) {
-      return window.localStorage.getItem(key) || null;
+      try {
+        const storedValue = window.localStorage.getItem(key);
+        return storedValue ? JSON.parse(storedValue) : null;
+      } catch (error) {
+        console.error("Error parsing localStorage data:", error);
+        return null;
+      }
     }
     return null;
   },

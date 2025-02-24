@@ -12,7 +12,7 @@ import pdf from "@/public/assets/svgs/pdf.svg";
 import { ArrayHelpers, ErrorMessage, Field, FieldArray } from "formik";
 import { AnimatePresence, m } from "motion/react";
 import { toast } from "@/hooks/use-toast";
-const categories = [
+export const categories = [
   {
     id: "r1",
     value: "1",
@@ -27,21 +27,16 @@ const categories = [
   {
     id: "r3",
     value: "3",
-    label: "G2B Government Solutions to Improve Business Climate",
+    label: "G2C Governments Solutions to Serve Citizens Needs",
   },
   {
     id: "r4",
     value: "4",
-    label: "G2C Governments Solutions to Serve Citizens Needs",
+    label: "G2D Government Solutions to Harnessing Data for Specific Use Cases",
   },
   {
     id: "r5",
     value: "5",
-    label: "G2D Government Solutions to Harnessing Data for Specific Use Cases",
-  },
-  {
-    id: "r6",
-    value: "6",
     label:
       "G2E Government solutions providing Education and Training to citizens",
   },
@@ -103,8 +98,8 @@ export default function Page2({ setFieldValue, values }: Iprops) {
             onValueChange={(e) => setFieldValue("projectCategory", e)}
             defaultValue={values.projectCategory}
           >
-            {categories.map((category) => (
-              <div key={category.id} className="flex items-center space-x-2">
+            {categories.map((category, index) => (
+              <div key={index} className="flex items-center space-x-2">
                 <RadioGroupItem value={category.value} id={category.id} />
                 <Label
                   htmlFor={category.id}
@@ -183,63 +178,46 @@ export default function Page2({ setFieldValue, values }: Iprops) {
               name="documents"
               render={(arrayHelpers: ArrayHelpers) => (
                 <div className="flex flex-col gap-2 w-full relative">
-                  <AnimatePresence>
-                    {values.documents &&
-                      values.documents.length > 0 &&
-                      values.documents.map((item: any, index: any) => {
-                        const fileURL = item.name && URL.createObjectURL(item);
+                  {values.documents &&
+                    values.documents.length > 0 &&
+                    values.documents.map((item: any, index: any) => {
+                      const fileURL = item.name && URL.createObjectURL(item);
 
-                        return (
-                          <m.div
-                            initial={{
-                              opacity: 0,
-                            }}
-                            animate={{
-                              opacity: 1,
-                            }}
-                            key={item.lastModified}
-                            className="overflow-hidden"
-                          >
-                            {item.name ? (
-                              <m.div
-                                exit={{
-                                  opacity: 0,
-                                  x: 50,
-                                }}
-                                transition={{ duration: 0.5 }}
-                                className="flex items-center gap-2 "
-                              >
-                                {" "}
-                                <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
-                                  <div className="flex items-center gap-2">
-                                    <Image src={pdf} alt="" />
-                                    {item.name}
-                                  </div>
-                                  <FileViewer url={fileURL} />
+                      return (
+                        <div key={index} className="overflow-hidden">
+                          {item.name ? (
+                            <div className="flex items-center gap-2 ">
+                              {" "}
+                              <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
+                                <div className="flex items-center gap-2">
+                                  <Image src={pdf} alt="" />
+                                  {item.name}
                                 </div>
-                                <Trash2
-                                  size={18}
-                                  color="red"
-                                  className="shrink-0"
-                                  onClick={() => arrayHelpers.remove(index)}
-                                />
-                              </m.div>
-                            ) : (
-                              <Input
-                                value={values.documents[index].name}
-                                type="file"
-                                accept="application/pdf"
-                                placeholder="Enter Project/Program Name"
-                                className="w-full"
-                                onChange={(e) =>
-                                  handleFileChange(e, index, arrayHelpers)
-                                }
+                                <FileViewer url={fileURL} />
+                              </div>
+                              <Trash2
+                                size={18}
+                                color="red"
+                                className="shrink-0"
+                                onClick={() => arrayHelpers.remove(index)}
                               />
-                            )}
-                          </m.div>
-                        );
-                      })}
-                  </AnimatePresence>
+                            </div>
+                          ) : (
+                            <Input
+                              value={values.documents[index].name}
+                              type="file"
+                              accept="application/pdf"
+                              placeholder="Enter Project/Program Name"
+                              className="w-full"
+                              onChange={(e) =>
+                                handleFileChange(e, index, arrayHelpers)
+                              }
+                            />
+                          )}
+                        </div>
+                      );
+                    })}
+
                   {values.documents.length < 5 && (
                     <>
                       <p className="text-slate-500 text-sm">

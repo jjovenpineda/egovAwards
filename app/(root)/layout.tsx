@@ -13,12 +13,12 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [hasAnimated, setHasAnimated] = useState(
-    JSON.parse(storage.getItem("hasAnimated") || "false")
+  const [hasBeenAnimated, sethasBeenAnimated] = useState(
+    storage.getItem("hasBeenAnimated") || "false"
   );
   useEffect(() => {
     const handleBeforeUnload = () => {
-      storage.removeItem("hasAnimated");
+      storage.removeItem("hasBeenAnimated");
     };
 
     window.addEventListener("beforeunload", handleBeforeUnload);
@@ -28,8 +28,8 @@ export default function RootLayout({
     };
   }, []);
   useEffect(() => {
-    storage.setItem("hasAnimated", JSON.stringify(hasAnimated));
-  }, [hasAnimated]);
+    storage.setItem("hasBeenAnimated", JSON.stringify(hasBeenAnimated));
+  }, [hasBeenAnimated]);
 
   return (
     <main className="min-h-screen  overflow-hidden flex justify-between flex-col">
@@ -37,10 +37,10 @@ export default function RootLayout({
         <Header />
 
         <m.div
-          initial={!hasAnimated && { y: 100, opacity: 0 }}
+          initial={!hasBeenAnimated && { y: 100, opacity: 0 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          onAnimationComplete={() => setHasAnimated(true)}
+          onAnimationComplete={() => sethasBeenAnimated(true)}
           className="w-full lg:px-16 py-14 "
         >
           <Suspense> {children}</Suspense>

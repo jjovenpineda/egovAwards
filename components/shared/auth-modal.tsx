@@ -66,7 +66,6 @@ export default function AuthModal({ action, page }: IAuthModal) {
     }
   }, []);
   const handleResend = () => {
-    console.log(" reset:");
     setTimer(60);
     setResetDisable(true);
   };

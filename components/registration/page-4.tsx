@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
-import debounce from "lodash/debounce";
+import React, { useEffect, useState } from "react";
 
 import { Input } from "@/components/ui/input";
 import pdf from "@/public/assets/svgs/pdf.svg";
@@ -17,18 +16,15 @@ interface Iprops {
 }
 export default function Page4({ setFieldValue, values }: Iprops) {
   const [count, setCount] = useState(0);
-  const [fileType, setFileType] = useState("");
   const [fileURL, setFileURL] = useState<string>("");
 
   useEffect(() => {
-    if (values.relevance instanceof File) {
-      setFileType("file");
-      setFileURL(URL.createObjectURL(values.relevance));
-    } else if (typeof values.relevance === "string") {
-      WordCounter(values.relevance, setCount, setFileType, () => {
-        setFieldValue("relevance", "");
-      });
+    if (values.relevance.file instanceof File) {
+      setFileURL(URL.createObjectURL(values.relevance.file));
     }
+    WordCounter(values.relevance.text, setCount, () => {
+      setFieldValue("relevance.text", "");
+    });
   }, [values.relevance]);
 
   return (
@@ -55,18 +51,14 @@ export default function Page4({ setFieldValue, values }: Iprops) {
             to solve?
           </p>
         </div>
+
         <p className="text-red-500">
           Please limit your answers to 500 - 1000 words
         </p>
-        <div
-          className={`my-2 rounded-full ${
-            fileType === "file" &&
-            "opacity-50 pointer-events-none cursor-not-allowed"
-          }`}
-        >
+        <div className="my-2 rounded-full ">
           <Editor
-            defaultValue={values.relevance}
-            onChange={(e) => setFieldValue("relevance", e)}
+            defaultValue={values.relevance.text}
+            onChange={(e) => setFieldValue("relevance.text", e)}
           />
         </div>
 
@@ -84,13 +76,13 @@ export default function Page4({ setFieldValue, values }: Iprops) {
           <p>or Upload File </p>
           <div>
             <div className="overflow-hidden">
-              {values.relevance instanceof File ? (
+              {values.relevance.file ? (
                 <div className="flex items-center gap-2 ">
                   {" "}
                   <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
                     <div className="flex items-center gap-2">
                       <Image src={pdf} alt="" />
-                      {values.relevance.name}
+                      {values.relevance.file.name}
                     </div>
                     <FileViewer url={fileURL} />
                   </div>
@@ -98,23 +90,23 @@ export default function Page4({ setFieldValue, values }: Iprops) {
                     size={18}
                     color="red"
                     className="shrink-0"
-                    onClick={() => setFieldValue("relevance", "")}
+                    onClick={() => setFieldValue("relevance.file", null)}
                   />
                 </div>
               ) : (
                 <Input
                   value={values.relevance.name}
                   type="file"
-                  disabled={fileType == "text"}
                   accept="application/pdf"
                   placeholder="Enter Project/Program Name"
                   className="w-full"
                   onChange={(e) =>
-                    handleFileChange(e, "relevance", setFieldValue)
+                    handleFileChange(e, "relevance.file", setFieldValue)
                   }
                 />
               )}
             </div>
+
             <p className="text-slate-500 text-sm">
               Files must not exceed 3MB in size.{" "}
             </p>

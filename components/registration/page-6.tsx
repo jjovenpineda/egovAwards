@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
-import debounce from "lodash/debounce";
+import React, { useEffect, useState } from "react";
 
 import { Input } from "@/components/ui/input";
 import pdf from "@/public/assets/svgs/pdf.svg";
@@ -15,20 +14,17 @@ interface Iprops {
   setFieldValue: Function;
   values: any;
 }
-export default function Page5({ setFieldValue, values }: Iprops) {
+export default function Page6({ setFieldValue, values }: Iprops) {
   const [count, setCount] = useState(0);
-  const [fileType, setFileType] = useState("");
   const [fileURL, setFileURL] = useState<string>("");
 
   useEffect(() => {
-    if (values.innovation instanceof File) {
-      setFileType("file");
-      setFileURL(URL.createObjectURL(values.innovation));
-    } else if (typeof values.innovation === "string") {
-      WordCounter(values.innovation, setCount, setFileType, () => {
-        setFieldValue("innovation", "");
-      });
+    if (values.innovation.file instanceof File) {
+      setFileURL(URL.createObjectURL(values.innovation.file));
     }
+    WordCounter(values.innovation.text, setCount, () => {
+      setFieldValue("innovation.text", "");
+    });
   }, [values.innovation]);
 
   return (
@@ -51,18 +47,14 @@ export default function Page5({ setFieldValue, values }: Iprops) {
             addressing the problems?
           </p>
         </div>
+
         <p className="text-red-500">
           Please limit your answers to 500 - 1000 words
         </p>
-        <div
-          className={`my-2 rounded-full ${
-            fileType === "file" &&
-            "opacity-50 pointer-events-none cursor-not-allowed"
-          }`}
-        >
+        <div className="my-2 rounded-full ">
           <Editor
-            defaultValue={values.innovation}
-            onChange={(e) => setFieldValue("innovation", e)}
+            defaultValue={values.innovation.text}
+            onChange={(e) => setFieldValue("innovation.text", e)}
           />
         </div>
 
@@ -80,13 +72,13 @@ export default function Page5({ setFieldValue, values }: Iprops) {
           <p>or Upload File </p>
           <div>
             <div className="overflow-hidden">
-              {values.innovation instanceof File ? (
+              {values.innovation.file ? (
                 <div className="flex items-center gap-2 ">
                   {" "}
                   <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
                     <div className="flex items-center gap-2">
                       <Image src={pdf} alt="" />
-                      {values.innovation.name}
+                      {values.innovation.file.name}
                     </div>
                     <FileViewer url={fileURL} />
                   </div>
@@ -94,23 +86,23 @@ export default function Page5({ setFieldValue, values }: Iprops) {
                     size={18}
                     color="red"
                     className="shrink-0"
-                    onClick={() => setFieldValue("innovation", "")}
+                    onClick={() => setFieldValue("innovation.file", null)}
                   />
                 </div>
               ) : (
                 <Input
                   value={values.innovation.name}
                   type="file"
-                  disabled={fileType == "text"}
                   accept="application/pdf"
                   placeholder="Enter Project/Program Name"
                   className="w-full"
                   onChange={(e) =>
-                    handleFileChange(e, "innovation", setFieldValue)
+                    handleFileChange(e, "innovation.file", setFieldValue)
                   }
                 />
               )}
             </div>
+
             <p className="text-slate-500 text-sm">
               Files must not exceed 3MB in size.{" "}
             </p>

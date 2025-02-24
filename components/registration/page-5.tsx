@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
-import debounce from "lodash/debounce";
+import React, { useEffect, useState } from "react";
 
 import { Input } from "@/components/ui/input";
 import pdf from "@/public/assets/svgs/pdf.svg";
@@ -17,18 +16,15 @@ interface Iprops {
 }
 export default function Page5({ setFieldValue, values }: Iprops) {
   const [count, setCount] = useState(0);
-  const [fileType, setFileType] = useState("");
   const [fileURL, setFileURL] = useState<string>("");
 
   useEffect(() => {
-    if (values.sustainability instanceof File) {
-      setFileType("file");
-      setFileURL(URL.createObjectURL(values.sustainability));
-    } else if (typeof values.sustainability === "string") {
-      WordCounter(values.sustainability, setCount, setFileType, () => {
-        setFieldValue("sustainability", "");
-      });
+    if (values.sustainability.file instanceof File) {
+      setFileURL(URL.createObjectURL(values.sustainability.file));
     }
+    WordCounter(values.sustainability.text, setCount, () => {
+      setFieldValue("sustainability.text", "");
+    });
   }, [values.sustainability]);
 
   return (
@@ -54,18 +50,14 @@ export default function Page5({ setFieldValue, values }: Iprops) {
             capacity-building to ensure ongoing local support and ownership?
           </p>
         </div>
+
         <p className="text-red-500">
           Please limit your answers to 500 - 1000 words
         </p>
-        <div
-          className={`my-2 rounded-full ${
-            fileType === "file" &&
-            "opacity-50 pointer-events-none cursor-not-allowed"
-          }`}
-        >
+        <div className="my-2 rounded-full ">
           <Editor
-            defaultValue={values.sustainability}
-            onChange={(e) => setFieldValue("sustainability", e)}
+            defaultValue={values.sustainability.text}
+            onChange={(e) => setFieldValue("sustainability.text", e)}
           />
         </div>
 
@@ -83,13 +75,13 @@ export default function Page5({ setFieldValue, values }: Iprops) {
           <p>or Upload File </p>
           <div>
             <div className="overflow-hidden">
-              {values.sustainability instanceof File ? (
+              {values.sustainability.file ? (
                 <div className="flex items-center gap-2 ">
                   {" "}
                   <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
                     <div className="flex items-center gap-2">
                       <Image src={pdf} alt="" />
-                      {values.sustainability.name}
+                      {values.sustainability.file.name}
                     </div>
                     <FileViewer url={fileURL} />
                   </div>
@@ -97,23 +89,23 @@ export default function Page5({ setFieldValue, values }: Iprops) {
                     size={18}
                     color="red"
                     className="shrink-0"
-                    onClick={() => setFieldValue("sustainability", "")}
+                    onClick={() => setFieldValue("sustainability.file", null)}
                   />
                 </div>
               ) : (
                 <Input
                   value={values.sustainability.name}
                   type="file"
-                  disabled={fileType == "text"}
                   accept="application/pdf"
                   placeholder="Enter Project/Program Name"
                   className="w-full"
                   onChange={(e) =>
-                    handleFileChange(e, "sustainability", setFieldValue)
+                    handleFileChange(e, "sustainability.file", setFieldValue)
                   }
                 />
               )}
             </div>
+
             <p className="text-slate-500 text-sm">
               Files must not exceed 3MB in size.{" "}
             </p>
