@@ -3,6 +3,12 @@
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight, Send } from "lucide-react";
 import React, { useEffect, useState } from "react";
+import bg from "@/public/assets/images/bg-gradient.webp";
+
+import dynamic from "next/dynamic";
+import warning from "@/public/assets/triangle-warning.json";
+import success from "@/public/assets/images/success.webp";
+import Image from "next/image";
 import Page1 from "@/components/registration/page-1";
 import Page2 from "@/components/registration/page-2";
 import Page3 from "@/components/registration/page-3";
@@ -22,13 +28,13 @@ import {
 import * as Yup from "yup";
 
 import Link from "next/link";
-import SuccessPage from "@/components/registration/success-page";
 import { Form, Formik, FormikHelpers, useFormikContext } from "formik";
 import { storage } from "@/utils/useStorage";
 import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
-/* const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
- */ interface IRegistration {
+import { m } from "motion/react";
+const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
+interface IRegistration {
   action: string;
   page: number;
 }
@@ -84,7 +90,7 @@ const validationSchema = Yup.object().shape({
   egovAwardsCount: Yup.string()
     .required("This field is required")
     .max(200, "Limit: 200 characters"),
-  /*  */
+
   projectName: Yup.string()
     .required("This field is required")
     .max(200, "Limit: 100 characters"),
@@ -200,7 +206,7 @@ const validationSchema = Yup.object().shape({
     }),
   innovationCheck: Yup.mixed().test(
     "eitherTextOrFile",
-    "This field is required",
+    "At least one input field must be filled",
     function () {
       const { innovationText, innovationFile } = this.parent;
 
@@ -266,10 +272,7 @@ const validationSchema = Yup.object().shape({
     }
   ),
 });
-const handleSubmit = async (
-  values: any /* { region: string } */,
-  { setFieldError }: FormikHelpers<any /* { region: string } */>
-) => {
+const handleSubmit = async (values: any /* { region: string } */) => {
   console.log("Submit Values:", values);
 
   /*  setIsLoading(true); */
@@ -385,6 +388,8 @@ export const handleFileChange = (
 export default function Registration({ action, page }: IRegistration) {
   const router = useRouter();
   const [submitDialog, setSubmitDialog] = useState(false);
+  const [successDialog, setSuccessDialog] = useState(false);
+
   const cachedData = storage.getItem("formData");
 
   const fields: Record<number, string[]> = {
@@ -418,12 +423,12 @@ export default function Registration({ action, page }: IRegistration) {
       onSubmit={handleSubmit}
     >
       {({
-        setFieldValue,
+        validateForm,
         values,
         validateField,
         errors,
         setFieldTouched,
-        dirty,
+        setTouched,
       }) => {
         const [hasError, setHasError] = useState(false);
 
@@ -438,7 +443,7 @@ export default function Registration({ action, page }: IRegistration) {
         }, [values]);
 
         return (
-          <Form className="mx-10 lg:mx-16 flex flex-col gap-6 ">
+          <Form className="mx-0 lg:mx-16 flex flex-col gap-6 ">
             {page < 9 && page != 0 && (
               <section className="space-y-8">
                 <div className="space-y-3">
@@ -465,10 +470,8 @@ export default function Registration({ action, page }: IRegistration) {
                     <Page6 />,
                     <Page7 />,
                     <Summary />,
-                    <SuccessPage />,
                   ][page - 1]
                 }
-                <Button type="submit">Submit</Button>
               </>
             </section>
 
@@ -520,8 +523,24 @@ export default function Registration({ action, page }: IRegistration) {
                 ) : (
                   <Button
                     type="submit"
-                    onClick={() => {
-                      /*  setSubmitDialog(true); */
+                    onClick={async (e) => {
+                      e.preventDefault();
+                      Object.keys(validationSchema.fields).forEach((field) => {
+                        setFieldTouched(field, true);
+                        validateField(field);
+                      });
+                      const validationErrors = await validateForm(); // Validates the form
+
+                      if (Object.keys(validationErrors).length === 0) {
+                        setSubmitDialog(true);
+                      } else {
+                        toast({
+                          title: "Submission Failed",
+                          description: "Please check the required fields.",
+                          variant: "destructive",
+                          duration: 3000,
+                        });
+                      }
                     }}
                   >
                     <Send />
@@ -539,8 +558,7 @@ export default function Registration({ action, page }: IRegistration) {
               <DialogContent className="sm:max-w-md p-0 overflow-hidden border-0">
                 <div className="flex flex-col items-center justify-center gap-2 m-4">
                   <div className="size-36">
-                    {/*               <Lottie animationData={test} loop={false} />
-                     */}{" "}
+                    <Lottie animationData={warning} loop={false} />{" "}
                   </div>
                   <h2 className=" font-bold text-2xl">SUBMIT APPLICATION!</h2>
                   <p className="font-medium text-base text-center text-slate-900">
@@ -552,24 +570,96 @@ export default function Registration({ action, page }: IRegistration) {
                   <DialogClose asChild>
                     <button
                       type="button"
-                      className="w-full rounded-0 bg-slate-100 text-slate-900 p-3 hover:bg-slate-200 font-medium transition-colors duration-300"
+                      className="w-full rounded-0 bg-slate-100 text-slate-900 p-3 hover:bg-slate-200 font-semibold text-base transition-colors duration-300"
                     >
                       Cancel
                     </button>
                   </DialogClose>
-                  <Button
-                    type="submit"
-                    /* href={{
-                      pathname: "/registration",
-                      query: { action: "register", page: page + 1 },
-                    }} */
-                    /*  onClick={() => {
-                      setSubmitDialog(false);
-                    }} */
-                    className="w-full flex items-center justify-center rounded-0 bg-[#2563EB] p-3 text-white font-medium hover:bg-[#3674fa] transition-colos duration-300"
+                  <div className="size-full group bg-[#2563EB] hover:bg-[#3674fa]">
+                    <Button
+                      type="submit"
+                      /* href={{
+                       pathname: "/registration",
+                       query: { action: "register", page: page + 1 },
+                     }} */
+                      onClick={() => {
+                        handleSubmit(values);
+                        setSubmitDialog(false);
+                        setSuccessDialog(true);
+                      }}
+                      className="w-full size-full flex items-center justify-center rounded-0 bg-[#2563EB] p-3 text-base text-white font-semibold group-hover:bg-[#3674fa] transition-colos duration-300"
+                    >
+                      Submit
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+
+            <Dialog open={successDialog}>
+              <DialogHeader>
+                <DialogTitle></DialogTitle>
+                <DialogDescription></DialogDescription>
+              </DialogHeader>
+              <DialogContent className="sm:max-w-4xl  overflow-hidden border-0 p-16">
+                <div className="relative">
+                  <div className="mx-10 lg:mx-16 flex flex-col gap-6 ">
+                    <div className="gap-3 flex flex-col items-center justify-center">
+                      <Image src={success} alt="" className="mr-4" />
+                      <h2 className="font-bold  text-2xl text-center lg:text-3xl text-blue-900">
+                        Submission Successful!{" "}
+                      </h2>
+                      <div className="text-blue-500">
+                        <h3 className="text-sm font-medium">
+                          REFERENCE NUMBER{" "}
+                        </h3>
+                        <h3 className="font-bold text-3xl">25G2BCAL</h3>
+                      </div>
+                      <p className="font-semibold text-center text-sm lg:text-base">
+                        Thank you for submitting your application.
+                      </p>
+                      <p className="font-[300] text-sm lg:text-base text-center text-slate-700">
+                        We've received your information and are currently
+                        validating it.
+                        <br />
+                        You’ll receive a confirmation email shortly. If you have
+                        any questions, feel free to reach out!
+                      </p>
+                      <Link
+                        draggable="false"
+                        href={{
+                          pathname: "/registration",
+                          query: { action: "register", page: 1 },
+                        }}
+                        onClick={() => {
+                          setSuccessDialog(false);
+                        }}
+                        className="flex active items-center justify-center text-sm rounded-lg bg-[#2563EB]  py-2 px-3 font-semibold text-white hover:bg-[#3674fa] transition-colos duration-300"
+                      >
+                        Submit Another Entry
+                      </Link>
+                      <Button
+                        variant={"ghost"}
+                        onClick={() => {
+                          setSuccessDialog(false);
+                        }}
+                        className="font-semibold bg-transparent  hover:text-[#142AF6] text-[#2563EB]"
+                      >
+                        Close{" "}
+                      </Button>
+                    </div>
+                  </div>
+                  <m.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{
+                      duration: 1,
+                      ease: "easeInOut",
+                    }}
+                    className="scale-[1.30] absolute inset-0 pointer-events-none"
                   >
-                    Submit
-                  </Button>
+                    <Image src={bg} alt="" fill className=" object-cover" />
+                  </m.div>
                 </div>
               </DialogContent>
             </Dialog>

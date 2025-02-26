@@ -303,6 +303,11 @@ export default function Summary() {
                   );
                 })()}
             </div>{" "}
+            <ErrorMessage
+              name="impactCheck"
+              component="div"
+              className=" text-base text-red-500 italic "
+            />
           </div>
         </div>
       </section>
@@ -371,6 +376,11 @@ export default function Summary() {
                   );
                 })()}
             </div>{" "}
+            <ErrorMessage
+              name="relevanceCheck"
+              component="div"
+              className=" text-base text-red-500 italic "
+            />
           </div>
         </div>
       </section>
@@ -440,7 +450,12 @@ export default function Summary() {
                     </div>
                   );
                 })()}
-            </div>{" "}
+            </div>
+            <ErrorMessage
+              name="sustainabilityCheck"
+              component="div"
+              className=" text-base text-red-500 italic "
+            />
           </div>
         </div>
       </section>
@@ -506,6 +521,11 @@ export default function Summary() {
                   );
                 })()}
             </div>{" "}
+            <ErrorMessage
+              name="innovationCheck"
+              component="div"
+              className=" text-base text-red-500 italic "
+            />
           </div>
         </div>
       </section>
@@ -546,6 +566,11 @@ export default function Summary() {
                 <li key={index}>{goal}</li>
               ))}
             </ul>
+            <ErrorMessage
+              name="goals"
+              component="div"
+              className=" text-base text-red-500 italic "
+            />
           </div>
           <div className="space-y-2">
             <h2 className="text-slate-900 text-base">
@@ -589,6 +614,11 @@ export default function Summary() {
                     );
                   })()}
               </div>{" "}
+              <ErrorMessage
+                name="goal1Check"
+                component="div"
+                className=" text-base text-red-500 italic "
+              />
             </div>
           </div>
 
@@ -623,6 +653,11 @@ export default function Summary() {
                     );
                   })()}
               </div>{" "}
+              <ErrorMessage
+                name="goal2Check"
+                component="div"
+                className=" text-base text-red-500 italic "
+              />
             </div>
           </div>
         </div>

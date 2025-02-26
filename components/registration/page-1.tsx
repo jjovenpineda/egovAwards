@@ -400,19 +400,17 @@ export default function Page1() {
               </div>
             </section>
             <div className="lg:w-1/2 lg:pr-4">
-              <div className="flex   items-center">
+              <div className="flex gap-4 items-center">
                 <Label className="font-semibold text-sm text-[#1F2937]">
                   Number of times in joining eGOV, Digital Cities Awards,
-                  Digital Governance Awards from 2012 to 2022.{" "}
-                </Label>
-                <div className="flex gap-1">
-                  <span className="text-red-500 text-base">*</span>
+                  Digital Governance Awards from 2012 to 2022.
+                  <span className="text-red-500 text-base"> *</span>
                   <ErrorMessage
                     name="egovAwardsCount"
-                    component="div"
-                    className=" text-xs text-red-500 font-semibold"
+                    component="span"
+                    className="text-xs text-red-500 font-semibold ml-1"
                   />
-                </div>
+                </Label>
               </div>
               <Field
                 type="number"

@@ -5,6 +5,7 @@ import Header from "@/components/shared/header";
 import { m } from "motion/react";
 import { Suspense, useEffect, useState } from "react";
 import { storage } from "@/utils/useStorage";
+import FloatingIcons from "@/components/shared/floating-icons";
 
 /* import useInactivityTimeout from "@/hooks/use-inactibe-timeout";
  */
@@ -35,7 +36,7 @@ export default function RootLayout({
     <main className="min-h-screen  overflow-hidden flex justify-between flex-col">
       <div>
         <Header />
-
+        <FloatingIcons />
         <m.div
           initial={!hasBeenAnimated && { y: 100, opacity: 0 }}
           animate={{ opacity: 1, y: 0 }}

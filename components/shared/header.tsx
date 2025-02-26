@@ -205,7 +205,7 @@ const links = [
   {
     name: "Registration Form",
     url: "/registration",
-    query: { action: "login", page: 1 },
+    query: { action: "register", page: 1 },
   },
   { name: "About Us", url: "/about" },
   { name: "Contact Us", url: "/contact" },

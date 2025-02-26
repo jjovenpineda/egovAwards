@@ -159,7 +159,7 @@ export default function Page7() {
         <hr className="border border-blue-900"></hr>
       </section>
       <section>
-        <div className="flex gap-1 items-center">
+        <div className="flex flex-wrap gap-1 items-center">
           <p className="text-base text-slate-900 italic py-4">
             <strong className="not-italic">
               Select the Sustainable Development Goals (SDGs) that your project
