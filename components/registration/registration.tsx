@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight, Send } from "lucide-react";
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Page1 from "@/components/registration/page-1";
 import Page2 from "@/components/registration/page-2";
 import Page3 from "@/components/registration/page-3";
@@ -24,28 +24,247 @@ import * as Yup from "yup";
 import Link from "next/link";
 import SuccessPage from "@/components/registration/success-page";
 import { Form, Formik, FormikHelpers, useFormikContext } from "formik";
-import { json } from "stream/consumers";
 import { storage } from "@/utils/useStorage";
+import { useRouter } from "next/navigation";
+import { toast } from "@/hooks/use-toast";
 /* const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
  */ interface IRegistration {
   action: string;
   page: number;
 }
+const countWords = (html: string) => {
+  if (!html) return 0;
+  const text = html.replace(/<[^>]*>/g, " ").trim();
+  return text ? text.split(/\s+/).length : 0;
+};
 const validationSchema = Yup.object().shape({
-  email: Yup.string().email("Invalid email").required("Email is required"),
-  password: Yup.string().required("Password is required"),
-
-  /*   documents: Yup.array()
-    .of(
-      Yup.mixed().test(
-        "fileSize",
-        "File size must be less than 3MB",
-        (file) => {
-          return file ? file.size <= 3 * 1024 * 1024 : true;
-        }
-      )
+  lgu: Yup.string()
+    .required("This field is required")
+    .max(200, "Limit: 100 characters"),
+  lguAbbreviation: Yup.string()
+    .required("This field is required")
+    .max(200, "Limit: 200 characters"),
+  province: Yup.string()
+    .required("This field is required")
+    .max(200, "Limit: 200 characters"),
+  region: Yup.string()
+    .required("This field is required")
+    .max(200, "Limit: 200 characters"),
+  nameOfLCE: Yup.string()
+    .required("This field is required")
+    .max(200, "Limit: 200 characters"),
+  nameOfOffice: Yup.string()
+    .required("This field is required")
+    .max(200, "Limit: 200 characters"),
+  contactPerson: Yup.string()
+    .required("This field is required")
+    .max(200, "Limit: 200 characters"),
+  email: Yup.string()
+    .email("Invalid email address")
+    .required("This field is required")
+    .max(200, "Limit: 200 characters"),
+  officeNumber: Yup.string()
+    .required("This field is required")
+    .max(15, "Invalid"),
+  mobileNumber: Yup.string()
+    .required("This field is required")
+    .max(15, "Invalid"),
+  website: Yup.string()
+    .matches(
+      /^(https?:\/\/)?([\w.-]+)\.([a-z]{2,})(\/.*)?$/i,
+      "Must be a valid website URL"
     )
-    .max(5, "You can upload up to 5 files only"), */
+    .max(200, "Limit: 200 characters"),
+  facebook: Yup.string()
+    .matches(
+      /^(https?:\/\/)?([\w.-]+)\.([a-z]{2,})(\/.*)?$/i,
+      "Must be a valid website URL"
+    )
+    .max(200, "Limit: 200 characters"),
+  egovAwardsCount: Yup.string()
+    .required("This field is required")
+    .max(200, "Limit: 200 characters"),
+  /*  */
+  projectName: Yup.string()
+    .required("This field is required")
+    .max(200, "Limit: 100 characters"),
+  projectCategory: Yup.string()
+    .required("This field is required")
+    .max(200, "Limit: 200 characters"),
+  projectPeriod: Yup.string()
+    .required("This field is required")
+    .max(200, "Limit: 200 characters"),
+  projectURL: Yup.string()
+    .required("This field is required")
+    .matches(
+      /^(https?:\/\/)?([\w.-]+)\.([a-z]{2,})(\/.*)?$/i,
+      "Must be a valid website URL"
+    )
+    .max(200, "Limit: 200 characters"),
+  documents: Yup.mixed()
+    .test("fileSize", "Max 3MB per file", (value) => {
+      if (!value || !Array.isArray(value)) return true; // Allow empty
+      return value.every((file) => file.size <= 3 * 1024 * 1024); // 3MB limit
+    })
+    .test("fileCount", "Max 5 files", (value) => {
+      if (!value || !Array.isArray(value)) return true;
+      return value.length <= 5;
+    }),
+  impactText: Yup.string().test("maxWords", "Limit: 1000 words", (value) => {
+    if (!value) return true;
+
+    return countWords(value) <= 1000;
+  }),
+  impactFile: Yup.mixed()
+    .nullable()
+    .test("fileSize", "Max 3MB per file", (value: any) => {
+      if (!value) return true;
+      return value.size <= 3 * 1024 * 1024;
+    }),
+  impactCheck: Yup.mixed().test(
+    "eitherTextOrFile",
+    "At least one input field must be filled",
+    function () {
+      const { impactText, impactFile } = this.parent;
+
+      const hasText = !!impactText?.trim();
+      const hasFile = impactFile instanceof File;
+
+      return hasText || hasFile;
+    }
+  ),
+  relevanceText: Yup.string().test("maxWords", "Limit: 1000 words", (value) => {
+    if (!value) return true;
+
+    return countWords(value) <= 1000;
+  }),
+  relevanceFile: Yup.mixed()
+    .nullable()
+    .test("fileSize", "Max 3MB per file", (value: any) => {
+      if (!value) return true;
+      return value.size <= 3 * 1024 * 1024;
+    }),
+  relevanceCheck: Yup.mixed().test(
+    "eitherTextOrFile",
+    "At least one input field must be filled",
+    function () {
+      const { relevanceText, relevanceFile } = this.parent;
+
+      const hasText = !!relevanceText?.trim();
+      const hasFile = relevanceFile instanceof File;
+
+      return hasText || hasFile;
+    }
+  ),
+  sustainabilityText: Yup.string().test(
+    "maxWords",
+    "Limit: 1000 words",
+    (value) => {
+      if (!value) return true;
+
+      return countWords(value) <= 1000;
+    }
+  ),
+  sustainabilityFile: Yup.mixed()
+    .nullable()
+    .test("fileSize", "Max 3MB per file", (value: any) => {
+      if (!value) return true;
+      return value.size <= 3 * 1024 * 1024;
+    }),
+  sustainabilityCheck: Yup.mixed().test(
+    "eitherTextOrFile",
+    "At least one input field must be filled",
+    function () {
+      const { sustainabilityText, sustainabilityFile } = this.parent;
+
+      const hasText = !!sustainabilityText?.trim();
+      const hasFile = sustainabilityFile instanceof File;
+
+      return hasText || hasFile;
+    }
+  ),
+  innovationText: Yup.string().test(
+    "maxWords",
+    "Limit: 1000 words",
+    (value) => {
+      if (!value) return true;
+
+      return countWords(value) <= 1000;
+    }
+  ),
+  innovationFile: Yup.mixed()
+    .nullable()
+    .test("fileSize", "Max 3MB per file", (value: any) => {
+      if (!value) return true;
+      return value.size <= 3 * 1024 * 1024;
+    }),
+  innovationCheck: Yup.mixed().test(
+    "eitherTextOrFile",
+    "This field is required",
+    function () {
+      const { innovationText, innovationFile } = this.parent;
+
+      const hasText = !!innovationText?.trim();
+      const hasFile = innovationFile instanceof File;
+
+      return hasText || hasFile;
+    }
+  ),
+  goalText1: Yup.string().test("maxWords", "Limit: 1000 words", (value) => {
+    if (!value) return true;
+
+    return countWords(value) <= 1000;
+  }),
+  goalFile1: Yup.mixed()
+    .nullable()
+    .test("fileSize", "Max 3MB per file", (value: any) => {
+      if (!value) return true;
+      return value.size <= 3 * 1024 * 1024;
+    }),
+  goal1Check: Yup.mixed().test(
+    "eitherTextOrFile",
+    "At least one input field must be filled",
+    function () {
+      const { goalText1, goalFile1 } = this.parent;
+
+      const hasText = !!goalText1?.trim();
+      const hasFile = goalFile1 instanceof File;
+
+      return hasText || hasFile;
+    }
+  ),
+  goalText2: Yup.string().test("maxWords", "Limit: 1000 words", (value) => {
+    if (!value) return true;
+
+    return countWords(value) <= 1000;
+  }),
+  goalFile2: Yup.mixed()
+    .nullable()
+    .test("fileSize", "Max 3MB per file", (value: any) => {
+      if (!value) return true;
+      return value.size <= 3 * 1024 * 1024;
+    }),
+  goal2Check: Yup.mixed().test(
+    "eitherTextOrFile",
+    "At least one input field must be filled",
+    function () {
+      const { goalText2, goalFile2 } = this.parent;
+
+      const hasText = !!goalText2?.trim();
+      const hasFile = goalFile2 instanceof File;
+
+      return hasText || hasFile;
+    }
+  ),
+  goals: Yup.mixed().test(
+    "required",
+    "At least one goal is required",
+    (value) => {
+      if (typeof value === "string") return value.trim().length > 0;
+      if (Array.isArray(value)) return value.length > 0;
+      return false;
+    }
+  ),
 });
 const handleSubmit = async (
   values: any /* { region: string } */,
@@ -91,6 +310,7 @@ const handleSubmit = async (
 };
 const initialValues = {
   lgu: "",
+  lguAbbreviation: "",
   province: "",
   region: "",
   nameOfLCE: "",
@@ -107,13 +327,20 @@ const initialValues = {
   projectPeriod: "",
   projectURL: "",
   documents: [new File([""], "", { type: "" })] as File[],
-  impact: { text: "", file: null },
-  relevance: { text: "", file: null },
-  sustainability: { text: "", file: null },
-  innovation: { text: "", file: null },
+  impactText: "",
+  impactFile: null,
+  relevanceText: "",
+  relevanceFile: null,
+  sustainabilityText: "",
+  sustainabilityFile: null,
+  innovationText: "",
+  innovationFile: null,
+  goalText1: "",
+  goalFile1: null,
+  goalText2: "",
+  goalFile2: null,
+
   goals: [],
-  goaltext1: { text: "", file: null },
-  goaltext2: { text: "", file: null },
 };
 export const WordCounter = (
   value: string,
@@ -134,28 +361,74 @@ export const WordCounter = (
 };
 export const handleFileChange = (
   event: React.ChangeEvent<HTMLInputElement>,
-  name: string,
-  setFieldValue: Function
+  setValue: Function
 ) => {
   const files = event.target.files;
-  if (files && files.length > 0) {
-    setFieldValue(name, files[0]);
+  const size = event.target.files?.[0]?.size;
+  if (size) {
+    if (size > 3 * 1024 * 1024) {
+      toast({
+        title: "File too large!",
+        description: "Please upload a file smaller than 3MB.",
+        variant: "destructive",
+        duration: 2500,
+      });
+      return;
+    } else {
+      if (files && files.length > 0) {
+        setValue();
+      }
+    }
   }
 };
+
 export default function Registration({ action, page }: IRegistration) {
+  const router = useRouter();
   const [submitDialog, setSubmitDialog] = useState(false);
   const cachedData = storage.getItem("formData");
 
+  const fields: Record<number, string[]> = {
+    1: ["lgu", "email", "website"],
+    2: ["projectName"],
+  };
+  const validateFields = async (
+    setFieldTouched: any,
+    validateField: any,
+    errors: any,
+    page: number
+  ) => {
+    const fieldsToValidate = fields[page] || [];
+
+    await Promise.all(
+      fieldsToValidate.map(async (field) => {
+        await setFieldTouched(field, true, false);
+        await validateField(field);
+      })
+    );
+
+    const hasError = fieldsToValidate.some((field) => errors[field]);
+
+    return hasError;
+  };
+
   return (
     <Formik
-      initialValues={/* cachedData ? cachedData :  */ initialValues}
-      validationSchema={"" /* validationSchema */}
+      initialValues={initialValues}
+      validationSchema={validationSchema}
       onSubmit={handleSubmit}
     >
-      {({ setFieldValue, values }) => {
+      {({
+        setFieldValue,
+        values,
+        validateField,
+        errors,
+        setFieldTouched,
+        dirty,
+      }) => {
+        const [hasError, setHasError] = useState(false);
+
         useEffect(() => {
           const isPaused = storage.getItem("isPaused");
-
           if (!isPaused) {
             const handler = setTimeout(() => {
               storage.setItem("formData", values);
@@ -170,7 +443,7 @@ export default function Registration({ action, page }: IRegistration) {
               <section className="space-y-8">
                 <div className="space-y-3">
                   <h1 className="font-bold text-3xl texxt-slate-900">
-                    Registration Form
+                    Application Form
                   </h1>
                   <p className="text-[#1E3A8A] text-base">
                     <strong>11th eGOV Awards:</strong> Excellence in Governance
@@ -184,14 +457,14 @@ export default function Registration({ action, page }: IRegistration) {
               <>
                 {
                   [
-                    <Page1 values={values} setFieldValue={setFieldValue} />,
-                    <Page2 values={values} setFieldValue={setFieldValue} />,
-                    <Page3 values={values} setFieldValue={setFieldValue} />,
-                    <Page4 values={values} setFieldValue={setFieldValue} />,
-                    <Page5 values={values} setFieldValue={setFieldValue} />,
-                    <Page6 values={values} setFieldValue={setFieldValue} />,
-                    <Page7 values={values} setFieldValue={setFieldValue} />,
-                    <Summary values={values} setFieldValue={setFieldValue} />,
+                    <Page1 />,
+                    <Page2 />,
+                    <Page3 />,
+                    <Page4 />,
+                    <Page5 />,
+                    <Page6 />,
+                    <Page7 />,
+                    <Summary />,
                     <SuccessPage />,
                   ][page - 1]
                 }
@@ -216,20 +489,39 @@ export default function Registration({ action, page }: IRegistration) {
                 </Link>
                 {page < 8 ? (
                   <Link
-                    draggable="false"
+                    /*  onClick={() => {
+                      validateFields(
+                        setFieldTouched,
+                        validateField,
+                        errors,
+                        page
+                      ).then((hasErrors) => {
+                        if (!hasErrors) {
+                          router.push(
+                            `/registration?action=register&page=${page + 1}`
+                          );
+                        }
+                      });
+                    }} */
                     href={{
                       pathname: "/registration",
                       query: { action: "register", page: page + 1 },
                     }}
-                    className="bg-[#1F2937] flex gap-2 text-xs items-center transition-colors duration-300  hover:bg-slate-700 text-white p-2.5 px-6 rounded-md "
+                    /*                     type="button"
+                     */ draggable="false"
+                    className={`bg-[#1F2937] flex gap-2 text-xs items-center transition-colors duration-300  hover:bg-slate-700 text-white p-2.5 px-6 rounded-md ${
+                      hasError &&
+                      "opacity-50 cursor-not-allowed pointer-events-none"
+                    }`}
                   >
                     <ArrowRight size={15} />
                     Next
                   </Link>
                 ) : (
                   <Button
+                    type="submit"
                     onClick={() => {
-                      setSubmitDialog(true);
+                      /*  setSubmitDialog(true); */
                     }}
                   >
                     <Send />
@@ -265,19 +557,19 @@ export default function Registration({ action, page }: IRegistration) {
                       Cancel
                     </button>
                   </DialogClose>
-                  <Link
-                    draggable="false"
-                    href={{
+                  <Button
+                    type="submit"
+                    /* href={{
                       pathname: "/registration",
                       query: { action: "register", page: page + 1 },
-                    }}
-                    onClick={() => {
+                    }} */
+                    /*  onClick={() => {
                       setSubmitDialog(false);
-                    }}
+                    }} */
                     className="w-full flex items-center justify-center rounded-0 bg-[#2563EB] p-3 text-white font-medium hover:bg-[#3674fa] transition-colos duration-300"
                   >
                     Submit
-                  </Link>
+                  </Button>
                 </div>
               </DialogContent>
             </Dialog>

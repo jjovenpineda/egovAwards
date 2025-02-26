@@ -15,13 +15,13 @@ import pdf from "@/public/assets/svgs/pdf.svg";
 import { storage } from "@/utils/useStorage";
 import { PSGC } from "@/constants";
 import FileViewer from "../shared/file-viewer";
-interface Iprops {
-  setFieldValue: Function;
-  values: any;
-}
-export default function Summary({ setFieldValue, values }: Iprops) {
+import { ErrorMessage, FormikValues, useFormikContext } from "formik";
+
+export default function Summary() {
+  const { values, setFieldValue } = useFormikContext<FormikValues>();
   const aboutTheLguLabels = [
     { label: "LGU Name", value: "lgu" },
+    { label: "LGU Abbreviation", value: "lgu" },
     { label: "Province", value: "province" },
     { label: "Region", value: "region" },
     { label: "Name of LCE", value: "nameOfLCE" },
@@ -31,6 +31,8 @@ export default function Summary({ setFieldValue, values }: Iprops) {
     { label: "Mobile Number", value: "mobileNumber" },
     { label: "Office Number", value: "officeNumber" },
     { label: "Facebook Page", value: "facebookPage" },
+    { label: "Website", value: "website" },
+
     {
       label:
         "Number of times in joining eGOV, Digital Cities Awards, Digital Governance Awards from 2012 to 2022",
@@ -103,7 +105,7 @@ export default function Summary({ setFieldValue, values }: Iprops) {
               setFieldValue={setFieldValue}
               values={values}
             >
-              <Page1 values={values} setFieldValue={setFieldValue} />
+              <Page1 />
             </ModalWrapper>
           </div>
           <hr className="p-2 "></hr>
@@ -128,14 +130,21 @@ export default function Summary({ setFieldValue, values }: Iprops) {
                 <div className="flex justify-between">
                   {item.label} <span className="mr-4">:</span>
                 </div>
-                <div className="mb-2 font-medium text-slate-500">
-                  {item.value == "region"
-                    ? region?.name
-                    : item.value == "province"
-                    ? province?.name
-                    : item.value == "lgu"
-                    ? lgu?.name
-                    : values[item.value]}
+                <div>
+                  <div className=" font-medium text-slate-500">
+                    {item.value == "region"
+                      ? region?.name
+                      : item.value == "province"
+                      ? province?.name
+                      : item.value == "lgu"
+                      ? lgu?.name
+                      : values[item.value]}
+                  </div>
+                  <ErrorMessage
+                    name={item.value}
+                    component="div"
+                    className=" text-base text-red-500 italic "
+                  />
                 </div>
               </React.Fragment>
             );
@@ -164,7 +173,7 @@ export default function Summary({ setFieldValue, values }: Iprops) {
               setFieldValue={setFieldValue}
               values={values}
             >
-              <Page2 values={values} setFieldValue={setFieldValue} />
+              <Page2 />
             </ModalWrapper>
           </div>
           <hr className="p-2 "></hr>
@@ -176,7 +185,7 @@ export default function Summary({ setFieldValue, values }: Iprops) {
             );
             return (
               <React.Fragment key={index}>
-                <div className="flex justify-between ">
+                <div className="flex justify-between">
                   {item.label}{" "}
                   {item.value != "documents" && <span className="mr-4">:</span>}
                 </div>
@@ -213,10 +222,20 @@ export default function Summary({ setFieldValue, values }: Iprops) {
                 ) : item.value == "projectCategory" ? (
                   <div className="mb-2 font-medium text-slate-500">
                     {category?.label}
+                    <ErrorMessage
+                      name={item.value}
+                      component="div"
+                      className=" text-base text-red-500 italic "
+                    />
                   </div>
                 ) : (
                   <div className="mb-2 font-medium text-slate-500">
                     {values[item.value]}
+                    <ErrorMessage
+                      name={item.value}
+                      component="div"
+                      className=" text-base text-red-500 italic "
+                    />
                   </div>
                 )}
                 {/*     {values[item.value]} */}
@@ -248,7 +267,7 @@ export default function Summary({ setFieldValue, values }: Iprops) {
               setFieldValue={setFieldValue}
               values={values}
             >
-              <Page3 values={values} setFieldValue={setFieldValue} />
+              <Page3 />
             </ModalWrapper>
           </div>
           <hr className="p-2 "></hr>
@@ -260,19 +279,31 @@ export default function Summary({ setFieldValue, values }: Iprops) {
             accountability in local governance? (You may cite several major
             impacts)
           </h2>
-          <p className="text-slate-500 text-base font-light leading-normal">
-            Forth momentary rice cattle call international nurse ornament loss
-            spring excessive bury pig dream ticket bunch taxi battery rule term
-            plaster east angry stretch then pupil scatter importance examine
-            arch permission board sport wake tin day ready shine salt reasonable
-            ripe repair competition inform eager paper influential railroad male
-            brush reward fit handkerchief from hurt ruin shine bread add strong
-            first effort persuasion ability manage you rock robbery condition
-            car forbid wide whisper castle attend monkey disturb library enter
-            salesman overflow flesh liar jaw raise crop thirst hard rather sir
-            control stamp failure arrange miss care resistance marriage film
-            staple.
-          </p>
+          <p
+            className="text-slate-500 text-base font-light leading-normal line-clamp-6"
+            dangerouslySetInnerHTML={{ __html: values.impactText }}
+          />
+          <div className="mb-2 font-medium text-slate-500 col-span-2">
+            <div className="flex flex-wrap gap-2 w-full ">
+              {values.impactFile &&
+                values.impactFile.name &&
+                (() => {
+                  const fileURL = URL.createObjectURL(values.impactFile);
+
+                  return (
+                    <div className="flex items-center gap-2 w-fit">
+                      <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
+                        <div className="flex items-center gap-2">
+                          <Image src={pdf} alt="PDF Icon" />
+                          {values.impactFile.name}
+                        </div>
+                        <FileViewer url={fileURL} />
+                      </div>
+                    </div>
+                  );
+                })()}
+            </div>{" "}
+          </div>
         </div>
       </section>
       <section>
@@ -297,7 +328,7 @@ export default function Summary({ setFieldValue, values }: Iprops) {
               setFieldValue={setFieldValue}
               values={values}
             >
-              <Page4 values={values} setFieldValue={setFieldValue} />
+              <Page4 />
             </ModalWrapper>
           </div>
           <hr className="p-2 "></hr>
@@ -316,19 +347,31 @@ export default function Summary({ setFieldValue, values }: Iprops) {
             the implementation of the project in relation to the problem it aims
             to solve?
           </h2>
-          <p className="text-slate-500 text-base font-light leading-normal">
-            Forth momentary rice cattle call international nurse ornament loss
-            spring excessive bury pig dream ticket bunch taxi battery rule term
-            plaster east angry stretch then pupil scatter importance examine
-            arch permission board sport wake tin day ready shine salt reasonable
-            ripe repair competition inform eager paper influential railroad male
-            brush reward fit handkerchief from hurt ruin shine bread add strong
-            first effort persuasion ability manage you rock robbery condition
-            car forbid wide whisper castle attend monkey disturb library enter
-            salesman overflow flesh liar jaw raise crop thirst hard rather sir
-            control stamp failure arrange miss care resistance marriage film
-            staple.
-          </p>
+          <p
+            className="text-slate-500 text-base font-light leading-normal line-clamp-6"
+            dangerouslySetInnerHTML={{ __html: values.relevanceText }}
+          />
+          <div className="mb-2 font-medium text-slate-500 col-span-2">
+            <div className="flex flex-wrap gap-2 w-full ">
+              {values.relevanceFile &&
+                values.relevanceFile.name &&
+                (() => {
+                  const fileURL = URL.createObjectURL(values.relevanceFile);
+
+                  return (
+                    <div className="flex items-center gap-2 w-fit">
+                      <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
+                        <div className="flex items-center gap-2">
+                          <Image src={pdf} alt="PDF Icon" />
+                          {values.relevanceFile.name}
+                        </div>
+                        <FileViewer url={fileURL} />
+                      </div>
+                    </div>
+                  );
+                })()}
+            </div>{" "}
+          </div>
         </div>
       </section>
       <section>
@@ -353,7 +396,7 @@ export default function Summary({ setFieldValue, values }: Iprops) {
               setFieldValue={setFieldValue}
               values={values}
             >
-              <Page5 values={values} setFieldValue={setFieldValue} />
+              <Page5 />
             </ModalWrapper>
           </div>
           <hr className="p-2 "></hr>
@@ -372,19 +415,33 @@ export default function Summary({ setFieldValue, values }: Iprops) {
             the implementation of the project in relation to the problem it aims
             to solve?
           </h2>
-          <p className="text-slate-500 text-base font-light leading-normal">
-            Forth momentary rice cattle call international nurse ornament loss
-            spring excessive bury pig dream ticket bunch taxi battery rule term
-            plaster east angry stretch then pupil scatter importance examine
-            arch permission board sport wake tin day ready shine salt reasonable
-            ripe repair competition inform eager paper influential railroad male
-            brush reward fit handkerchief from hurt ruin shine bread add strong
-            first effort persuasion ability manage you rock robbery condition
-            car forbid wide whisper castle attend monkey disturb library enter
-            salesman overflow flesh liar jaw raise crop thirst hard rather sir
-            control stamp failure arrange miss care resistance marriage film
-            staple.
-          </p>
+          <p
+            className="text-slate-500 text-base font-light leading-normal line-clamp-6"
+            dangerouslySetInnerHTML={{ __html: values.sustainabilityText }}
+          />
+          <div className="mb-2 font-medium text-slate-500 col-span-2">
+            <div className="flex flex-wrap gap-2 w-full ">
+              {values.sustainabilityFile &&
+                values.sustainabilityFile.name &&
+                (() => {
+                  const fileURL = URL.createObjectURL(
+                    values.sustainabilityFile
+                  );
+
+                  return (
+                    <div className="flex items-center gap-2 w-fit">
+                      <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
+                        <div className="flex items-center gap-2">
+                          <Image src={pdf} alt="PDF Icon" />
+                          {values.sustainabilityFile.name}
+                        </div>
+                        <FileViewer url={fileURL} />
+                      </div>
+                    </div>
+                  );
+                })()}
+            </div>{" "}
+          </div>
         </div>
       </section>
       <section>
@@ -409,7 +466,7 @@ export default function Summary({ setFieldValue, values }: Iprops) {
               setFieldValue={setFieldValue}
               values={values}
             >
-              <Page6 values={values} setFieldValue={setFieldValue} />
+              <Page6 />
             </ModalWrapper>
           </div>
           <hr className="p-2 "></hr>
@@ -425,19 +482,31 @@ export default function Summary({ setFieldValue, values }: Iprops) {
             addressing the problems?
           </h2>
 
-          <p className="text-slate-500 text-base font-light leading-normal">
-            Forth momentary rice cattle call international nurse ornament loss
-            spring excessive bury pig dream ticket bunch taxi battery rule term
-            plaster east angry stretch then pupil scatter importance examine
-            arch permission board sport wake tin day ready shine salt reasonable
-            ripe repair competition inform eager paper influential railroad male
-            brush reward fit handkerchief from hurt ruin shine bread add strong
-            first effort persuasion ability manage you rock robbery condition
-            car forbid wide whisper castle attend monkey disturb library enter
-            salesman overflow flesh liar jaw raise crop thirst hard rather sir
-            control stamp failure arrange miss care resistance marriage film
-            staple.
-          </p>
+          <p
+            className="text-slate-500 text-base font-light leading-normal line-clamp-6"
+            dangerouslySetInnerHTML={{ __html: values.innovationText }}
+          />
+          <div className="mb-2 font-medium text-slate-500 col-span-2">
+            <div className="flex flex-wrap gap-2 w-full ">
+              {values.innovationFile &&
+                values.innovationFile.name &&
+                (() => {
+                  const fileURL = URL.createObjectURL(values.innovationFile);
+
+                  return (
+                    <div className="flex items-center gap-2 w-fit">
+                      <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
+                        <div className="flex items-center gap-2">
+                          <Image src={pdf} alt="PDF Icon" />
+                          {values.innovationFile.name}
+                        </div>
+                        <FileViewer url={fileURL} />
+                      </div>
+                    </div>
+                  );
+                })()}
+            </div>{" "}
+          </div>
         </div>
       </section>
       <section>
@@ -462,7 +531,7 @@ export default function Summary({ setFieldValue, values }: Iprops) {
               setFieldValue={setFieldValue}
               values={values}
             >
-              <Page7 values={values} setFieldValue={setFieldValue} />
+              <Page7 />
             </ModalWrapper>
           </div>
           <hr className="p-2 "></hr>
@@ -473,11 +542,9 @@ export default function Summary({ setFieldValue, values }: Iprops) {
               Sustainable Development Goals (SDGs) that your project focuses on.
             </p>
             <ul className="list-disc list-inside ml-2 text-slate-600">
-              <li>No Poverty</li>
-              <li>Gender Equality</li>
-              <li>Industry, Innovation, and Infrastructure</li>
-              <li>Climate Action</li>
-              <li>Partnerships for the Goals </li>
+              {values.goals.map((goal: any, index: any) => (
+                <li key={index}>{goal}</li>
+              ))}
             </ul>
           </div>
           <div className="space-y-2">
@@ -498,19 +565,31 @@ export default function Summary({ setFieldValue, values }: Iprops) {
               economic, social, or environmental aspects of the chosen SDGs?){" "}
             </h2>
 
-            <p className="text-slate-500 text-base font-light leading-normal">
-              Forth momentary rice cattle call international nurse ornament loss
-              spring excessive bury pig dream ticket bunch taxi battery rule
-              term plaster east angry stretch then pupil scatter importance
-              examine arch permission board sport wake tin day ready shine salt
-              reasonable ripe repair competition inform eager paper influential
-              railroad male brush reward fit handkerchief from hurt ruin shine
-              bread add strong first effort persuasion ability manage you rock
-              robbery condition car forbid wide whisper castle attend monkey
-              disturb library enter salesman overflow flesh liar jaw raise crop
-              thirst hard rather sir control stamp failure arrange miss care
-              resistance marriage film staple.
-            </p>
+            <p
+              className="text-slate-500 text-base font-light leading-normal line-clamp-6"
+              dangerouslySetInnerHTML={{ __html: values.goalText1 }}
+            />
+            <div className="mb-2 font-medium text-slate-500 col-span-2">
+              <div className="flex flex-wrap gap-2 w-full ">
+                {values.goalFile1 &&
+                  values.goalFile1.name &&
+                  (() => {
+                    const fileURL = URL.createObjectURL(values.goalFile1);
+
+                    return (
+                      <div className="flex items-center gap-2 w-fit">
+                        <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
+                          <div className="flex items-center gap-2">
+                            <Image src={pdf} alt="PDF Icon" />
+                            {values.goalFile1.name}
+                          </div>
+                          <FileViewer url={fileURL} />
+                        </div>
+                      </div>
+                    );
+                  })()}
+              </div>{" "}
+            </div>
           </div>
 
           <div className="space-y-2">
@@ -520,19 +599,31 @@ export default function Summary({ setFieldValue, values }: Iprops) {
               Technology (DICT).
             </h2>
 
-            <p className="text-slate-500 text-base font-light leading-normal">
-              Forth momentary rice cattle call international nurse ornament loss
-              spring excessive bury pig dream ticket bunch taxi battery rule
-              term plaster east angry stretch then pupil scatter importance
-              examine arch permission board sport wake tin day ready shine salt
-              reasonable ripe repair competition inform eager paper influential
-              railroad male brush reward fit handkerchief from hurt ruin shine
-              bread add strong first effort persuasion ability manage you rock
-              robbery condition car forbid wide whisper castle attend monkey
-              disturb library enter salesman overflow flesh liar jaw raise crop
-              thirst hard rather sir control stamp failure arrange miss care
-              resistance marriage film staple.
-            </p>
+            <p
+              className="text-slate-500 text-base font-light leading-normal line-clamp-6"
+              dangerouslySetInnerHTML={{ __html: values.goalText2 }}
+            />
+            <div className="mb-2 font-medium text-slate-500 col-span-2">
+              <div className="flex flex-wrap gap-2 w-full ">
+                {values.goalFile2 &&
+                  values.goalFile2.name &&
+                  (() => {
+                    const fileURL = URL.createObjectURL(values.goalFile2);
+
+                    return (
+                      <div className="flex items-center gap-2 w-fit">
+                        <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
+                          <div className="flex items-center gap-2">
+                            <Image src={pdf} alt="PDF Icon" />
+                            {values.goalFile2.name}
+                          </div>
+                          <FileViewer url={fileURL} />
+                        </div>
+                      </div>
+                    );
+                  })()}
+              </div>{" "}
+            </div>
           </div>
         </div>
       </section>

@@ -19,12 +19,11 @@ import { Globe, Mail, Phone } from "lucide-react";
 import ModalWrapper from "./modal-wrapper";
 import { Button } from "@/components/ui/button";
 import { PSGC } from "@/constants";
-import { ErrorMessage, Field } from "formik";
-interface Iprops {
-  setFieldValue: Function;
-  values: any;
-}
-export default function Page1({ setFieldValue, values }: Iprops) {
+import { ErrorMessage, Field, FormikValues, useFormikContext } from "formik";
+
+export default function Page1() {
+  const { values, setFieldValue, validateField, setFieldTouched } =
+    useFormikContext<FormikValues>();
   const [isloaded, setIsLoaded] = useState(false);
   const findLGU = () => {
     const region = PSGC.regions.find((region) =>
@@ -54,12 +53,21 @@ export default function Page1({ setFieldValue, values }: Iprops) {
           </section>
           <div className="space-y-10 lg:space-y-16 py-6">
             <section className="grid lg:grid-cols-2 lg:gap-x-8 lg:gap-y-4 gap-2">
-              <div className="lg:col-span-2 lg:w-1/2 lg:pr-4 ">
-                <Label className="text-sm font-semibold text-slate-900">
-                  LGU
-                </Label>
+              <div className="  lg:pr-4 ">
+                <div className="flex gap-1 items-center">
+                  <Label className="font-semibold text-sm text-[#1F2937]">
+                    LGU <span className="text-red-500 text-base"> *</span>
+                  </Label>
+                  <ErrorMessage
+                    name="lgu"
+                    component="div"
+                    className=" text-xs text-red-500 font-semibold"
+                  />
+                </div>
                 <Select
-                  onValueChange={(e) => setFieldValue("lgu", e)}
+                  onValueChange={(e) => {
+                    setFieldValue("lgu", e);
+                  }}
                   defaultValue={values.lgu}
                 >
                   <SelectTrigger>
@@ -79,60 +87,117 @@ export default function Page1({ setFieldValue, values }: Iprops) {
                     </SelectGroup>
                   </SelectContent>
                 </Select>
+                <p className="font-medium my-1 text-gray-400 text-sm lg:max-w-[80%]">
+                  If you cannot find your LGU, kindly get in touch with the{" "}
+                  <a className="underline text-blue-400">
+                    egovawards@dict.gov.ph
+                  </a>{" "}
+                  to provide the province, region, and name of your LGU.{" "}
+                </p>
               </div>
-              <div className="flex flex-col-reverse">
-                <Select
-                  disabled={values.lgu ? false : true}
-                  value={values.province}
-                  onValueChange={(e) => setFieldValue("province", e)}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select Province" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {PSGC.regions
-                      .filter((region) => values.lgu.startsWith(region.id))
-                      .map((i) =>
-                        i.provinces.map((province, index) => (
-                          <SelectItem key={index} value={province.id}>
-                            {province.name}
+              <div className="  lg:pr-4 ">
+                <div className="flex gap-1 items-center">
+                  <Label className="font-semibold text-sm text-[#1F2937]">
+                    LGU Abbreviation{" "}
+                    <span className="text-red-500 text-base">*</span>
+                  </Label>
+                  <ErrorMessage
+                    name="lguAbbreviation"
+                    component="div"
+                    className=" text-xs text-red-500 font-semibold"
+                  />
+                </div>
+
+                <Field
+                  type="text"
+                  autoComplete="off"
+                  name="lguAbbreviation"
+                  placeholder="Enter LGU Abbreviation"
+                  as={Input}
+                  className=" space-y-8 rounded-md bg-white "
+                />
+              </div>
+              <div>
+                <div className="flex flex-col-reverse">
+                  <Select
+                    disabled={values.lgu ? false : true}
+                    value={values.province}
+                    onValueChange={(e) => setFieldValue("province", e)}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select Province" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {PSGC.regions
+                        .filter((region) => values.lgu.startsWith(region.id))
+                        .map((i) =>
+                          i.provinces.map((province, index) => (
+                            <SelectItem key={index} value={province.id}>
+                              {province.name}
+                            </SelectItem>
+                          ))
+                        )}
+                    </SelectContent>
+                  </Select>
+
+                  <div className="flex gap-1 items-center">
+                    <Label className="peer-disabled:opacity-50 font-semibold text-sm text-[#1F2937]">
+                      Province <span className="text-red-500 text-base">*</span>
+                    </Label>
+                    <ErrorMessage
+                      name="region"
+                      component="div"
+                      className=" text-xs text-red-500 font-semibold"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div className="flex flex-col-reverse">
+                  <Select
+                    disabled={values.province ? false : true}
+                    value={values.region}
+                    onValueChange={(e) => setFieldValue("region", e)}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select Region" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {PSGC.regions
+                        .filter((i) => values.lgu.startsWith(i.id))
+                        .map((region, index) => (
+                          <SelectItem key={index} value={region.id}>
+                            {region.name}
                           </SelectItem>
-                        ))
-                      )}
-                  </SelectContent>
-                </Select>
-                <Label className="peer-disabled:opacity-50 font-semibold text-sm text-[#1F2937]">
-                  Province
-                </Label>
-              </div>
-              <div className="flex flex-col-reverse">
-                <Select
-                  disabled={values.province ? false : true}
-                  value={values.region}
-                  onValueChange={(e) => setFieldValue("region", e)}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select Region" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {PSGC.regions
-                      .filter((i) => values.lgu.startsWith(i.id))
-                      .map((region, index) => (
-                        <SelectItem key={index} value={region.id}>
-                          {region.name}
-                        </SelectItem>
-                      ))}
-                  </SelectContent>
-                </Select>
-                <Label className="peer-disabled:opacity-50 font-semibold text-sm text-[#1F2937]">
-                  Region
-                </Label>
+                        ))}
+                    </SelectContent>
+                  </Select>
+
+                  <div className="flex gap-1 items-center">
+                    <Label className="peer-disabled:opacity-50 font-semibold text-sm text-[#1F2937]">
+                      Region <span className="text-red-500 text-base">*</span>
+                    </Label>
+                    <ErrorMessage
+                      name="region"
+                      component="div"
+                      className=" text-xs text-red-500 font-semibold"
+                    />
+                  </div>
+                </div>
               </div>
 
               <div>
-                <Label className="font-semibold text-sm text-[#1F2937]">
-                  Name of LCE
-                </Label>
+                <div className="flex gap-1 items-center">
+                  <Label className="font-semibold text-sm text-[#1F2937]">
+                    Name of LCE{" "}
+                    <span className="text-red-500 text-base">*</span>
+                  </Label>
+                  <ErrorMessage
+                    name="nameOfLCE"
+                    component="div"
+                    className=" text-xs text-red-500 font-semibold"
+                  />
+                </div>
                 <Field
                   type="text"
                   autoComplete="off"
@@ -141,37 +206,43 @@ export default function Page1({ setFieldValue, values }: Iprops) {
                   as={Input}
                   className=" space-y-8 rounded-md bg-white "
                 />
-                <ErrorMessage
-                  name="nameOfLCE"
-                  component="div"
-                  className=" text-xs text-red-500"
-                />
               </div>
 
               <div>
-                <Label className="font-semibold text-sm text-[#1F2937]">
-                  Name of Office in LGU{" "}
-                </Label>
+                <div className="flex gap-1 items-center">
+                  <Label className="font-semibold text-sm text-[#1F2937]">
+                    Name of Office in LGU{" "}
+                    <span className="text-red-500 text-base">*</span>
+                  </Label>
+                  <ErrorMessage
+                    name="nameOfOffice"
+                    component="div"
+                    className=" text-xs text-red-500 font-semibold"
+                  />
+                </div>
                 <Field
                   type="text"
                   autoComplete="off"
                   name="nameOfOffice"
-                  placeholder="Enter Name of Office in LCE"
+                  placeholder="Enter Name of Office in LGU"
                   as={Input}
                   className=" space-y-8 rounded-md bg-white "
-                />
-                <ErrorMessage
-                  name="nameOfOffice"
-                  component="div"
-                  className=" text-xs text-red-500"
                 />
               </div>
             </section>
             <section className="grid lg:grid-cols-2 lg:gap-x-8 lg:gap-y-4 gap-2">
               <div>
-                <Label className="font-semibold text-sm text-[#1F2937]">
-                  Contact Person
-                </Label>
+                <div className="flex gap-1 items-center">
+                  <Label className="font-semibold text-sm text-[#1F2937]">
+                    Contact Person{" "}
+                    <span className="text-red-500 text-base">*</span>
+                  </Label>
+                  <ErrorMessage
+                    name="contactPerson"
+                    component="div"
+                    className=" text-xs text-red-500 font-semibold"
+                  />
+                </div>
                 <Field
                   type="text"
                   autoComplete="off"
@@ -180,16 +251,21 @@ export default function Page1({ setFieldValue, values }: Iprops) {
                   as={Input}
                   className=" space-y-8 rounded-md bg-white "
                 />
-                <ErrorMessage
-                  name="contactPerson"
-                  component="div"
-                  className=" text-xs text-red-500"
-                />
+                <p className="font-medium my-1 text-gray-400 text-sm">
+                  Name of Authorized Official Representative.
+                </p>
               </div>
               <div>
-                <Label className="font-semibold text-sm text-[#1F2937]">
-                  Email
-                </Label>
+                <div className="flex gap-1 items-center">
+                  <Label className="font-semibold text-sm text-[#1F2937]">
+                    Email <span className="text-red-500 text-base">*</span>
+                  </Label>
+                  <ErrorMessage
+                    name="email"
+                    component="div"
+                    className=" text-xs text-red-500 font-semibold"
+                  />
+                </div>
                 <div className="relative">
                   <Field
                     type="email"
@@ -204,16 +280,22 @@ export default function Page1({ setFieldValue, values }: Iprops) {
                     className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
                   />
                 </div>
-                <ErrorMessage
-                  name="email"
-                  component="div"
-                  className=" text-xs text-red-500"
-                />
+                <p className="font-medium my-1 text-gray-400 text-sm">
+                  Kindly ensure that your email is accurate to receive updates.{" "}
+                </p>
               </div>
               <div>
-                <Label className="font-semibold text-sm text-[#1F2937]">
-                  Office Number
-                </Label>
+                <div className="flex gap-1 items-center">
+                  <Label className="font-semibold text-sm text-[#1F2937]">
+                    Office Number{" "}
+                    <span className="text-red-500 text-base">*</span>
+                  </Label>
+                  <ErrorMessage
+                    name="officeNumber"
+                    component="div"
+                    className=" text-xs text-red-500 font-semibold"
+                  />
+                </div>
                 <div className="relative">
                   <Field
                     type="number"
@@ -228,16 +310,19 @@ export default function Page1({ setFieldValue, values }: Iprops) {
                     className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
                   />
                 </div>
-                <ErrorMessage
-                  name="officeNumber"
-                  component="div"
-                  className=" text-xs text-red-500"
-                />
               </div>
               <div>
-                <Label className="font-semibold text-sm text-[#1F2937]">
-                  Mobile Number
-                </Label>
+                <div className="flex gap-1 items-center">
+                  <Label className="font-semibold text-sm text-[#1F2937]">
+                    Mobile Number{" "}
+                    <span className="text-red-500 text-base">*</span>
+                  </Label>
+                  <ErrorMessage
+                    name="mobileNumber"
+                    component="div"
+                    className=" text-xs text-red-500 font-semibold"
+                  />
+                </div>
                 <div className="relative">
                   <Field
                     type="number"
@@ -256,18 +341,20 @@ export default function Page1({ setFieldValue, values }: Iprops) {
                     className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
                   />
                 </div>
-                <ErrorMessage
-                  name="mobileNumber"
-                  component="div"
-                  className=" text-xs text-red-500"
-                />
               </div>
             </section>
             <section className="grid lg:grid-cols-2 lg:gap-x-8 lg:gap-y-4 gap-2">
               <div>
-                <Label className="font-semibold text-sm text-[#1F2937]">
-                  Website
-                </Label>
+                <div className="flex gap-1 items-center">
+                  <Label className="font-semibold text-sm text-[#1F2937]">
+                    Website
+                  </Label>
+                  <ErrorMessage
+                    name="website"
+                    component="div"
+                    className=" text-xs text-red-500 font-semibold"
+                  />
+                </div>
                 <div className="relative">
                   <Field
                     type="text"
@@ -282,23 +369,24 @@ export default function Page1({ setFieldValue, values }: Iprops) {
                     className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
                   />
                 </div>
-
-                <ErrorMessage
-                  name="website"
-                  component="div"
-                  className=" text-xs text-red-500"
-                />
               </div>
 
               <div>
-                <Label className="font-semibold text-sm text-[#1F2937]">
-                  Facebook Page
-                </Label>
+                <div className="flex gap-1 items-center">
+                  <Label className="font-semibold text-sm text-[#1F2937]">
+                    Facebook Page
+                  </Label>
+                  <ErrorMessage
+                    name="facebook"
+                    component="div"
+                    className=" text-xs text-red-500 font-semibold"
+                  />
+                </div>
                 <div className="relative">
                   <Field
                     type="text"
                     autoComplete="off"
-                    name="facebookPage"
+                    name="facebook"
                     placeholder="Enter Website"
                     as={Input}
                     className=" space-y-8 rounded-md bg-white pl-9"
@@ -309,32 +397,30 @@ export default function Page1({ setFieldValue, values }: Iprops) {
                     className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
                   />
                 </div>
-
-                <ErrorMessage
-                  name="facebookPage"
-                  component="div"
-                  className=" text-xs text-red-500"
-                />
               </div>
             </section>
             <div className="lg:w-1/2 lg:pr-4">
-              <p className="font-semibold text-sm text-[#1F2937]">
-                Number of times in joining eGOV, Digital Cities Awards, Digital
-                Governance Awards from 2012 to 2022.{" "}
-              </p>
-
+              <div className="flex   items-center">
+                <Label className="font-semibold text-sm text-[#1F2937]">
+                  Number of times in joining eGOV, Digital Cities Awards,
+                  Digital Governance Awards from 2012 to 2022.{" "}
+                </Label>
+                <div className="flex gap-1">
+                  <span className="text-red-500 text-base">*</span>
+                  <ErrorMessage
+                    name="egovAwardsCount"
+                    component="div"
+                    className=" text-xs text-red-500 font-semibold"
+                  />
+                </div>
+              </div>
               <Field
-                type="text"
+                type="number"
                 autoComplete="off"
                 name="egovAwardsCount"
                 placeholder="Enter times in joining eGOV, DCA, DGA"
                 as={Input}
                 className=" space-y-8 rounded-md bg-white"
-              />
-              <ErrorMessage
-                name="egovAwardsCount"
-                component="div"
-                className=" text-xs text-red-500"
               />
             </div>
           </div>

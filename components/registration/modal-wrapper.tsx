@@ -66,21 +66,8 @@ export default function ModalWrapper({
       Object.entries(values).forEach(([key, value]: any) => {
         if (key === "documents" && Array.isArray(value)) {
           return null;
-        } else if (
-          typeof value === "object" &&
-          value !== null &&
-          key != "goals"
-        ) {
-          const filteredObject = Object.fromEntries(
-            Object.entries(value).map(([subKey, subValue]) => [
-              subKey,
-              subValue instanceof File ? value[subKey] : subValue, // Keep existing File object, update others
-            ])
-          );
-
-          setFieldValue(key, filteredObject);
         } else if (!(value instanceof File)) {
-          setFieldValue(key, value);
+          return null;
         }
       });
     }

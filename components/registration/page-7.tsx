@@ -7,7 +7,13 @@ import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import Editor from "@/components/shared/rich-text-editor";
 import { debounce } from "lodash";
-import { Field, FieldArray } from "formik";
+import {
+  ErrorMessage,
+  Field,
+  FieldArray,
+  FormikValues,
+  useFormikContext,
+} from "formik";
 import pdf from "@/public/assets/svgs/pdf.svg";
 import FileViewer from "../shared/file-viewer";
 import { Trash2 } from "lucide-react";
@@ -118,11 +124,10 @@ const goals = [
     selected: true,
   },
 ];
-interface Iprops {
-  setFieldValue: Function;
-  values: any;
-}
-export default function Page7({ setFieldValue, values }: Iprops) {
+
+export default function Page7() {
+  const { values, setFieldValue, setFieldTouched, validateField } =
+    useFormikContext<FormikValues>();
   const [content, setContent] = useState("");
   const [count, setCount] = useState(0);
 
@@ -130,21 +135,21 @@ export default function Page7({ setFieldValue, values }: Iprops) {
   const [fileURL2, setFileURL2] = useState<string>("");
 
   useEffect(() => {
-    if (values.goaltext1.file instanceof File) {
-      setFileURL1(URL.createObjectURL(values.goaltext1.file));
+    if (values.goalFile1 instanceof File) {
+      setFileURL1(URL.createObjectURL(values.goalFile1));
     }
-    WordCounter(values.goaltext1.text, setCount, () => {
-      setFieldValue("goaltext1.text", "");
+    WordCounter(values.goalText1, setCount, () => {
+      setFieldValue("goalText1", "");
     });
-  }, [values.goaltext1]);
+  }, [values.goalText1, values.goalFile1]);
   useEffect(() => {
-    if (values.goaltext2.file instanceof File) {
-      setFileURL2(URL.createObjectURL(values.goaltext2.file));
+    if (values.goalFile2 instanceof File) {
+      setFileURL2(URL.createObjectURL(values.goalFile2));
     }
-    WordCounter(values.goaltext2.text, setCount, () => {
-      setFieldValue("goaltext2.text", "");
+    WordCounter(values.goalText2, setCount, () => {
+      setFieldValue("goalText2", "");
     });
-  }, [values.goaltext2]);
+  }, [values.goalText2, values.goalFile2]);
   return (
     <div>
       <section className="space-y-2 pt-6 lg:pt-0">
@@ -154,14 +159,21 @@ export default function Page7({ setFieldValue, values }: Iprops) {
         <hr className="border border-blue-900"></hr>
       </section>
       <section>
-        <p className="text-base text-slate-900 italic py-4">
-          <strong className="not-italic">
-            Select the Sustainable Development Goals (SDGs) that your project
-            focuses on.
-          </strong>{" "}
-          (Select all that apply.)
-        </p>
-
+        <div className="flex gap-1 items-center">
+          <p className="text-base text-slate-900 italic py-4">
+            <strong className="not-italic">
+              Select the Sustainable Development Goals (SDGs) that your project
+              focuses on.
+            </strong>{" "}
+            (Select all that apply.){" "}
+            <span className="text-red-500 text-base">*</span>
+          </p>
+          <ErrorMessage
+            name="goals"
+            component="div"
+            className=" text-xs text-red-500 font-semibold"
+          />
+        </div>
         <FieldArray
           name="goals"
           render={(arrayHelpers) => (
@@ -227,62 +239,107 @@ export default function Page7({ setFieldValue, values }: Iprops) {
         <p className="text-red-500">
           Please limit your answers to 500 - 1000 words
         </p>
-        <div className="my-2 rounded-full ">
-          <Editor
-            defaultValue={values.goaltext1.text}
-            onChange={(e) => setFieldValue("goaltext1.text", e)}
-          />
-        </div>
-
-        <div className="flex justify-end">
+        <div>
           <div
-            className={` text-sm ${
-              count >= 1000 ? "text-red-500" : "text-gray-500"
-            }`}
+            onFocus={() => {
+              setFieldTouched("goal1Check", true), validateField("goal1Check");
+            }}
+            onBlur={() => {
+              validateField("goal1Check");
+            }}
+            className="h-min"
           >
-            {count}/500
+            <Editor
+              defaultValue={values.goalText1}
+              onChange={(e) => {
+                setFieldValue("goalText1", e);
+                setFieldTouched("goalText1", true);
+                // Trigger validation
+              }} // Trigger validation}}
+            />
           </div>
-        </div>
-
-        <div className="flex flex-wrap gap-2 items-center my-10">
-          <p>or Upload File </p>
-          <div>
-            <div className="overflow-hidden">
-              {values.goaltext1.file ? (
-                <div className="flex items-center gap-2 ">
-                  {" "}
-                  <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
-                    <div className="flex items-center gap-2">
-                      <Image src={pdf} alt="" />
-                      {values.goaltext1.file.name}
-                    </div>
-                    <FileViewer url={fileURL1} />
-                  </div>
-                  <Trash2
-                    size={18}
-                    color="red"
-                    className="shrink-0"
-                    onClick={() => setFieldValue("goaltext1.file", null)}
-                  />
-                </div>
-              ) : (
-                <Input
-                  value={values.goaltext1.name}
-                  type="file"
-                  accept="application/pdf"
-                  placeholder="Enter Project/Program Name"
-                  className="w-full"
-                  onChange={(e) =>
-                    handleFileChange(e, "goaltext1.file", setFieldValue)
-                  }
-                />
-              )}
+          <ErrorMessage
+            name="goalText1"
+            component="div"
+            className=" text-xs text-red-500 font-semibold"
+          />
+          <div className="flex justify-end">
+            <div
+              className={` text-sm ${
+                count > 1000 ? "text-red-500" : "text-gray-500"
+              }`}
+            >
+              {count}/1000
             </div>
-
-            <p className="text-slate-500 text-sm">
-              Files must not exceed 3MB in size.{" "}
-            </p>
           </div>
+
+          <div className="flex flex-wrap gap-2 items-center my-4">
+            <p>or Upload File </p>
+            <div>
+              <div className="overflow-hidden">
+                {values.goalFile1 ? (
+                  <div className="flex items-center gap-2 ">
+                    {" "}
+                    <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
+                      <div className="flex items-center gap-2">
+                        <Image src={pdf} alt="" />
+                        {values.goalFile1.name}
+                      </div>
+                      <FileViewer url={fileURL1} />
+                    </div>
+                    <Trash2
+                      size={18}
+                      color="red"
+                      className="shrink-0"
+                      onClick={() => setFieldValue("goalFile1", null)}
+                    />
+                  </div>
+                ) : (
+                  <Input
+                    value={""}
+                    type="file"
+                    onFocus={() => {
+                      setTimeout(() => {
+                        setFieldTouched("goal1Check", true),
+                          validateField("goal1Check");
+                      }, 3000);
+                    }}
+                    onBlur={() => {
+                      setTimeout(() => {
+                        validateField("goal1Check");
+                      }, 3000);
+                    }}
+                    accept="application/pdf"
+                    placeholder="Enter Project/Program Name"
+                    className="w-full"
+                    onChange={(e) => {
+                      handleFileChange(e, () => {
+                        setFieldValue(
+                          "goalFile1",
+                          e.target.files && e.target.files[0]
+                        ),
+                          setFieldTouched("goal1Check", true),
+                          validateField("goal1Check");
+                      });
+                    }}
+                  />
+                )}
+              </div>
+              <ErrorMessage
+                name="goalFile1"
+                component="div"
+                className=" text-sm text-red-500 font-semibold"
+              />
+              <p className="text-slate-500 text-sm">
+                Files must not exceed 3MB in size.{" "}
+              </p>
+            </div>
+          </div>
+          <ErrorMessage
+            name="goal1Check"
+            component="div"
+            className=" text-xs text-red-500"
+          />
         </div>
       </section>
       <section className=" my-10">
@@ -296,62 +353,107 @@ export default function Page7({ setFieldValue, values }: Iprops) {
         <p className="text-red-500">
           Please limit your answers to 500 - 1000 words
         </p>
-        <div className="my-2 rounded-full ">
-          <Editor
-            defaultValue={values.goaltext2.text}
-            onChange={(e) => setFieldValue("goaltext2.text", e)}
-          />
-        </div>
-
-        <div className="flex justify-end">
+        <div>
           <div
-            className={` text-sm ${
-              count >= 1000 ? "text-red-500" : "text-gray-500"
-            }`}
+            onFocus={() => {
+              setFieldTouched("goal2Check", true), validateField("goal2Check");
+            }}
+            onBlur={() => {
+              validateField("goal2Check");
+            }}
+            className="h-min"
           >
-            {count}/500
+            <Editor
+              defaultValue={values.goalText2}
+              onChange={(e) => {
+                setFieldValue("goalText2", e);
+                setFieldTouched("goalText2", true);
+                // Trigger validation
+              }} // Trigger validation}}
+            />
           </div>
-        </div>
-
-        <div className="flex flex-wrap gap-2 items-center my-10">
-          <p>or Upload File </p>
-          <div>
-            <div className="overflow-hidden">
-              {values.goaltext2.file ? (
-                <div className="flex items-center gap-2 ">
-                  {" "}
-                  <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
-                    <div className="flex items-center gap-2">
-                      <Image src={pdf} alt="" />
-                      {values.goaltext2.file.name}
-                    </div>
-                    <FileViewer url={fileURL2} />
-                  </div>
-                  <Trash2
-                    size={18}
-                    color="red"
-                    className="shrink-0"
-                    onClick={() => setFieldValue("goaltext2.file", null)}
-                  />
-                </div>
-              ) : (
-                <Input
-                  value={values.goaltext2.name}
-                  type="file"
-                  accept="application/pdf"
-                  placeholder="Enter Project/Program Name"
-                  className="w-full"
-                  onChange={(e) =>
-                    handleFileChange(e, "goaltext2.file", setFieldValue)
-                  }
-                />
-              )}
+          <ErrorMessage
+            name="goalText2"
+            component="div"
+            className=" text-xs text-red-500 font-semibold"
+          />
+          <div className="flex justify-end">
+            <div
+              className={` text-sm ${
+                count > 1000 ? "text-red-500" : "text-gray-500"
+              }`}
+            >
+              {count}/1000
             </div>
-
-            <p className="text-slate-500 text-sm">
-              Files must not exceed 3MB in size.{" "}
-            </p>
           </div>
+
+          <div className="flex flex-wrap gap-2 items-center my-4">
+            <p>or Upload File </p>
+            <div>
+              <div className="overflow-hidden">
+                {values.goalFile2 ? (
+                  <div className="flex items-center gap-2 ">
+                    {" "}
+                    <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
+                      <div className="flex items-center gap-2">
+                        <Image src={pdf} alt="" />
+                        {values.goalFile2.name}
+                      </div>
+                      <FileViewer url={fileURL2} />
+                    </div>
+                    <Trash2
+                      size={18}
+                      color="red"
+                      className="shrink-0"
+                      onClick={() => setFieldValue("goalFile2", null)}
+                    />
+                  </div>
+                ) : (
+                  <Input
+                    value={""}
+                    type="file"
+                    onFocus={() => {
+                      setTimeout(() => {
+                        setFieldTouched("goal2Check", true),
+                          validateField("goal2Check");
+                      }, 3000);
+                    }}
+                    onBlur={() => {
+                      setTimeout(() => {
+                        validateField("goal2Check");
+                      }, 3000);
+                    }}
+                    accept="application/pdf"
+                    placeholder="Enter Project/Program Name"
+                    className="w-full"
+                    onChange={(e) => {
+                      handleFileChange(e, () => {
+                        setFieldValue(
+                          "goalFile2",
+                          e.target.files && e.target.files[0]
+                        ),
+                          setFieldTouched("goal2Check", true),
+                          validateField("goal2Check");
+                      });
+                    }}
+                  />
+                )}
+              </div>
+              <ErrorMessage
+                name="goalFile2"
+                component="div"
+                className=" text-sm text-red-500 font-semibold"
+              />
+              <p className="text-slate-500 text-sm">
+                Files must not exceed 3MB in size.{" "}
+              </p>
+            </div>
+          </div>
+          <ErrorMessage
+            name="goal2Check"
+            component="div"
+            className=" text-xs text-red-500"
+          />
         </div>
       </section>
     </div>

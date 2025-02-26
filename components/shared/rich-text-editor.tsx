@@ -17,7 +17,7 @@ const Editor = ({ onChange, defaultValue }: Props) => {
       setOptions={{
         showPathLabel: false,
         width: "100%",
-        minHeight: "323px",
+        minHeight: "290px",
         buttonList: [
           /*  ["font", "fontSize", "formatBlock"], */
           ["bold", "underline", "italic", "strike"],

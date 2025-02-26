@@ -9,7 +9,14 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import FileViewer from "../shared/file-viewer";
 import pdf from "@/public/assets/svgs/pdf.svg";
-import { ArrayHelpers, ErrorMessage, Field, FieldArray } from "formik";
+import {
+  ArrayHelpers,
+  ErrorMessage,
+  Field,
+  FieldArray,
+  FormikValues,
+  useFormikContext,
+} from "formik";
 import { AnimatePresence, m } from "motion/react";
 import { toast } from "@/hooks/use-toast";
 export const categories = [
@@ -41,30 +48,44 @@ export const categories = [
       "G2E Government solutions providing Education and Training to citizens",
   },
 ];
-interface Iprops {
-  setFieldValue: Function;
-  values: any;
-}
-export default function Page2({ setFieldValue, values }: Iprops) {
+
+export default function Page2() {
+  const { values, setFieldValue, setFieldTouched } =
+    useFormikContext<FormikValues>();
   const handleFileChange = (
     event: React.ChangeEvent<HTMLInputElement>,
     index: number,
     arrayHelpers: any
   ) => {
     const files = event.target.files;
+    const size = event.target.files?.[0]?.size;
+    if (size) {
+      if (size > 3 * 1024 * 1024) {
+        toast({
+          title: "File too large!",
+          description: "Please upload a file smaller than 3MB.",
+          variant: "destructive",
+          duration: 2500,
+        });
+        return;
+      }
+    }
+
     if (files && files.length > 0) {
       if (values.documents.map((e: any) => e.name).includes(files[0].name)) {
         toast({
           title: "Duplicate File",
           description: "This file has already been uploaded.",
           variant: "destructive",
-          duration: 2000,
+          duration: 2500,
         });
       } else {
         setFieldValue(`documents.${index}`, files[0]);
       }
+      setFieldTouched("documents", true, true);
     }
   };
+
   return (
     <div className="">
       <section className="space-y-2 pt-6 lg:pt-0">
@@ -73,9 +94,17 @@ export default function Page2({ setFieldValue, values }: Iprops) {
       </section>
       <div className="py-6 space-y-4 lg:w-1/2">
         <div>
-          <Label className="font-semibold text-sm text-[#1F2937]">
-            Project/Program Name
-          </Label>
+          <div className="flex gap-1 items-center">
+            <Label className="font-semibold text-sm text-[#1F2937]">
+              Project/Program Name{" "}
+              <span className="text-red-500 text-base">*</span>
+            </Label>
+            <ErrorMessage
+              name="projectName"
+              component="div"
+              className=" text-xs text-red-500 font-semibold"
+            />
+          </div>
           <Field
             type="text"
             autoComplete="off"
@@ -84,16 +113,21 @@ export default function Page2({ setFieldValue, values }: Iprops) {
             as={Input}
             className=" space-y-8 rounded-md bg-white "
           />
-          <ErrorMessage
-            name="projectName"
-            component="div"
-            className=" text-xs text-red-500"
-          />
         </div>
         <div>
-          <h2 className="font-semibold py-2 text-sm text-[#1F2937]">
-            Choose Category for Project
-          </h2>
+          <div className="flex gap-1 items-center">
+            <div className="flex items-center gap-1">
+              <h2 className="font-semibold py-2 text-sm text-[#1F2937]">
+                Choose Category for Project{" "}
+              </h2>
+              <div className="flex gap-1">
+                <span className="text-red-500 text-base font-semibold">*</span>
+                <h2 className="text-xs font-semibold text-red-500 mt-1">
+                  This field is required
+                </h2>
+              </div>
+            </div>
+          </div>
           <RadioGroup
             onValueChange={(e) => setFieldValue("projectCategory", e)}
             defaultValue={values.projectCategory}
@@ -110,21 +144,24 @@ export default function Page2({ setFieldValue, values }: Iprops) {
               </div>
             ))}
           </RadioGroup>
-          <ErrorMessage
-            name="projectCategory"
-            component="div"
-            className=" text-xs text-red-500"
-          />
         </div>
         <div className="flex flex-col gap-2">
           <div>
             <div className="flex flex-wrap justify-between">
-              <Label className="font-semibold text-sm text-[#1F2937]">
-                Project Period{" "}
-              </Label>
+              <div className="flex gap-1 items-center">
+                <Label className="font-semibold text-sm text-[#1F2937]">
+                  Project Period{" "}
+                  <span className="text-red-500 text-base">*</span>
+                </Label>
+                <ErrorMessage
+                  name="projectPeriod"
+                  component="div"
+                  className=" text-xs text-red-500 font-semibold"
+                />
+              </div>
               <p className="text-slate-500 text-sm">
                 (*Must be existing for a minimum of one year)
-              </p>
+              </p>{" "}
             </div>
             <Field
               type="text"
@@ -134,16 +171,18 @@ export default function Page2({ setFieldValue, values }: Iprops) {
               as={Input}
               className=" space-y-8 rounded-md bg-white "
             />
-            <ErrorMessage
-              name="projectPeriod"
-              component="div"
-              className=" text-xs text-red-500"
-            />
           </div>
           <div>
-            <Label className="font-semibold text-sm text-[#1F2937]">
-              Project URL{" "}
-            </Label>
+            <div className="flex gap-1 items-center">
+              <Label className="font-semibold text-sm text-[#1F2937]">
+                Project URL <span className="text-red-500 text-base">*</span>
+              </Label>
+              <ErrorMessage
+                name="projectURL"
+                component="div"
+                className=" text-xs text-red-500 font-semibold"
+              />
+            </div>
             <Field
               type="text"
               autoComplete="off"
@@ -152,26 +191,26 @@ export default function Page2({ setFieldValue, values }: Iprops) {
               as={Input}
               className=" space-y-8 rounded-md bg-white "
             />
-            <ErrorMessage
-              name="projectURL"
-              component="div"
-              className=" text-xs text-red-500"
-            />
+
             <p className="text-slate-500 text-sm">
               Please provide any link for virtual access to the project.
             </p>
           </div>
         </div>
         <div className="space-y-3 pt-20 pb-10">
-          <div className="text-sm text-slate-800">
-            <h3 className="font-semibold">
-              Upload Supporting Documents (Maximum of 5 documents)
-            </h3>
-            <p className="max-w-md">
-              Example of supporting documents: performance ratings, transparency
-              reports, competitive analysis, photo documentation, feedback
-              reports,
-            </p>
+          <div className="flex gap-1 items-center">
+            <div className="text-sm text-slate-800">
+              <div className="flex items-center gap-1">
+                <h3 className="font-semibold">
+                  Upload Supporting Documents (Maximum of 5 documents)
+                </h3>
+              </div>
+              <p className="max-w-md">
+                Example of supporting documents: performance ratings,
+                transparency reports, competitive analysis, photo documentation,
+                feedback reports,
+              </p>
+            </div>
           </div>
           <div className="flex items-center gap-2">
             <FieldArray
@@ -201,6 +240,11 @@ export default function Page2({ setFieldValue, values }: Iprops) {
                                 className="shrink-0"
                                 onClick={() => arrayHelpers.remove(index)}
                               />
+                              <ErrorMessage
+                                name={`documents`}
+                                component="div"
+                                className=" text-xs text-red-500 font-semibold"
+                              />
                             </div>
                           ) : (
                             <Input
@@ -209,9 +253,9 @@ export default function Page2({ setFieldValue, values }: Iprops) {
                               accept="application/pdf"
                               placeholder="Enter Project/Program Name"
                               className="w-full"
-                              onChange={(e) =>
-                                handleFileChange(e, index, arrayHelpers)
-                              }
+                              onChange={(e) => {
+                                handleFileChange(e, index, arrayHelpers);
+                              }}
                             />
                           )}
                         </div>

@@ -10,22 +10,21 @@ import Image from "next/image";
 import FileViewer from "../shared/file-viewer";
 import { Trash2 } from "lucide-react";
 import { handleFileChange, WordCounter } from "./registration";
-interface Iprops {
-  setFieldValue: Function;
-  values: any;
-}
-export default function Page6({ setFieldValue, values }: Iprops) {
+import { ErrorMessage, Field, FormikValues, useFormikContext } from "formik";
+
+export default function Page6() {
+  const { values, setFieldValue, setFieldTouched, validateField } =
+    useFormikContext<FormikValues>();
   const [count, setCount] = useState(0);
   const [fileURL, setFileURL] = useState<string>("");
-
   useEffect(() => {
-    if (values.innovation.file instanceof File) {
-      setFileURL(URL.createObjectURL(values.innovation.file));
+    if (values.innovationFile instanceof File) {
+      setFileURL(URL.createObjectURL(values.innovationFile));
     }
-    WordCounter(values.innovation.text, setCount, () => {
-      setFieldValue("innovation.text", "");
+    WordCounter(values.innovationText, setCount, () => {
+      setFieldValue("innovationText", "");
     });
-  }, [values.innovation]);
+  }, [values.innovationText, values.innovationFile]);
 
   return (
     <div>
@@ -35,7 +34,7 @@ export default function Page6({ setFieldValue, values }: Iprops) {
         </h2>
         <hr className="border border-blue-900"></hr>
       </section>
-      <div className=" my-10">
+      <div className="grid lg:grid-cols-2 gap-8 my-10">
         <div className="space-y-4">
           <p className="text-base">
             How has the innovation in your project improved service delivery and
@@ -47,66 +46,108 @@ export default function Page6({ setFieldValue, values }: Iprops) {
             addressing the problems?
           </p>
         </div>
-
-        <p className="text-red-500">
-          Please limit your answers to 500 - 1000 words
-        </p>
-        <div className="my-2 rounded-full ">
-          <Editor
-            defaultValue={values.innovation.text}
-            onChange={(e) => setFieldValue("innovation.text", e)}
-          />
-        </div>
-
-        <div className="flex justify-end">
+        <div>
           <div
-            className={` text-sm ${
-              count >= 1000 ? "text-red-500" : "text-gray-500"
-            }`}
+            onFocus={() => {
+              setFieldTouched("innovationCheck", true),
+                validateField("innovationCheck");
+            }}
+            onBlur={() => {
+              validateField("innovationCheck");
+            }}
+            className="h-min"
           >
-            {count}/500
+            <Editor
+              defaultValue={values.innovationText}
+              onChange={(e) => {
+                setFieldValue("innovationText", e);
+                setFieldTouched("innovationText", true);
+                // Trigger validation
+              }} // Trigger validation}}
+            />
           </div>
-        </div>
-
-        <div className="flex flex-wrap gap-2 items-center my-10">
-          <p>or Upload File </p>
-          <div>
-            <div className="overflow-hidden">
-              {values.innovation.file ? (
-                <div className="flex items-center gap-2 ">
-                  {" "}
-                  <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
-                    <div className="flex items-center gap-2">
-                      <Image src={pdf} alt="" />
-                      {values.innovation.file.name}
-                    </div>
-                    <FileViewer url={fileURL} />
-                  </div>
-                  <Trash2
-                    size={18}
-                    color="red"
-                    className="shrink-0"
-                    onClick={() => setFieldValue("innovation.file", null)}
-                  />
-                </div>
-              ) : (
-                <Input
-                  value={values.innovation.name}
-                  type="file"
-                  accept="application/pdf"
-                  placeholder="Enter Project/Program Name"
-                  className="w-full"
-                  onChange={(e) =>
-                    handleFileChange(e, "innovation.file", setFieldValue)
-                  }
-                />
-              )}
+          <ErrorMessage
+            name="innovationText"
+            component="div"
+            className=" text-xs text-red-500 font-semibold"
+          />
+          <div className="flex justify-end">
+            <div
+              className={` text-sm ${
+                count > 1000 ? "text-red-500" : "text-gray-500"
+              }`}
+            >
+              {count}/1000
             </div>
-
-            <p className="text-slate-500 text-sm">
-              Files must not exceed 3MB in size.{" "}
-            </p>
           </div>
+
+          <div className="flex flex-wrap gap-2 items-center my-4">
+            <p>or Upload File </p>
+            <div>
+              <div className="overflow-hidden">
+                {values.innovationFile ? (
+                  <div className="flex items-center gap-2 ">
+                    {" "}
+                    <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
+                      <div className="flex items-center gap-2">
+                        <Image src={pdf} alt="" />
+                        {values.innovationFile.name}
+                      </div>
+                      <FileViewer url={fileURL} />
+                    </div>
+                    <Trash2
+                      size={18}
+                      color="red"
+                      className="shrink-0"
+                      onClick={() => setFieldValue("innovationFile", null)}
+                    />
+                  </div>
+                ) : (
+                  <Input
+                    value={""}
+                    type="file"
+                    onFocus={() => {
+                      setTimeout(() => {
+                        setFieldTouched("innovationCheck", true),
+                          validateField("innovationCheck");
+                      }, 3000);
+                    }}
+                    onBlur={() => {
+                      setTimeout(() => {
+                        validateField("innovationCheck");
+                      }, 3000);
+                    }}
+                    accept="application/pdf"
+                    placeholder="Enter Project/Program Name"
+                    className="w-full"
+                    onChange={(e) => {
+                      handleFileChange(e, () => {
+                        setFieldValue(
+                          "innovationFile",
+                          e.target.files && e.target.files[0]
+                        ),
+                          setFieldTouched("innovationCheck", true),
+                          validateField("innovationCheck");
+                      });
+                    }}
+                  />
+                )}
+              </div>
+              <ErrorMessage
+                name="innovationFile"
+                component="div"
+                className=" text-sm text-red-500 font-semibold"
+              />
+              <p className="text-slate-500 text-sm">
+                Files must not exceed 3MB in size.{" "}
+              </p>
+            </div>
+          </div>
+          <ErrorMessage
+            name="innovationCheck"
+            component="div"
+            className=" text-xs text-red-500"
+          />
         </div>
       </div>
     </div>
