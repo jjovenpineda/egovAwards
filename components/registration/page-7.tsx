@@ -158,7 +158,7 @@ export default function Page7() {
         </h2>
         <hr className="border border-blue-900"></hr>
       </section>
-      <section>
+      <section className="mb-20">
         <div className="flex flex-wrap gap-1 items-center">
           <p className="text-base text-slate-900 italic py-4">
             <strong className="not-italic">
@@ -217,28 +217,30 @@ export default function Page7() {
           )}
         />
       </section>
-      <section className=" my-10">
-        <div className="space-y-2">
-          <p className="text-base">
-            Describe how it aligns with 1 or 2 SDGs. (Which specific SDGs does
-            the project primarily target, and why?
-          </p>
-          <p className="text-base">
-            How does the project's focus on these SDGs address local or global
-            challenges?
-          </p>
-          <p className="text-base">
-            What measurable outcomes are expected from the project in relation
-            to the selected SDGs?
-          </p>
-          <p className="text-base">
-            Can you provide examples of how the project contributes to the
-            economic, social, or environmental aspects of the chosen SDGs?)
+      <section className="grid gap-8 lg:grid-cols-2 my-10">
+        <div>
+          <div className="space-y-2">
+            <p className="text-base">
+              Describe how it aligns with 1 or 2 SDGs. (Which specific SDGs does
+              the project primarily target, and why?
+            </p>
+            <p className="text-base">
+              How does the project's focus on these SDGs address local or global
+              challenges?
+            </p>
+            <p className="text-base">
+              What measurable outcomes are expected from the project in relation
+              to the selected SDGs?
+            </p>
+            <p className="text-base">
+              Can you provide examples of how the project contributes to the
+              economic, social, or environmental aspects of the chosen SDGs?)
+            </p>
+          </div>
+          <p className="text-red-500">
+            Please limit your answers to 500 - 1000 words
           </p>
         </div>
-        <p className="text-red-500">
-          Please limit your answers to 500 - 1000 words
-        </p>
         <div>
           <div
             onFocus={() => {
@@ -342,17 +344,19 @@ export default function Page7() {
           />
         </div>
       </section>
-      <section className=" my-10">
-        <div className="space-y-2">
-          <p className="text-base lg:w-1/2">
-            Describe how the project aligns with or supports the mandate and
-            programs of the Department of Information and Communications
-            Technology (DICT).
+      <section className="grid gap-8 lg:grid-cols-2 my-10">
+        <div>
+          <div className="space-y-2">
+            <p className="text-base ">
+              Describe how the project aligns with or supports the mandate and
+              programs of the Department of Information and Communications
+              Technology (DICT).
+            </p>
+          </div>
+          <p className="text-red-500">
+            Please limit your answers to 500 - 1000 words
           </p>
         </div>
-        <p className="text-red-500">
-          Please limit your answers to 500 - 1000 words
-        </p>
         <div>
           <div
             onFocus={() => {
