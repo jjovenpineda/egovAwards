@@ -36,25 +36,20 @@ export default function RootLayout({
     <main className="min-h-screen  overflow-hidden flex justify-between flex-col">
       <div>
         <Header />
-        <FloatingIcons />
         <m.div
           initial={!hasBeenAnimated && { y: 100, opacity: 0 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
           onAnimationComplete={() => sethasBeenAnimated(true)}
-          className="w-full lg:px-16 py-14 "
+          className="w-full min-h-[80%] lg:px-16 py-14 "
         >
-          <Suspense> {children}</Suspense>
+          <Suspense>
+            {" "}
+            <FloatingIcons /> {children}
+          </Suspense>
         </m.div>
       </div>
       <Footer />
-      {/*   {isInactive && (
-        <div className="inactivity-dialog">
-          <p>Are you still there?</p>
-          <button onClick={() => handleUserResponse("yes")}>Yes</button>
-          <button onClick={() => handleUserResponse("no")}>No</button>
-        </div>
-      )} */}
     </main>
   );
 }

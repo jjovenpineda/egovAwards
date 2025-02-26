@@ -1,30 +1,23 @@
 "use client";
+export const dynamic = "force-dynamic"; // Ensure it's dynamic
+import React, { Suspense, useState } from "react";
 
-import dynamic from "next/dynamic";
-import React, { useEffect, useState } from "react";
-import underDev from "@/public/assets/website-maintenance.json";
-import { m } from "motion/react";
-import bg from "@/public/assets/images/bg-gradient.webp";
+import { useSearchParams } from "next/navigation";
 
-const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
-import Image from "next/image";
-export default function Home() {
+import AuthModal from "@/components/shared/auth-modal";
+import Registration from "@/components/registration/registration";
+export default function Page() {
+  const searchParams = useSearchParams();
+  const page = parseInt(searchParams.get("page") || "0");
+  const action = searchParams.get("action");
   return (
-    <div className="p-10 relative">
-      <div className="max-w-[600px] mx-auto">
-        <Lottie animationData={underDev} loop={true} />{" "}
-      </div>
-      {/*  <m.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{
-          duration: 1,
-          ease: "easeInOut",
-        }}
-        className="scale-[1.30] absolute inset-0 pointer-events-none"
-      >
-        <Image src={bg} alt="" fill className=" object-cover -z-50" />
-      </m.div> */}
+    <div className="mx-10 lg:mx-16 flex flex-col gap-6 ">
+      <section>
+        {/* {["login", "signup", "reset"].includes(action || "") && (
+          <AuthModal action={action} page={page} />
+        )} */}
+        <Registration />
+      </section>
     </div>
   );
 }

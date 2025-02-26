@@ -35,7 +35,6 @@ import { toast } from "@/hooks/use-toast";
 import { m } from "motion/react";
 const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
 interface IRegistration {
-  action: string;
   page: number;
 }
 const countWords = (html: string) => {
@@ -385,11 +384,11 @@ export const handleFileChange = (
   }
 };
 
-export default function Registration({ action, page }: IRegistration) {
+export default function Registration() {
   const router = useRouter();
   const [submitDialog, setSubmitDialog] = useState(false);
   const [successDialog, setSuccessDialog] = useState(false);
-
+  const [page, setPage] = useState(1);
   const cachedData = storage.getItem("formData");
 
   const fields: Record<number, string[]> = {
@@ -444,20 +443,6 @@ export default function Registration({ action, page }: IRegistration) {
 
         return (
           <Form className="mx-0 lg:mx-16 flex flex-col gap-6 ">
-            {page < 9 && page != 0 && (
-              <section className="space-y-8">
-                <div className="space-y-3">
-                  <h1 className="font-bold text-3xl texxt-slate-900">
-                    Application Form
-                  </h1>
-                  <p className="text-[#1E3A8A] text-base">
-                    <strong>11th eGOV Awards:</strong> Excellence in Governance
-                    Through Information and Communications Technology Awards
-                  </p>
-                </div>
-              </section>
-            )}
-
             <section>
               <>
                 {
@@ -477,21 +462,29 @@ export default function Registration({ action, page }: IRegistration) {
 
             {page < 9 && page != 0 && (
               <section className="flex justify-between items-center">
-                <Link
-                  onClick={() => storage.setItem("isPaused", false)}
-                  draggable="false"
-                  href={{
+                <Button
+                  type="button"
+                  variant={"outline"}
+                  onClick={() => {
+                    storage.setItem("isPaused", false), setPage(page - 1);
+                  }}
+                  /* draggable="false"
+                   href={{
                     pathname: "/registration",
                     query: { action: "register", page: page - 1 },
-                  }}
-                  className={`text-slate-900 border border-black flex gap-2 text-xs items-center hover:bg-slate-200 p-2.5 px-6 rounded-md transition-colors duration-300 ${
+                  }} */
+                  className={`text-slate-900 border border-black flex gap-2 text-xs items-center hover:bg-slate-100 p-2.5 px-6 rounded-md transition-colors duration-300 ${
                     page === 1 ? "invisible " : "visible"
                   }`}
                 >
                   <ArrowLeft size={15} /> Back
-                </Link>
+                </Button>
                 {page < 8 ? (
-                  <Link
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      storage.setItem("isPaused", false), setPage(page + 1);
+                    }}
                     /*  onClick={() => {
                       validateFields(
                         setFieldTouched,
@@ -506,12 +499,12 @@ export default function Registration({ action, page }: IRegistration) {
                         }
                       });
                     }} */
-                    href={{
+                    /*  href={{
                       pathname: "/registration",
                       query: { action: "register", page: page + 1 },
-                    }}
+                    }} */
                     /*                     type="button"
-                     */ draggable="false"
+                     */
                     className={`bg-[#1F2937] flex gap-2 text-xs items-center transition-colors duration-300  hover:bg-slate-700 text-white p-2.5 px-6 rounded-md ${
                       hasError &&
                       "opacity-50 cursor-not-allowed pointer-events-none"
@@ -519,10 +512,10 @@ export default function Registration({ action, page }: IRegistration) {
                   >
                     <ArrowRight size={15} />
                     Next
-                  </Link>
+                  </Button>
                 ) : (
                   <Button
-                    type="submit"
+                    type="button"
                     onClick={async (e) => {
                       e.preventDefault();
                       Object.keys(validationSchema.fields).forEach((field) => {
@@ -625,20 +618,23 @@ export default function Registration({ action, page }: IRegistration) {
                         You’ll receive a confirmation email shortly. If you have
                         any questions, feel free to reach out!
                       </p>
-                      <Link
+                      <Button
+                        type="button"
                         draggable="false"
-                        href={{
+                        /*  href={{
                           pathname: "/registration",
                           query: { action: "register", page: 1 },
-                        }}
+                        }} */
                         onClick={() => {
                           setSuccessDialog(false);
+                          setPage(1);
                         }}
                         className="flex active items-center justify-center text-sm rounded-lg bg-[#2563EB]  py-2 px-3 font-semibold text-white hover:bg-[#3674fa] transition-colos duration-300"
                       >
                         Submit Another Entry
-                      </Link>
+                      </Button>
                       <Button
+                        type="button"
                         variant={"ghost"}
                         onClick={() => {
                           setSuccessDialog(false);

@@ -60,14 +60,14 @@ export default function FloatingIcons() {
   }, []);
 
   return (
-    <div className=" ">
+    <div className="">
       <div>
         <link
           rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
         />
       </div>
-      <div className=" inset-0 bg-[#F8FAFC] overflow-hidden -z-10">
+      <div className=" inset-0 bg-[#F8FAFC] overflow-hidden -z-[9999] pointer-events-none">
         <div className="absolute w-full h-full opacity-30">
           {iconElements.map(
             ({ id, icon, left, top, color, fontSize, animationDelay }) => (
