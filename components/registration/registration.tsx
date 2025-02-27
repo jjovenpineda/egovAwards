@@ -467,6 +467,7 @@ export default function Registration() {
                   variant={"outline"}
                   onClick={() => {
                     storage.setItem("isPaused", false), setPage(page - 1);
+                    window.scrollTo({ top: 200, behavior: "smooth" });
                   }}
                   /* draggable="false"
                    href={{
@@ -484,6 +485,7 @@ export default function Registration() {
                     type="button"
                     onClick={() => {
                       storage.setItem("isPaused", false), setPage(page + 1);
+                      window.scrollTo({ top: 200, behavior: "smooth" });
                     }}
                     /*  onClick={() => {
                       validateFields(
@@ -628,6 +630,7 @@ export default function Registration() {
                         onClick={() => {
                           setSuccessDialog(false);
                           setPage(1);
+                          window.scrollTo({ top: 200, behavior: "smooth" });
                         }}
                         className="flex active items-center justify-center text-sm rounded-lg bg-[#2563EB]  py-2 px-3 font-semibold text-white hover:bg-[#3674fa] transition-colos duration-300"
                       >
