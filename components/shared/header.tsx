@@ -13,9 +13,6 @@ import Image from "next/image";
 import egov from "@/public/assets/images/egov.webp";
 import image1 from "@/public/assets/images/carousel1.webp";
 
-import Link from "next/link";
-import { cn } from "@/lib/utils";
-import { Input } from "../ui/input";
 export default function Header() {
   const slides = [
     { id: 1, content: "Slide 1" },
@@ -27,21 +24,39 @@ export default function Header() {
   useEffect(() => {
     const interval = setInterval(() => {
       setIndex((prev) => (prev + 1) % slides.length);
-    }, 3500); // Change slide every 3 seconds
+    }, 3500);
 
     return () => clearInterval(interval);
   }, []);
+  const [isScrolling, setIsScrolling] = useState(false);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 280) {
+        setIsScrolling(true);
+      } else {
+        setIsScrolling(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
   return (
     <>
       <div className="flex justify-between items-center max-h-[183px] overflow-hidden border-b-2 bg-gradient-to-r  from-blue-100 from-1% via-[#DCEBFF] via-40% to-blue-50 to-80%">
         <div className="p-8 lg:px-32">
-          <Image src={egov} alt="egov" width={466} loading="lazy" />
+          <Image
+            src={egov}
+            alt="egov"
+            loading="lazy"
+            className="max-w-[300px] lg:max-w-[450px]"
+          />
           <h2 className="text-xs font-medium text-blue-900">
             <strong>11th eGOV Awards:</strong> Excellence in Governance Through
             Information and Communications Technology Awards{" "}
           </h2>
-          <h1 className="font-bold text-3xl text-[#2D2D2D]">
+          <h1 className="font-bold text-2xl lg:text-3xl text-[#2D2D2D]">
             Application Form
           </h1>
         </div>
@@ -284,6 +299,40 @@ export default function Header() {
           </div>
         </div>
       </div>
+      <AnimatePresence>
+        {isScrolling && (
+          <m.div
+            initial={{ y: "-100%" }}
+            animate={{ y: "0%" }}
+            exit={{ y: "-100%", opacity: 0 }}
+            transition={{
+              y: { duration: 0.3, ease: "easeIn" },
+              exit: { duration: 0.1, ease: "easeOut" },
+            }}
+            className="fixed top-0 left-0 w-full text-white z-40 "
+          >
+            <div className="flex  overflow-hidden border-b-2 bg-gradient-to-r  from-blue-100 from-1% via-[#DCEBFF] via-40% to-blue-50 to-80%">
+              <div className="flex flex-wrap-reverse items-center justify-between w-full p-2 lg:px-32">
+                <div>
+                  <h2 className="text-xs font-medium text-blue-900">
+                    <strong>11th eGOV Awards:</strong> Excellence in Governance
+                    Through Information and Communications Technology Awards{" "}
+                  </h2>
+                  <h1 className="font-bold text-xl lg:text-3xl text-[#2D2D2D]">
+                    Application Form
+                  </h1>
+                </div>
+                <Image
+                  src={egov}
+                  alt="egov"
+                  loading="lazy"
+                  className="max-w-[200px] lg:max-w-[300px]"
+                />
+              </div>
+            </div>
+          </m.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }
