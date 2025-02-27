@@ -4,10 +4,16 @@ import Link from "next/link";
 
 import republika from "@/public/assets/images/republika.webp";
 import dict from "@/public/assets/images/dict.webp";
+import { m } from "motion/react";
 
 export function Footer() {
   return (
-    <div className="bg-gray-800 z-10">
+    <m.div
+      initial={{ y: 100, opacity: 0 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, ease: "easeOut" }}
+      className="bg-gray-800 z-10"
+    >
       <div className="container relative mx-auto px-10 lg:px-20 py-8 lg:py-16 text-sm text-white">
         <div className="flex max-w-full flex-col items-center justify-evenly flex-wrap gap-8 md:gap-20  md:flex-row ">
           <div className="max-w-40 hidden 2xl:block">
@@ -156,6 +162,6 @@ export function Footer() {
           </div>
         </div>
       </div>
-    </div>
+    </m.div>
   );
 }

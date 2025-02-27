@@ -37,10 +37,9 @@ export default function RootLayout({
       <div>
         <Header />
         <m.div
-          initial={!hasBeenAnimated && { y: 100, opacity: 0 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          onAnimationComplete={() => sethasBeenAnimated(true)}
           className="w-full min-h-[80%] lg:px-16 py-14 "
         >
           <Suspense>

@@ -44,7 +44,12 @@ export default function Header() {
   }, []);
   return (
     <>
-      <div className="flex justify-between items-center max-h-[183px] overflow-hidden border-b-2 bg-gradient-to-r  from-blue-100 from-1% via-[#DCEBFF] via-40% to-blue-50 to-80%">
+      <m.div
+        initial={{ y: -100, opacity: 0 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="flex justify-between items-center max-h-[183px] overflow-hidden border-b-2 bg-gradient-to-r  from-blue-100 from-1% via-[#DCEBFF] via-40% to-blue-50 to-80%"
+      >
         <div className="p-8 lg:px-32">
           <Image
             src={egov}
@@ -298,7 +303,7 @@ export default function Header() {
             </AnimatePresence>
           </div>
         </div>
-      </div>
+      </m.div>
       <AnimatePresence>
         {isScrolling && (
           <m.div
