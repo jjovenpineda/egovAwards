@@ -52,7 +52,7 @@ export default function Page1() {
             <hr className="border border-blue-900"></hr>
           </section>
           <div className="space-y-10 lg:space-y-16 py-6">
-            <section className="grid lg:grid-cols-2 lg:gap-x-8 lg:gap-y-4 gap-2">
+            <section className="grid lg:grid-cols-2 lg:gap-x-8 lg:gap-y-4 gap-4">
               <div className="  lg:pr-4 ">
                 <div className="flex gap-1 items-center">
                   <Label className="font-semibold text-sm text-[#1F2937]">
@@ -101,6 +101,7 @@ export default function Page1() {
                     LGU Abbreviation{" "}
                     <span className="text-red-500 text-base">*</span>
                   </Label>
+
                   <ErrorMessage
                     name="lguAbbreviation"
                     component="div"
@@ -116,6 +117,9 @@ export default function Page1() {
                   as={Input}
                   className=" space-y-8 rounded-md bg-white "
                 />
+                <p className="font-medium my-1 text-gray-400 text-sm">
+                  e.g. QC{" "}
+                </p>
               </div>
               <div>
                 <div className="flex flex-col-reverse">
@@ -369,6 +373,9 @@ export default function Page1() {
                     className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
                   />
                 </div>
+                <p className="font-medium my-1 text-gray-400 text-sm">
+                  e.g. www.egovawards.gov.ph{" "}
+                </p>
               </div>
 
               <div>
@@ -397,6 +404,9 @@ export default function Page1() {
                     className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
                   />
                 </div>
+                <p className="font-medium my-1 text-gray-400 text-sm">
+                  e.g. facebook.com/egovawards{" "}
+                </p>
               </div>
             </section>
             <div className="lg:w-1/2 lg:pr-4">

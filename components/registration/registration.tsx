@@ -322,7 +322,7 @@ const initialValues = {
   officeNumber: "",
   mobileNumber: "",
   website: "",
-  facebookPage: "",
+  facebook: "",
   egovAwardsCount: "",
   projectName: "",
   projectCategory: "",
@@ -427,7 +427,7 @@ export default function Registration() {
         validateField,
         errors,
         setFieldTouched,
-        setTouched,
+        resetForm,
       }) => {
         const [hasError, setHasError] = useState(false);
 
@@ -628,15 +628,16 @@ export default function Registration() {
                           query: { action: "register", page: 1 },
                         }} */
                         onClick={() => {
+                          resetForm();
                           setSuccessDialog(false);
                           setPage(1);
                           window.scrollTo({ top: 200, behavior: "smooth" });
                         }}
-                        className="flex active items-center justify-center text-sm rounded-lg bg-[#2563EB]  py-2 px-3 font-semibold text-white hover:bg-[#3674fa] transition-colos duration-300"
+                        className="flex active items-center justify-center text-sm rounded-lg bg-[#DBEAFE]  py-2 px-3 font-semibold text-[#1E40AF] hover:bg-[#bed7f9] transition-colos duration-300"
                       >
-                        Submit Another Entry
+                        Close{" "}
                       </Button>
-                      <Button
+                      {/*   <Button
                         type="button"
                         variant={"ghost"}
                         onClick={() => {
@@ -645,7 +646,7 @@ export default function Registration() {
                         className="font-semibold bg-transparent  hover:text-[#142AF6] text-[#2563EB]"
                       >
                         Close{" "}
-                      </Button>
+                      </Button> */}
                     </div>
                   </div>
                   <m.div

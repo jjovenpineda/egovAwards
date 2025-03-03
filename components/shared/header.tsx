@@ -48,20 +48,20 @@ export default function Header() {
         initial={{ y: -100, opacity: 0 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="flex justify-between items-center max-h-[183px] overflow-hidden border-b-2 bg-gradient-to-r  from-blue-100 from-1% via-[#DCEBFF] via-40% to-blue-50 to-80%"
+        className="flex justify-between items-center px-4 lg:px-20 max-h-[183px] overflow-hidden border-b-2 bg-gradient-to-r  from-blue-100 from-1% via-[#DCEBFF] via-40% to-blue-50 to-80%"
       >
-        <div className="p-8 lg:px-32">
+        <div className="p-8">
           <Image
             src={egov}
             alt="egov"
             loading="lazy"
             className="max-w-[300px] lg:max-w-[450px]"
           />
-          <h2 className="text-xs font-medium text-blue-900">
+          <h2 className="text-xs font-medium text-blue-900 mt-2">
             <strong>11th eGOV Awards:</strong> Excellence in Governance Through
             Information and Communications Technology Awards{" "}
           </h2>
-          <h1 className="font-bold text-2xl lg:text-3xl text-[#2D2D2D]">
+          <h1 className="font-bold text-2xl lg:text-3xl text-[#2D2D2D] mt-8">
             Application Form
           </h1>
         </div>
@@ -198,9 +198,9 @@ export default function Header() {
                           className="object-cover h-full w-[70%]  absolute top-0 -right-4 "
                           style={{
                             WebkitMaskImage:
-                              "linear-gradient(to right, transparent, black 80%)",
+                              "linear-gradient(to right, transparent, black 80%, transparent 95%)",
                             maskImage:
-                              "linear-gradient(to right, transparent, black 80%)",
+                              "linear-gradient(to right, transparent, black 80%, transparent 95%)",
                           }}
                         />
                       </m.div>

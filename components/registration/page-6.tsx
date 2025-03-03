@@ -35,17 +35,23 @@ export default function Page6() {
         <hr className="border border-blue-900"></hr>
       </section>
       <div className="grid lg:grid-cols-2 gap-8 my-10">
-        <div className="space-y-4">
-          <p className="text-base">
-            How has the innovation in your project improved service delivery and
-            operational efficiency within your local government unit?
-          </p>
-          <p className="text-base">
-            What specific technological advancements or digital solutions were
-            implemented in your project, and how have they contributed to
-            addressing the problems?
+        <div>
+          <div className="space-y-4">
+            <p className="text-base">
+              How has the innovation in your project improved service delivery
+              and operational efficiency within your local government unit?
+            </p>
+            <p className="text-base">
+              What specific technological advancements or digital solutions were
+              implemented in your project, and how have they contributed to
+              addressing the problems?
+            </p>
+          </div>
+          <p className="text-red-500">
+            Please limit your answers to 500 - 1000 words
           </p>
         </div>
+
         <div>
           <div
             onFocus={() => {

@@ -110,7 +110,7 @@ export default function ModalWrapper({
                   onClose(), saveData();
                 }}
               >
-                <Save /> Save
+                <Save /> Update
               </Button>
             </DialogFooter>
           </DialogContent>

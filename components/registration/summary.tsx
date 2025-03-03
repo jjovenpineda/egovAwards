@@ -30,7 +30,7 @@ export default function Summary() {
     { label: "Email", value: "email" },
     { label: "Mobile Number", value: "mobileNumber" },
     { label: "Office Number", value: "officeNumber" },
-    { label: "Facebook Page", value: "facebookPage" },
+    { label: "Facebook Page", value: "facebook" },
     { label: "Website", value: "website" },
 
     {
@@ -85,6 +85,10 @@ export default function Summary() {
         </div>
       </section> */}
       <section>
+        <p className="text-red-500 mb-6 text-base">
+          Please review if all information are correct and accurate before you
+          submit.{" "}
+        </p>
         <div className=" space-y-2 pt-6 lg:pt-0">
           <div className="flex justify-between items-center">
             <h2 className="font-bold text-lg text-blue-900">ABOUT THE LGU </h2>
