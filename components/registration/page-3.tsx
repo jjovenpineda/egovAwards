@@ -18,13 +18,13 @@ export default function Page3() {
   const [count, setCount] = useState(0);
   const [fileURL, setFileURL] = useState<string>("");
   useEffect(() => {
-    if (values.impactFile instanceof File) {
-      setFileURL(URL.createObjectURL(values.impactFile));
+    if (values.impactAnswer_file instanceof File) {
+      setFileURL(URL.createObjectURL(values.impactAnswer_file));
     }
-    WordCounter(values.impactText, setCount, () => {
-      setFieldValue("impactText", "");
+    WordCounter(values.impactAnswer_text, setCount, () => {
+      setFieldValue("impactAnswer_text", "");
     });
-  }, [values.impactText, values.impactFile]);
+  }, [values.impactAnswer_text, values.impactAnswer_file]);
 
   return (
     <div>
@@ -58,16 +58,16 @@ export default function Page3() {
             className="h-min"
           >
             <Editor
-              defaultValue={values.impactText}
+              defaultValue={values.impactAnswer_text}
               onChange={(e) => {
-                setFieldValue("impactText", e);
-                setFieldTouched("impactText", true);
+                setFieldValue("impactAnswer_text", e);
+                setFieldTouched("impactAnswer_text", true);
                 // Trigger validation
               }} // Trigger validation}}
             />
           </div>
           <ErrorMessage
-            name="impactText"
+            name="impactAnswer_text"
             component="div"
             className=" text-xs text-red-500 font-semibold"
           />
@@ -85,13 +85,13 @@ export default function Page3() {
             <p>or Upload File </p>
             <div>
               <div className="overflow-hidden">
-                {values.impactFile ? (
+                {values.impactAnswer_file ? (
                   <div className="flex items-center gap-2 ">
                     {" "}
                     <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
                       <div className="flex items-center gap-2">
                         <Image src={pdf} alt="" />
-                        {values.impactFile.name}
+                        {values.impactAnswer_file.name}
                       </div>
                       <FileViewer url={fileURL} />
                     </div>
@@ -99,7 +99,7 @@ export default function Page3() {
                       size={18}
                       color="red"
                       className="shrink-0"
-                      onClick={() => setFieldValue("impactFile", null)}
+                      onClick={() => setFieldValue("impactAnswer_file", null)}
                     />
                   </div>
                 ) : (
@@ -123,7 +123,7 @@ export default function Page3() {
                     onChange={(e) => {
                       handleFileChange(e, () => {
                         setFieldValue(
-                          "impactFile",
+                          "impactAnswer_file",
                           e.target.files && e.target.files[0]
                         ),
                           setFieldTouched("impactCheck", true),
@@ -134,12 +134,12 @@ export default function Page3() {
                 )}
               </div>
               <ErrorMessage
-                name="impactFile"
+                name="impactAnswer_file"
                 component="div"
                 className=" text-sm text-red-500 font-semibold"
               />
               <p className="text-slate-500 text-sm">
-                Files must not exceed 3MB in size.{" "}
+                File size must not exceed 3MB.{" "}
               </p>
             </div>
           </div>

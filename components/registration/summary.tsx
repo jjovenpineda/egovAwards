@@ -20,37 +20,37 @@ import { ErrorMessage, FormikValues, useFormikContext } from "formik";
 export default function Summary() {
   const { values, setFieldValue } = useFormikContext<FormikValues>();
   const aboutTheLguLabels = [
-    { label: "LGU Name", value: "lgu" },
-    { label: "LGU Abbreviation", value: "lgu" },
-    { label: "Province", value: "province" },
-    { label: "Region", value: "region" },
-    { label: "Name of LCE", value: "nameOfLCE" },
-    { label: "Name of Office in LGU", value: "nameOfOffice" },
-    { label: "Contact Person", value: "contactPerson" },
-    { label: "Email", value: "email" },
-    { label: "Mobile Number", value: "mobileNumber" },
-    { label: "Office Number", value: "officeNumber" },
-    { label: "Facebook Page", value: "facebook" },
-    { label: "Website", value: "website" },
+    { label: "LGU Name", value: "lgu_name" },
+    { label: "LGU Abbreviation", value: "lgu_abbr" },
+    { label: "Province", value: "lgu_province" },
+    { label: "Region", value: "lgu_region" },
+    { label: "Name of LCE", value: "lgu_lceName" },
+    { label: "Name of Office in LGU", value: "lgu_officeName" },
+    { label: "Contact Person", value: "lgu_contactPerson" },
+    { label: "Email", value: "lgu_contactPersonEmail" },
+    { label: "Mobile Number", value: "lgu_contactPersonMobileNo" },
+    { label: "Office Number", value: "lgu_contactPersonOfficeNo" },
+    { label: "Facebook Page", value: "lgu_facebook" },
+    { label: "Website", value: "lgu_website" },
 
     {
       label:
         "Number of times in joining eGOV, Digital Cities Awards, Digital Governance Awards from 2012 to 2022",
-      value: "egovAwardsCount",
+      value: "joinCount",
     },
   ];
 
   const aboutTheEntryLabels: AboutTheEntryLabel[] = [
-    { label: "Project/Program Name", value: "projectName" },
-    { label: "Choose Category for Project", value: "projectCategory" },
+    { label: "Project/Program Name", value: "project" },
+    { label: "Choose Category for Project", value: "category" },
     { label: "Project Period", value: "projectPeriod" },
     { label: "Project URL", value: "projectURL" },
-    { label: "Supporting Documents", value: "documents" },
+    { label: "Supporting Documents", value: "supportingDoc" },
   ];
 
   interface AboutTheEntryDetails {
     projectProgramName: string;
-    projectCategory: string;
+    category: string;
     projectPeriod: string;
     projectURL: string;
     supportingDocuments: string[];
@@ -116,19 +116,6 @@ export default function Summary() {
         </div>
         <div className="grid text-base w-full grid-cols-2 md:grid-cols-[_40%,_60%] md:gap-2">
           {aboutTheLguLabels.map((item, index) => {
-            const region = PSGC.regions.find((region) =>
-              values.lgu.startsWith(region.id)
-            );
-            const province = PSGC.regions
-              .find((region) => values.lgu.startsWith(region.id))
-              ?.provinces.find((province) =>
-                values.lgu.startsWith(province.id)
-              );
-            const lgu = PSGC.regions
-              .find((region) => values.lgu.startsWith(region.id))
-              ?.provinces.find((province) => values.lgu.startsWith(province.id))
-              ?.lgus.find((lgu) => lgu.id === values.lgu);
-
             return (
               <React.Fragment key={index}>
                 <div className="flex justify-between">
@@ -136,13 +123,7 @@ export default function Summary() {
                 </div>
                 <div>
                   <div className=" font-medium text-slate-500">
-                    {item.value == "region"
-                      ? region?.name
-                      : item.value == "province"
-                      ? province?.name
-                      : item.value == "lgu"
-                      ? lgu?.name
-                      : values[item.value]}
+                    {values[item.value]}
                   </div>
                   <ErrorMessage
                     name={item.value}
@@ -185,20 +166,22 @@ export default function Summary() {
         <div className="grid w-full grid-cols-2 text-base md:grid-cols-[_40%,_60%] md:gap-2">
           {aboutTheEntryLabels.map((item, index) => {
             const category = categories.find(
-              (cat) => cat.value === values.projectCategory
+              (cat) => cat.value === values.category
             );
             return (
               <React.Fragment key={index}>
                 <div className="flex justify-between">
                   {item.label}{" "}
-                  {item.value != "documents" && <span className="mr-4">:</span>}
+                  {item.value != "supportingDoc" && (
+                    <span className="mr-4">:</span>
+                  )}
                 </div>
 
-                {item.value == "documents" ? (
+                {item.value == "supportingDoc" ? (
                   <div className="mb-2 font-medium text-slate-500 col-span-2">
                     <div className="flex flex-wrap gap-2 w-full ">
-                      {values.documents.length > 0 &&
-                        values.documents.map((item: any, index: any) => {
+                      {values.supportingDoc.length > 0 &&
+                        values.supportingDoc.map((item: any, index: any) => {
                           const fileURL =
                             item.name && URL.createObjectURL(item);
                           return (
@@ -223,7 +206,7 @@ export default function Summary() {
                         })}
                     </div>{" "}
                   </div>
-                ) : item.value == "projectCategory" ? (
+                ) : item.value == "category" ? (
                   <div className="mb-2 font-medium text-slate-500">
                     {category?.label}
                     <ErrorMessage
@@ -285,21 +268,21 @@ export default function Summary() {
           </h2>
           <p
             className="text-slate-500 text-base font-light leading-normal line-clamp-6"
-            dangerouslySetInnerHTML={{ __html: values.impactText }}
+            dangerouslySetInnerHTML={{ __html: values.impactAnswer_text }}
           />
           <div className="mb-2 font-medium text-slate-500 col-span-2">
             <div className="flex flex-wrap gap-2 w-full ">
-              {values.impactFile &&
-                values.impactFile.name &&
+              {values.impactAnswer_file &&
+                values.impactAnswer_file.name &&
                 (() => {
-                  const fileURL = URL.createObjectURL(values.impactFile);
+                  const fileURL = URL.createObjectURL(values.impactAnswer_file);
 
                   return (
                     <div className="flex items-center gap-2 w-fit">
                       <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
                         <div className="flex items-center gap-2">
                           <Image src={pdf} alt="PDF Icon" />
-                          {values.impactFile.name}
+                          {values.impactAnswer_file.name}
                         </div>
                         <FileViewer url={fileURL} />
                       </div>
@@ -358,21 +341,23 @@ export default function Summary() {
           </h2>
           <p
             className="text-slate-500 text-base font-light leading-normal line-clamp-6"
-            dangerouslySetInnerHTML={{ __html: values.relevanceText }}
+            dangerouslySetInnerHTML={{ __html: values.relevanceAnswer_text }}
           />
           <div className="mb-2 font-medium text-slate-500 col-span-2">
             <div className="flex flex-wrap gap-2 w-full ">
-              {values.relevanceFile &&
-                values.relevanceFile.name &&
+              {values.relevanceAnswer_file &&
+                values.relevanceAnswer_file.name &&
                 (() => {
-                  const fileURL = URL.createObjectURL(values.relevanceFile);
+                  const fileURL = URL.createObjectURL(
+                    values.relevanceAnswer_file
+                  );
 
                   return (
                     <div className="flex items-center gap-2 w-fit">
                       <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
                         <div className="flex items-center gap-2">
                           <Image src={pdf} alt="PDF Icon" />
-                          {values.relevanceFile.name}
+                          {values.relevanceAnswer_file.name}
                         </div>
                         <FileViewer url={fileURL} />
                       </div>
@@ -431,15 +416,17 @@ export default function Summary() {
           </h2>
           <p
             className="text-slate-500 text-base font-light leading-normal line-clamp-6"
-            dangerouslySetInnerHTML={{ __html: values.sustainabilityText }}
+            dangerouslySetInnerHTML={{
+              __html: values.sustainabilityAnswer_text,
+            }}
           />
           <div className="mb-2 font-medium text-slate-500 col-span-2">
             <div className="flex flex-wrap gap-2 w-full ">
-              {values.sustainabilityFile &&
-                values.sustainabilityFile.name &&
+              {values.sustainabilityAnswer_file &&
+                values.sustainabilityAnswer_file.name &&
                 (() => {
                   const fileURL = URL.createObjectURL(
-                    values.sustainabilityFile
+                    values.sustainabilityAnswer_file
                   );
 
                   return (
@@ -447,7 +434,7 @@ export default function Summary() {
                       <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
                         <div className="flex items-center gap-2">
                           <Image src={pdf} alt="PDF Icon" />
-                          {values.sustainabilityFile.name}
+                          {values.sustainabilityAnswer_file.name}
                         </div>
                         <FileViewer url={fileURL} />
                       </div>
@@ -503,21 +490,23 @@ export default function Summary() {
 
           <p
             className="text-slate-500 text-base font-light leading-normal line-clamp-6"
-            dangerouslySetInnerHTML={{ __html: values.innovationText }}
+            dangerouslySetInnerHTML={{ __html: values.innovationAnswer_text }}
           />
           <div className="mb-2 font-medium text-slate-500 col-span-2">
             <div className="flex flex-wrap gap-2 w-full ">
-              {values.innovationFile &&
-                values.innovationFile.name &&
+              {values.innovationAnswer_file &&
+                values.innovationAnswer_file.name &&
                 (() => {
-                  const fileURL = URL.createObjectURL(values.innovationFile);
+                  const fileURL = URL.createObjectURL(
+                    values.innovationAnswer_file
+                  );
 
                   return (
                     <div className="flex items-center gap-2 w-fit">
                       <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
                         <div className="flex items-center gap-2">
                           <Image src={pdf} alt="PDF Icon" />
-                          {values.innovationFile.name}
+                          {values.innovationAnswer_file.name}
                         </div>
                         <FileViewer url={fileURL} />
                       </div>
@@ -566,12 +555,12 @@ export default function Summary() {
               Sustainable Development Goals (SDGs) that your project focuses on.
             </p>
             <ul className="list-disc list-inside ml-2 text-slate-600">
-              {values.goals.map((goal: any, index: any) => (
+              {values.alignmentSDG_target.map((goal: any, index: any) => (
                 <li key={index}>{goal}</li>
               ))}
             </ul>
             <ErrorMessage
-              name="goals"
+              name="alignmentSDG_target"
               component="div"
               className=" text-base text-red-500 italic "
             />
@@ -596,21 +585,25 @@ export default function Summary() {
 
             <p
               className="text-slate-500 text-base font-light leading-normal line-clamp-6"
-              dangerouslySetInnerHTML={{ __html: values.goalText1 }}
+              dangerouslySetInnerHTML={{
+                __html: values.alignmentSDG_answer_text,
+              }}
             />
             <div className="mb-2 font-medium text-slate-500 col-span-2">
               <div className="flex flex-wrap gap-2 w-full ">
-                {values.goalFile1 &&
-                  values.goalFile1.name &&
+                {values.alignmentSDG_answer_file &&
+                  values.alignmentSDG_answer_file.name &&
                   (() => {
-                    const fileURL = URL.createObjectURL(values.goalFile1);
+                    const fileURL = URL.createObjectURL(
+                      values.alignmentSDG_answer_file
+                    );
 
                     return (
                       <div className="flex items-center gap-2 w-fit">
                         <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
                           <div className="flex items-center gap-2">
                             <Image src={pdf} alt="PDF Icon" />
-                            {values.goalFile1.name}
+                            {values.alignmentSDG_answer_file.name}
                           </div>
                           <FileViewer url={fileURL} />
                         </div>
@@ -635,21 +628,25 @@ export default function Summary() {
 
             <p
               className="text-slate-500 text-base font-light leading-normal line-clamp-6"
-              dangerouslySetInnerHTML={{ __html: values.goalText2 }}
+              dangerouslySetInnerHTML={{
+                __html: values.alignmentAnswerDICT_text,
+              }}
             />
             <div className="mb-2 font-medium text-slate-500 col-span-2">
               <div className="flex flex-wrap gap-2 w-full ">
-                {values.goalFile2 &&
-                  values.goalFile2.name &&
+                {values.alignmentAnswerDICT_file &&
+                  values.alignmentAnswerDICT_file.name &&
                   (() => {
-                    const fileURL = URL.createObjectURL(values.goalFile2);
+                    const fileURL = URL.createObjectURL(
+                      values.alignmentAnswerDICT_file
+                    );
 
                     return (
                       <div className="flex items-center gap-2 w-fit">
                         <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
                           <div className="flex items-center gap-2">
                             <Image src={pdf} alt="PDF Icon" />
-                            {values.goalFile2.name}
+                            {values.alignmentAnswerDICT_file.name}
                           </div>
                           <FileViewer url={fileURL} />
                         </div>

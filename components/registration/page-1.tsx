@@ -12,35 +12,77 @@ import {
 import Image from "next/image";
 import ph from "@/public/assets/svgs/ph.svg";
 import fb from "@/public/assets/svgs/fb.svg";
-
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Globe, Mail, Phone } from "lucide-react";
+import { ChevronDown, Globe, Mail, Phone, Search } from "lucide-react";
 import ModalWrapper from "./modal-wrapper";
 import { Button } from "@/components/ui/button";
 import { PSGC } from "@/constants";
 import { ErrorMessage, Field, FormikValues, useFormikContext } from "formik";
-
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { apiGet } from "@/utils/api";
+import test from "node:test";
+import { ScrollArea } from "../ui/scroll-area";
+interface ILGU {
+  lgu: string;
+  province: string;
+  region: string;
+  tenDigitCode: string;
+}
 export default function Page1() {
-  const { values, setFieldValue, validateField, setFieldTouched } =
+  const { values, setFieldValue, setFieldTouched } =
     useFormikContext<FormikValues>();
   const [isloaded, setIsLoaded] = useState(false);
-  const findLGU = () => {
-    const region = PSGC.regions.find((region) =>
-      values.lgu.startsWith(region.id)
-    );
-    const province = region?.provinces.find((province) =>
-      province.lgus.find((lgu) => lgu.id === values.lgu)
-    );
-    region &&
-      province &&
-      (setFieldValue("province", province.id),
-      setFieldValue("region", region.id));
+  const [searchQuery, setSearchQuery] = useState("");
+  const [LguList, setLguList] = useState<ILGU[]>([]);
+  const [lguPopover, setLguPopover] = useState(false);
+  const [selectedProvince, setSelectedProvince] = useState("");
+  const [selectedRegion, setSelectedRegion] = useState("");
+  const [page, setPage] = useState(1);
+  const getLGUList = async () => {
+    try {
+      const res = await apiGet("/api/lgu/list");
+      const { data } = res;
+      if (!data) return;
+      setLguList(data);
+    } catch (e) {
+      console.error("Error fetching LGU list:", e);
+    }
   };
+
   useEffect(() => {
-    findLGU();
-  }, [values.lgu]);
+    const selectedLgu = LguList.find((lgu) => lgu.lgu === values.lgu_name);
+
+    if (selectedLgu) {
+      setFieldValue("lgu_province", selectedLgu.province);
+      setSelectedProvince(selectedLgu.province);
+
+      setFieldValue("lgu_region", selectedLgu.region);
+      setSelectedRegion(selectedLgu.region);
+    }
+  }, [values.lgu_name]);
+
   useEffect(() => {
+    getLGUList();
+
     setIsLoaded(true);
   }, []);
   return (
@@ -59,34 +101,122 @@ export default function Page1() {
                     LGU <span className="text-red-500 text-base"> *</span>
                   </Label>
                   <ErrorMessage
-                    name="lgu"
+                    name="lgu_name"
                     component="div"
                     className=" text-xs text-red-500 font-semibold"
                   />
                 </div>
-                <Select
-                  onValueChange={(e) => {
-                    setFieldValue("lgu", e);
-                  }}
-                  defaultValue={values.lgu}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select LGU" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      {PSGC.regions.map((region) =>
-                        region.provinces.map((province) =>
-                          province.lgus.map((lgu, index) => (
-                            <SelectItem key={index} value={lgu.id}>
-                              {lgu.name}
-                            </SelectItem>
-                          ))
-                        )
-                      )}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
+
+                <Popover open={lguPopover} onOpenChange={setLguPopover}>
+                  <PopoverTrigger asChild>
+                    <div
+                      onClick={() => {
+                        setSearchQuery(""), setFieldTouched("lgu_name", true);
+                      }}
+                      id="popover-trigger"
+                      className="flex items-center justify-between  cursor-pointer border w-full rounded-md p-2 my-2 shadow-sm px-3 text-sm"
+                    >
+                      {values.lgu_name ? values.lgu_name : "Select LGU"}
+                      <ChevronDown size={15} className="text-slate-500" />
+                    </div>
+                  </PopoverTrigger>
+
+                  <PopoverContent
+                    side="bottom"
+                    align="start"
+                    className="w-[var(--radix-popover-trigger-width)] cursor-pointer relative"
+                  >
+                    <div className="relative bg-white z-10 shadow-sm py-2">
+                      <Input
+                        type="text"
+                        autoComplete="off"
+                        name="lgu_website"
+                        placeholder="Search LGU"
+                        onChange={(e) => {
+                          setSearchQuery(e.target.value);
+                        }}
+                        className=" space-y-8 rounded-md bg-white pl-9"
+                      />
+                      <Search
+                        size={15}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
+                      />
+                    </div>
+                    {(() => {
+                      const itemsPerPage = 10;
+                      const paginatedList = LguList?.slice(
+                        0,
+                        page * itemsPerPage
+                      );
+                      return (
+                        <ScrollArea className="max-h-[200px] overflow-y-auto p-0 ">
+                          {searchQuery ? (
+                            <>
+                              {LguList.filter((item) =>
+                                item.lgu
+                                  .toLowerCase()
+                                  .includes(searchQuery.trim().toLowerCase())
+                              )
+                                .slice(0, page * itemsPerPage)
+                                .map((item, index) => (
+                                  <div
+                                    key={index}
+                                    onClick={() => {
+                                      setFieldValue("lgu_name", item.lgu);
+                                      setLguPopover(false);
+                                    }}
+                                    className="hover:bg-slate-100 cursor-pointer py-0.5 p-2 rounded-md my-1"
+                                  >
+                                    {item.lgu}
+                                  </div>
+                                ))}
+
+                              {LguList.filter((item) =>
+                                item.lgu
+                                  .toLowerCase()
+                                  .includes(searchQuery.trim().toLowerCase())
+                              ).length >
+                                page * itemsPerPage && (
+                                <button
+                                  onClick={() => setPage(page + 1)}
+                                  className="text-slate-500 text-sm w-full cursor-pointer hover:underline py-1"
+                                >
+                                  Load More
+                                </button>
+                              )}
+                            </>
+                          ) : (
+                            <>
+                              {paginatedList.map((item, index) => (
+                                <div
+                                  key={index}
+                                  onClick={() => {
+                                    setFieldValue("lgu_name", item.lgu);
+                                    setLguPopover(false);
+                                  }}
+                                  className="hover:bg-slate-100 cursor-pointer py-0.5 p-2 rounded-md  my-1"
+                                >
+                                  {item.lgu}
+                                </div>
+                              ))}
+                              {LguList.length > paginatedList.length && (
+                                <button
+                                  onClick={() => {
+                                    setPage(page + 1);
+                                  }}
+                                  className="text-slate-500 text-sm  w-full cursor-pointer hover:underline py-1"
+                                >
+                                  Load More
+                                </button>
+                              )}
+                            </>
+                          )}
+                        </ScrollArea>
+                      );
+                    })()}
+                  </PopoverContent>
+                </Popover>
+
                 <p className="font-medium my-1 text-gray-400 text-sm lg:max-w-[80%]">
                   If you cannot find your LGU, kindly get in touch with the{" "}
                   <a className="underline text-blue-400">
@@ -103,7 +233,7 @@ export default function Page1() {
                   </Label>
 
                   <ErrorMessage
-                    name="lguAbbreviation"
+                    name="lgu_abbr"
                     component="div"
                     className=" text-xs text-red-500 font-semibold"
                   />
@@ -112,7 +242,7 @@ export default function Page1() {
                 <Field
                   type="text"
                   autoComplete="off"
-                  name="lguAbbreviation"
+                  name="lgu_abbr"
                   placeholder="Enter LGU Abbreviation"
                   as={Input}
                   className=" space-y-8 rounded-md bg-white "
@@ -123,33 +253,13 @@ export default function Page1() {
               </div>
               <div>
                 <div className="flex flex-col-reverse">
-                  <Select
-                    disabled={values.lgu ? false : true}
-                    value={values.province}
-                    onValueChange={(e) => setFieldValue("province", e)}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select Province" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {PSGC.regions
-                        .filter((region) => values.lgu.startsWith(region.id))
-                        .map((i) =>
-                          i.provinces.map((province, index) => (
-                            <SelectItem key={index} value={province.id}>
-                              {province.name}
-                            </SelectItem>
-                          ))
-                        )}
-                    </SelectContent>
-                  </Select>
-
+                  <Input value={selectedProvince} disabled />
                   <div className="flex gap-1 items-center">
-                    <Label className="peer-disabled:opacity-50 font-semibold text-sm text-[#1F2937]">
+                    <Label className="opacity-50 font-semibold text-sm text-[#1F2937]">
                       Province <span className="text-red-500 text-base">*</span>
                     </Label>
                     <ErrorMessage
-                      name="region"
+                      name="lgu_region"
                       component="div"
                       className=" text-xs text-red-500 font-semibold"
                     />
@@ -158,31 +268,14 @@ export default function Page1() {
               </div>
               <div>
                 <div className="flex flex-col-reverse">
-                  <Select
-                    disabled={values.province ? false : true}
-                    value={values.region}
-                    onValueChange={(e) => setFieldValue("region", e)}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select Region" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {PSGC.regions
-                        .filter((i) => values.lgu.startsWith(i.id))
-                        .map((region, index) => (
-                          <SelectItem key={index} value={region.id}>
-                            {region.name}
-                          </SelectItem>
-                        ))}
-                    </SelectContent>
-                  </Select>
+                  <Input value={selectedRegion} disabled />
 
                   <div className="flex gap-1 items-center">
-                    <Label className="peer-disabled:opacity-50 font-semibold text-sm text-[#1F2937]">
+                    <Label className="opacity-50 font-semibold text-sm text-[#1F2937]">
                       Region <span className="text-red-500 text-base">*</span>
                     </Label>
                     <ErrorMessage
-                      name="region"
+                      name="lgu_region"
                       component="div"
                       className=" text-xs text-red-500 font-semibold"
                     />
@@ -193,11 +286,11 @@ export default function Page1() {
               <div>
                 <div className="flex gap-1 items-center">
                   <Label className="font-semibold text-sm text-[#1F2937]">
-                    Name of LCE{" "}
+                    Name of LCE
                     <span className="text-red-500 text-base">*</span>
                   </Label>
                   <ErrorMessage
-                    name="nameOfLCE"
+                    name="lgu_lceName"
                     component="div"
                     className=" text-xs text-red-500 font-semibold"
                   />
@@ -205,7 +298,7 @@ export default function Page1() {
                 <Field
                   type="text"
                   autoComplete="off"
-                  name="nameOfLCE"
+                  name="lgu_lceName"
                   placeholder="Enter Name of LCE"
                   as={Input}
                   className=" space-y-8 rounded-md bg-white "
@@ -219,7 +312,7 @@ export default function Page1() {
                     <span className="text-red-500 text-base">*</span>
                   </Label>
                   <ErrorMessage
-                    name="nameOfOffice"
+                    name="lgu_officeName"
                     component="div"
                     className=" text-xs text-red-500 font-semibold"
                   />
@@ -227,7 +320,7 @@ export default function Page1() {
                 <Field
                   type="text"
                   autoComplete="off"
-                  name="nameOfOffice"
+                  name="lgu_officeName"
                   placeholder="Enter Name of Office in LGU"
                   as={Input}
                   className=" space-y-8 rounded-md bg-white "
@@ -242,7 +335,7 @@ export default function Page1() {
                     <span className="text-red-500 text-base">*</span>
                   </Label>
                   <ErrorMessage
-                    name="contactPerson"
+                    name="lgu_contactPerson"
                     component="div"
                     className=" text-xs text-red-500 font-semibold"
                   />
@@ -250,7 +343,7 @@ export default function Page1() {
                 <Field
                   type="text"
                   autoComplete="off"
-                  name="contactPerson"
+                  name="lgu_contactPerson"
                   placeholder="Enter Contact Person"
                   as={Input}
                   className=" space-y-8 rounded-md bg-white "
@@ -265,7 +358,7 @@ export default function Page1() {
                     Email <span className="text-red-500 text-base">*</span>
                   </Label>
                   <ErrorMessage
-                    name="email"
+                    name="lgu_contactPersonEmail"
                     component="div"
                     className=" text-xs text-red-500 font-semibold"
                   />
@@ -274,7 +367,7 @@ export default function Page1() {
                   <Field
                     type="email"
                     autoComplete="off"
-                    name="email"
+                    name="lgu_contactPersonEmail"
                     placeholder="Enter Email"
                     as={Input}
                     className=" space-y-8 rounded-md bg-white pl-9"
@@ -295,7 +388,7 @@ export default function Page1() {
                     <span className="text-red-500 text-base">*</span>
                   </Label>
                   <ErrorMessage
-                    name="officeNumber"
+                    name="lgu_contactPersonOfficeNo"
                     component="div"
                     className=" text-xs text-red-500 font-semibold"
                   />
@@ -304,7 +397,7 @@ export default function Page1() {
                   <Field
                     type="number"
                     autoComplete="off"
-                    name="officeNumber"
+                    name="lgu_contactPersonOfficeNo"
                     placeholder="(02) 000 000"
                     as={Input}
                     className=" space-y-8 rounded-md bg-white pl-9"
@@ -322,7 +415,7 @@ export default function Page1() {
                     <span className="text-red-500 text-base">*</span>
                   </Label>
                   <ErrorMessage
-                    name="mobileNumber"
+                    name="lgu_contactPersonMobileNo"
                     component="div"
                     className=" text-xs text-red-500 font-semibold"
                   />
@@ -331,7 +424,7 @@ export default function Page1() {
                   <Field
                     type="number"
                     autoComplete="off"
-                    name="mobileNumber"
+                    name="lgu_contactPersonMobileNo"
                     placeholder="9876543210"
                     as={Input}
                     className=" space-y-8 rounded-md bg-white pl-[70px]"
@@ -354,7 +447,7 @@ export default function Page1() {
                     Website
                   </Label>
                   <ErrorMessage
-                    name="website"
+                    name="lgu_website"
                     component="div"
                     className=" text-xs text-red-500 font-semibold"
                   />
@@ -363,7 +456,7 @@ export default function Page1() {
                   <Field
                     type="text"
                     autoComplete="off"
-                    name="website"
+                    name="lgu_website"
                     placeholder="Enter Website"
                     as={Input}
                     className=" space-y-8 rounded-md bg-white pl-9"
@@ -384,7 +477,7 @@ export default function Page1() {
                     Facebook Page
                   </Label>
                   <ErrorMessage
-                    name="facebook"
+                    name="lgu_facebook"
                     component="div"
                     className=" text-xs text-red-500 font-semibold"
                   />
@@ -393,8 +486,8 @@ export default function Page1() {
                   <Field
                     type="text"
                     autoComplete="off"
-                    name="facebook"
-                    placeholder="Enter Website"
+                    name="lgu_facebook"
+                    placeholder="Enter Facebook Page"
                     as={Input}
                     className=" space-y-8 rounded-md bg-white pl-9"
                   />{" "}
@@ -416,7 +509,7 @@ export default function Page1() {
                   Digital Governance Awards from 2012 to 2022.
                   <span className="text-red-500 text-base"> *</span>
                   <ErrorMessage
-                    name="egovAwardsCount"
+                    name="joinCount"
                     component="span"
                     className="text-xs text-red-500 font-semibold ml-1"
                   />
@@ -425,7 +518,7 @@ export default function Page1() {
               <Field
                 type="number"
                 autoComplete="off"
-                name="egovAwardsCount"
+                name="joinCount"
                 placeholder="Enter times in joining eGOV, DCA, DGA"
                 as={Input}
                 className=" space-y-8 rounded-md bg-white"

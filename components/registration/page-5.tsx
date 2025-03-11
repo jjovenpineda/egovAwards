@@ -18,13 +18,13 @@ export default function Page5() {
   const [count, setCount] = useState(0);
   const [fileURL, setFileURL] = useState<string>("");
   useEffect(() => {
-    if (values.sustainabilityFile instanceof File) {
-      setFileURL(URL.createObjectURL(values.sustainabilityFile));
+    if (values.sustainabilityAnswer_file instanceof File) {
+      setFileURL(URL.createObjectURL(values.sustainabilityAnswer_file));
     }
-    WordCounter(values.sustainabilityText, setCount, () => {
-      setFieldValue("sustainabilityText", "");
+    WordCounter(values.sustainabilityAnswer_text, setCount, () => {
+      setFieldValue("sustainabilityAnswer_text", "");
     });
-  }, [values.sustainabilityText, values.sustainabilityFile]);
+  }, [values.sustainabilityAnswer_text, values.sustainabilityAnswer_file]);
 
   return (
     <div>
@@ -66,16 +66,16 @@ export default function Page5() {
             className="h-min"
           >
             <Editor
-              defaultValue={values.sustainabilityText}
+              defaultValue={values.sustainabilityAnswer_text}
               onChange={(e) => {
-                setFieldValue("sustainabilityText", e);
-                setFieldTouched("sustainabilityText", true);
+                setFieldValue("sustainabilityAnswer_text", e);
+                setFieldTouched("sustainabilityAnswer_text", true);
                 // Trigger validation
               }} // Trigger validation}}
             />
           </div>
           <ErrorMessage
-            name="sustainabilityText"
+            name="sustainabilityAnswer_text"
             component="div"
             className=" text-xs text-red-500 font-semibold"
           />
@@ -93,13 +93,13 @@ export default function Page5() {
             <p>or Upload File </p>
             <div>
               <div className="overflow-hidden">
-                {values.sustainabilityFile ? (
+                {values.sustainabilityAnswer_file ? (
                   <div className="flex items-center gap-2 ">
                     {" "}
                     <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
                       <div className="flex items-center gap-2">
                         <Image src={pdf} alt="" />
-                        {values.sustainabilityFile.name}
+                        {values.sustainabilityAnswer_file.name}
                       </div>
                       <FileViewer url={fileURL} />
                     </div>
@@ -107,7 +107,9 @@ export default function Page5() {
                       size={18}
                       color="red"
                       className="shrink-0"
-                      onClick={() => setFieldValue("sustainabilityFile", null)}
+                      onClick={() =>
+                        setFieldValue("sustainabilityAnswer_file", null)
+                      }
                     />
                   </div>
                 ) : (
@@ -131,7 +133,7 @@ export default function Page5() {
                     onChange={(e) => {
                       handleFileChange(e, () => {
                         setFieldValue(
-                          "sustainabilityFile",
+                          "sustainabilityAnswer_file",
                           e.target.files && e.target.files[0]
                         ),
                           setFieldTouched("sustainabilityCheck", true),
@@ -142,12 +144,12 @@ export default function Page5() {
                 )}
               </div>
               <ErrorMessage
-                name="sustainabilityFile"
+                name="sustainabilityAnswer_file"
                 component="div"
                 className=" text-sm text-red-500 font-semibold"
               />
               <p className="text-slate-500 text-sm">
-                Files must not exceed 3MB in size.{" "}
+                File size must not exceed 3MB.{" "}
               </p>
             </div>
           </div>

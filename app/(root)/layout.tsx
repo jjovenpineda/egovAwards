@@ -40,7 +40,7 @@ export default function RootLayout({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="w-full min-h-[80%] lg:px-16 py-14 "
+          className="w-full min-h-[80%] px-8 lg:px-32 py-14 "
         >
           <Suspense>
             {" "}

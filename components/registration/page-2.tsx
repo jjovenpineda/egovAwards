@@ -72,7 +72,9 @@ export default function Page2() {
     }
 
     if (files && files.length > 0) {
-      if (values.documents.map((e: any) => e.name).includes(files[0].name)) {
+      if (
+        values.supportingDoc.map((e: any) => e.name).includes(files[0].name)
+      ) {
         toast({
           title: "Duplicate File",
           description: "This file has already been uploaded.",
@@ -80,9 +82,9 @@ export default function Page2() {
           duration: 2500,
         });
       } else {
-        setFieldValue(`documents.${index}`, files[0]);
+        setFieldValue(`supportingDoc.${index}`, files[0]);
       }
-      setFieldTouched("documents", true, true);
+      setFieldTouched("supportingDoc", true, true);
     }
   };
 
@@ -100,7 +102,7 @@ export default function Page2() {
               <span className="text-red-500 text-base">*</span>
             </Label>
             <ErrorMessage
-              name="projectName"
+              name="project"
               component="div"
               className=" text-xs text-red-500 font-semibold"
             />
@@ -108,7 +110,7 @@ export default function Page2() {
           <Field
             type="text"
             autoComplete="off"
-            name="projectName"
+            name="project"
             placeholder="Enter Project/Program Name"
             as={Input}
             className=" space-y-8 rounded-md bg-white "
@@ -129,8 +131,8 @@ export default function Page2() {
             </div>
           </div>
           <RadioGroup
-            onValueChange={(e) => setFieldValue("projectCategory", e)}
-            defaultValue={values.projectCategory}
+            onValueChange={(e) => setFieldValue("category", e)}
+            defaultValue={values.category}
           >
             {categories.map((category, index) => (
               <div key={index} className="flex items-center space-x-2">
@@ -159,9 +161,6 @@ export default function Page2() {
                   className=" text-xs text-red-500 font-semibold"
                 />
               </div>
-              <p className="text-slate-500 text-sm">
-                (*Must be existing for a minimum of one year)
-              </p>{" "}
             </div>
             <Field
               type="text"
@@ -171,6 +170,9 @@ export default function Page2() {
               as={Input}
               className=" space-y-8 rounded-md bg-white "
             />
+            <p className="text-slate-500 text-sm">
+              Must be existing for a minimum of one year
+            </p>
           </div>
           <div>
             <div className="flex gap-1 items-center">
@@ -214,12 +216,12 @@ export default function Page2() {
           </div>
           <div className="flex items-center gap-2">
             <FieldArray
-              name="documents"
+              name="supportingDoc"
               render={(arrayHelpers: ArrayHelpers) => (
                 <div className="flex flex-col gap-2 w-full relative">
-                  {values.documents &&
-                    values.documents.length > 0 &&
-                    values.documents.map((item: any, index: any) => {
+                  {values.supportingDoc &&
+                    values.supportingDoc.length > 0 &&
+                    values.supportingDoc.map((item: any, index: any) => {
                       const fileURL = item.name && URL.createObjectURL(item);
 
                       return (
@@ -241,14 +243,14 @@ export default function Page2() {
                                 onClick={() => arrayHelpers.remove(index)}
                               />
                               <ErrorMessage
-                                name={`documents`}
+                                name={`supportingDoc`}
                                 component="div"
                                 className=" text-xs text-red-500 font-semibold"
                               />
                             </div>
                           ) : (
                             <Input
-                              value={values.documents[index].name}
+                              value={values.supportingDoc[index].name}
                               type="file"
                               accept="application/pdf"
                               placeholder="Enter Project/Program Name"
@@ -262,10 +264,10 @@ export default function Page2() {
                       );
                     })}
 
-                  {values.documents.length < 5 && (
+                  {values.supportingDoc.length < 5 && (
                     <>
                       <p className="text-slate-500 text-sm">
-                        Files must not exceed 3MB in size.{" "}
+                        File size must not exceed 3MB.{" "}
                       </p>
                       <Button
                         variant={"primary"}

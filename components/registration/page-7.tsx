@@ -135,21 +135,21 @@ export default function Page7() {
   const [fileURL2, setFileURL2] = useState<string>("");
 
   useEffect(() => {
-    if (values.goalFile1 instanceof File) {
-      setFileURL1(URL.createObjectURL(values.goalFile1));
+    if (values.alignmentSDG_answer_file instanceof File) {
+      setFileURL1(URL.createObjectURL(values.alignmentSDG_answer_file));
     }
-    WordCounter(values.goalText1, setCount, () => {
-      setFieldValue("goalText1", "");
+    WordCounter(values.alignmentSDG_answer_text, setCount, () => {
+      setFieldValue("alignmentSDG_answer_text", "");
     });
-  }, [values.goalText1, values.goalFile1]);
+  }, [values.alignmentSDG_answer_text, values.alignmentSDG_answer_file]);
   useEffect(() => {
-    if (values.goalFile2 instanceof File) {
-      setFileURL2(URL.createObjectURL(values.goalFile2));
+    if (values.alignmentAnswerDICT_file instanceof File) {
+      setFileURL2(URL.createObjectURL(values.alignmentAnswerDICT_file));
     }
-    WordCounter(values.goalText2, setCount, () => {
-      setFieldValue("goalText2", "");
+    WordCounter(values.alignmentAnswerDICT_text, setCount, () => {
+      setFieldValue("alignmentAnswerDICT_text", "");
     });
-  }, [values.goalText2, values.goalFile2]);
+  }, [values.alignmentAnswerDICT_text, values.alignmentAnswerDICT_file]);
   return (
     <div>
       <section className="space-y-2 pt-6 lg:pt-0">
@@ -168,29 +168,31 @@ export default function Page7() {
             <span className="text-red-500 text-base">*</span>
           </p>
           <ErrorMessage
-            name="goals"
+            name="alignmentSDG_target"
             component="div"
             className=" text-xs text-red-500 font-semibold"
           />
         </div>
         <FieldArray
-          name="goals"
+          name="alignmentSDG_target"
           render={(arrayHelpers) => (
-            <div className="grid items-start lg:grid-cols-2 xl:grid-cols-3 gap-x-2 w-full">
+            <div className="grid items-start lg:grid-cols-2 xl:grid-cols-3 gap-5 w-full">
               {goals.map((goal, index) => (
                 <div key={index} className="flex items-start gap-3">
                   <Field
                     type="checkbox"
-                    name="goals"
+                    name="alignmentSDG_target"
                     className=" mt-1.5"
                     id={goal.title}
                     value={goal.title}
-                    checked={values.goals.includes(goal.title)}
+                    checked={values.alignmentSDG_target.includes(goal.title)}
                     onChange={(e: any) => {
                       if (e.target.checked) {
                         arrayHelpers.push(goal.title);
                       } else {
-                        const idx = values.goals.indexOf(goal.title);
+                        const idx = values.alignmentSDG_target.indexOf(
+                          goal.title
+                        );
                         arrayHelpers.remove(idx);
                       }
                     }}
@@ -200,7 +202,10 @@ export default function Page7() {
                       htmlFor={goal.title}
                       className="font-bold text-base text-slate-900"
                     >
-                      {goal.title}
+                      {goal.title}{" "}
+                      <span className="text-slate-500 text-sm">{`(SDG ${
+                        index + 1
+                      })`}</span>
                     </Label>
 
                     <Label
@@ -251,16 +256,16 @@ export default function Page7() {
             className="h-min"
           >
             <Editor
-              defaultValue={values.goalText1}
+              defaultValue={values.alignmentSDG_answer_text}
               onChange={(e) => {
-                setFieldValue("goalText1", e);
-                setFieldTouched("goalText1", true);
+                setFieldValue("alignmentSDG_answer_text", e);
+                setFieldTouched("alignmentSDG_answer_text", true);
                 // Trigger validation
               }} // Trigger validation}}
             />
           </div>
           <ErrorMessage
-            name="goalText1"
+            name="alignmentSDG_answer_text"
             component="div"
             className=" text-xs text-red-500 font-semibold"
           />
@@ -278,13 +283,13 @@ export default function Page7() {
             <p>or Upload File </p>
             <div>
               <div className="overflow-hidden">
-                {values.goalFile1 ? (
+                {values.alignmentSDG_answer_file ? (
                   <div className="flex items-center gap-2 ">
                     {" "}
                     <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
                       <div className="flex items-center gap-2">
                         <Image src={pdf} alt="" />
-                        {values.goalFile1.name}
+                        {values.alignmentSDG_answer_file.name}
                       </div>
                       <FileViewer url={fileURL1} />
                     </div>
@@ -292,7 +297,9 @@ export default function Page7() {
                       size={18}
                       color="red"
                       className="shrink-0"
-                      onClick={() => setFieldValue("goalFile1", null)}
+                      onClick={() =>
+                        setFieldValue("alignmentSDG_answer_file", null)
+                      }
                     />
                   </div>
                 ) : (
@@ -316,7 +323,7 @@ export default function Page7() {
                     onChange={(e) => {
                       handleFileChange(e, () => {
                         setFieldValue(
-                          "goalFile1",
+                          "alignmentSDG_answer_file",
                           e.target.files && e.target.files[0]
                         ),
                           setFieldTouched("goal1Check", true),
@@ -327,12 +334,12 @@ export default function Page7() {
                 )}
               </div>
               <ErrorMessage
-                name="goalFile1"
+                name="alignmentSDG_answer_file"
                 component="div"
                 className=" text-sm text-red-500 font-semibold"
               />
               <p className="text-slate-500 text-sm">
-                Files must not exceed 3MB in size.{" "}
+                File size must not exceed 3MB.{" "}
               </p>
             </div>
           </div>
@@ -367,16 +374,16 @@ export default function Page7() {
             className="h-min"
           >
             <Editor
-              defaultValue={values.goalText2}
+              defaultValue={values.alignmentAnswerDICT_text}
               onChange={(e) => {
-                setFieldValue("goalText2", e);
-                setFieldTouched("goalText2", true);
+                setFieldValue("alignmentAnswerDICT_text", e);
+                setFieldTouched("alignmentAnswerDICT_text", true);
                 // Trigger validation
               }} // Trigger validation}}
             />
           </div>
           <ErrorMessage
-            name="goalText2"
+            name="alignmentAnswerDICT_text"
             component="div"
             className=" text-xs text-red-500 font-semibold"
           />
@@ -394,13 +401,13 @@ export default function Page7() {
             <p>or Upload File </p>
             <div>
               <div className="overflow-hidden">
-                {values.goalFile2 ? (
+                {values.alignmentAnswerDICT_file ? (
                   <div className="flex items-center gap-2 ">
                     {" "}
                     <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
                       <div className="flex items-center gap-2">
                         <Image src={pdf} alt="" />
-                        {values.goalFile2.name}
+                        {values.alignmentAnswerDICT_file.name}
                       </div>
                       <FileViewer url={fileURL2} />
                     </div>
@@ -408,7 +415,9 @@ export default function Page7() {
                       size={18}
                       color="red"
                       className="shrink-0"
-                      onClick={() => setFieldValue("goalFile2", null)}
+                      onClick={() =>
+                        setFieldValue("alignmentAnswerDICT_file", null)
+                      }
                     />
                   </div>
                 ) : (
@@ -432,7 +441,7 @@ export default function Page7() {
                     onChange={(e) => {
                       handleFileChange(e, () => {
                         setFieldValue(
-                          "goalFile2",
+                          "alignmentAnswerDICT_file",
                           e.target.files && e.target.files[0]
                         ),
                           setFieldTouched("goal2Check", true),
@@ -443,12 +452,12 @@ export default function Page7() {
                 )}
               </div>
               <ErrorMessage
-                name="goalFile2"
+                name="alignmentAnswerDICT_file"
                 component="div"
                 className=" text-sm text-red-500 font-semibold"
               />
               <p className="text-slate-500 text-sm">
-                Files must not exceed 3MB in size.{" "}
+                File size must not exceed 3MB.{" "}
               </p>
             </div>
           </div>

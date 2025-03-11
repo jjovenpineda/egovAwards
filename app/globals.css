@@ -99,3 +99,7 @@ body {
 .main-title {
   @apply text-slate-600 font-semibold text-xl;
 }
+html,
+body {
+  overscroll-behavior: none;
+}

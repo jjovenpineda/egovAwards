@@ -48,9 +48,9 @@ export default function Header() {
         initial={{ y: -100, opacity: 0 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="flex justify-between items-center px-4 lg:px-20 max-h-[183px] overflow-hidden border-b-2 bg-gradient-to-r  from-blue-100 from-1% via-[#DCEBFF] via-40% to-blue-50 to-80%"
+        className="flex justify-between items-center px-8 lg:px-32 max-h-[183px] overflow-hidden border-b-2 bg-gradient-to-r  from-blue-100 from-1% via-[#DCEBFF] via-40% to-blue-50 to-80%"
       >
-        <div className="p-8">
+        <div className="py-8">
           <Image
             src={egov}
             alt="egov"
@@ -314,10 +314,10 @@ export default function Header() {
               y: { duration: 0.3, ease: "easeIn" },
               exit: { duration: 0.1, ease: "easeOut" },
             }}
-            className="fixed top-0 left-0 w-full text-white z-40 "
+            className="fixed top-0  left-0 w-full text-white z-40 "
           >
             <div className="flex  overflow-hidden border-b-2 bg-gradient-to-r  from-blue-100 from-1% via-[#DCEBFF] via-40% to-blue-50 to-80%">
-              <div className="flex flex-wrap-reverse items-center justify-between w-full p-2 lg:px-32">
+              <div className="flex flex-wrap-reverse items-center justify-between w-full py-2 px-8 lg:px-32">
                 <div>
                   <h2 className="text-xs font-medium text-blue-900">
                     <strong>11th eGOV Awards:</strong> Excellence in Governance

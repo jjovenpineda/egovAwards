@@ -1,8 +1,8 @@
 import axiosInstance from "./axiosInstance";
 
-export const apiPost = async (url: string, data: object) => {
+export const apiPost = async (url: string, data: object, headers?: object) => {
   try {
-    const response = await axiosInstance.post(url, data);
+    const response = await axiosInstance.post(url, data, headers);
 
     return response.data;
   } catch (e) {

@@ -18,13 +18,13 @@ export default function Page4() {
   const [count, setCount] = useState(0);
   const [fileURL, setFileURL] = useState<string>("");
   useEffect(() => {
-    if (values.relevanceFile instanceof File) {
-      setFileURL(URL.createObjectURL(values.relevanceFile));
+    if (values.relevanceAnswer_file instanceof File) {
+      setFileURL(URL.createObjectURL(values.relevanceAnswer_file));
     }
-    WordCounter(values.relevanceText, setCount, () => {
-      setFieldValue("relevanceText", "");
+    WordCounter(values.relevanceAnswer_text, setCount, () => {
+      setFieldValue("relevanceAnswer_text", "");
     });
-  }, [values.relevanceText, values.relevanceFile]);
+  }, [values.relevanceAnswer_text, values.relevanceAnswer_file]);
 
   return (
     <div>
@@ -67,16 +67,16 @@ export default function Page4() {
             className="h-min"
           >
             <Editor
-              defaultValue={values.relevanceText}
+              defaultValue={values.relevanceAnswer_text}
               onChange={(e) => {
-                setFieldValue("relevanceText", e);
-                setFieldTouched("relevanceText", true);
+                setFieldValue("relevanceAnswer_text", e);
+                setFieldTouched("relevanceAnswer_text", true);
                 // Trigger validation
               }} // Trigger validation}}
             />
           </div>
           <ErrorMessage
-            name="relevanceText"
+            name="relevanceAnswer_text"
             component="div"
             className=" text-xs text-red-500 font-semibold"
           />
@@ -94,13 +94,13 @@ export default function Page4() {
             <p>or Upload File </p>
             <div>
               <div className="overflow-hidden">
-                {values.relevanceFile ? (
+                {values.relevanceAnswer_file ? (
                   <div className="flex items-center gap-2 ">
                     {" "}
                     <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
                       <div className="flex items-center gap-2">
                         <Image src={pdf} alt="" />
-                        {values.relevanceFile.name}
+                        {values.relevanceAnswer_file.name}
                       </div>
                       <FileViewer url={fileURL} />
                     </div>
@@ -108,7 +108,9 @@ export default function Page4() {
                       size={18}
                       color="red"
                       className="shrink-0"
-                      onClick={() => setFieldValue("relevanceFile", null)}
+                      onClick={() =>
+                        setFieldValue("relevanceAnswer_file", null)
+                      }
                     />
                   </div>
                 ) : (
@@ -132,7 +134,7 @@ export default function Page4() {
                     onChange={(e) => {
                       handleFileChange(e, () => {
                         setFieldValue(
-                          "relevanceFile",
+                          "relevanceAnswer_file",
                           e.target.files && e.target.files[0]
                         ),
                           setFieldTouched("relevanceCheck", true),
@@ -143,12 +145,12 @@ export default function Page4() {
                 )}
               </div>
               <ErrorMessage
-                name="relevanceFile"
+                name="relevanceAnswer_file"
                 component="div"
                 className=" text-sm text-red-500 font-semibold"
               />
               <p className="text-slate-500 text-sm">
-                Files must not exceed 3MB in size.{" "}
+                File size must not exceed 3MB.{" "}
               </p>
             </div>
           </div>

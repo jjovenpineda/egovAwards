@@ -18,13 +18,13 @@ export default function Page6() {
   const [count, setCount] = useState(0);
   const [fileURL, setFileURL] = useState<string>("");
   useEffect(() => {
-    if (values.innovationFile instanceof File) {
-      setFileURL(URL.createObjectURL(values.innovationFile));
+    if (values.innovationAnswer_file instanceof File) {
+      setFileURL(URL.createObjectURL(values.innovationAnswer_file));
     }
-    WordCounter(values.innovationText, setCount, () => {
-      setFieldValue("innovationText", "");
+    WordCounter(values.innovationAnswer_text, setCount, () => {
+      setFieldValue("innovationAnswer_text", "");
     });
-  }, [values.innovationText, values.innovationFile]);
+  }, [values.innovationAnswer_text, values.innovationAnswer_file]);
 
   return (
     <div>
@@ -64,16 +64,16 @@ export default function Page6() {
             className="h-min"
           >
             <Editor
-              defaultValue={values.innovationText}
+              defaultValue={values.innovationAnswer_text}
               onChange={(e) => {
-                setFieldValue("innovationText", e);
-                setFieldTouched("innovationText", true);
+                setFieldValue("innovationAnswer_text", e);
+                setFieldTouched("innovationAnswer_text", true);
                 // Trigger validation
               }} // Trigger validation}}
             />
           </div>
           <ErrorMessage
-            name="innovationText"
+            name="innovationAnswer_text"
             component="div"
             className=" text-xs text-red-500 font-semibold"
           />
@@ -91,13 +91,13 @@ export default function Page6() {
             <p>or Upload File </p>
             <div>
               <div className="overflow-hidden">
-                {values.innovationFile ? (
+                {values.innovationAnswer_file ? (
                   <div className="flex items-center gap-2 ">
                     {" "}
                     <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
                       <div className="flex items-center gap-2">
                         <Image src={pdf} alt="" />
-                        {values.innovationFile.name}
+                        {values.innovationAnswer_file.name}
                       </div>
                       <FileViewer url={fileURL} />
                     </div>
@@ -105,7 +105,9 @@ export default function Page6() {
                       size={18}
                       color="red"
                       className="shrink-0"
-                      onClick={() => setFieldValue("innovationFile", null)}
+                      onClick={() =>
+                        setFieldValue("innovationAnswer_file", null)
+                      }
                     />
                   </div>
                 ) : (
@@ -129,7 +131,7 @@ export default function Page6() {
                     onChange={(e) => {
                       handleFileChange(e, () => {
                         setFieldValue(
-                          "innovationFile",
+                          "innovationAnswer_file",
                           e.target.files && e.target.files[0]
                         ),
                           setFieldTouched("innovationCheck", true),
@@ -140,12 +142,12 @@ export default function Page6() {
                 )}
               </div>
               <ErrorMessage
-                name="innovationFile"
+                name="innovationAnswer_file"
                 component="div"
                 className=" text-sm text-red-500 font-semibold"
               />
               <p className="text-slate-500 text-sm">
-                Files must not exceed 3MB in size.{" "}
+                File size must not exceed 3MB.{" "}
               </p>
             </div>
           </div>
