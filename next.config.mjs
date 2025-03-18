@@ -4,6 +4,7 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   distDir: "build",
+  reactStrictMode: false,
 };
 
 export default nextConfig;

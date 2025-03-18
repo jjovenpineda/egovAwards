@@ -1,37 +1,14 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
 import Image from "next/image";
 import ph from "@/public/assets/svgs/ph.svg";
 import fb from "@/public/assets/svgs/fb.svg";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuPortal,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { ChevronDown, Globe, Mail, Phone, Search } from "lucide-react";
-import ModalWrapper from "./modal-wrapper";
-import { Button } from "@/components/ui/button";
-import { PSGC } from "@/constants";
+
 import { ErrorMessage, Field, FormikValues, useFormikContext } from "formik";
 import {
   Popover,
@@ -41,12 +18,8 @@ import {
 import { apiGet } from "@/utils/api";
 import test from "node:test";
 import { ScrollArea } from "../ui/scroll-area";
-interface ILGU {
-  lgu: string;
-  province: string;
-  region: string;
-  tenDigitCode: string;
-}
+import { ILGU } from "@/types";
+
 export default function Page1() {
   const { values, setFieldValue, setFieldTouched } =
     useFormikContext<FormikValues>();

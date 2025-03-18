@@ -44,7 +44,7 @@ export default function FloatingIcons() {
   useEffect(() => {
     const newIcons = [];
 
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < 100; i++) {
       newIcons.push({
         id: i,
         icon: icons[Math.floor(Math.random() * icons.length)],
@@ -60,20 +60,20 @@ export default function FloatingIcons() {
   }, []);
 
   return (
-    <div className="">
-      <div>
+    <div className="absolute inset-0 pointer-events-none">
+      <div className="">
         <link
           rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
         />
       </div>
-      <div className=" inset-0 bg-[#F8FAFC] overflow-hidden -z-[9999] pointer-events-none">
-        <div className="absolute w-full h-full opacity-30">
+      <div className=" inset-0   overflow-hidden   ">
+        <div className="absolute  w-full h-full opacity-30 ">
           {iconElements.map(
             ({ id, icon, left, top, color, fontSize, animationDelay }) => (
               <i
                 key={id}
-                className={`fa ${icon} absolute animate-float`}
+                className={`fa ${icon} absolute animate-float   `}
                 style={{ left, top, color, fontSize, animationDelay }}
               ></i>
             )

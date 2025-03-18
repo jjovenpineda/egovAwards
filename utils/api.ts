@@ -5,8 +5,9 @@ export const apiPost = async (url: string, data: object, headers?: object) => {
     const response = await axiosInstance.post(url, data, headers);
 
     return response.data;
-  } catch (e) {
-    console.log("Post request failed:", e);
+  } catch (e: any) {
+    console.error("Error:", e);
+    return e.response?.data ?? { success: false, message: "An error occurred" };
   }
 };
 

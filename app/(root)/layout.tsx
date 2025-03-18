@@ -6,6 +6,8 @@ import { m } from "motion/react";
 import { Suspense, useEffect, useState } from "react";
 import { storage } from "@/utils/useStorage";
 import FloatingIcons from "@/components/shared/floating-icons";
+import SideBar from "@/components/shared/sidebar";
+import TopBar from "@/components/shared/top-bar";
 
 /* import useInactivityTimeout from "@/hooks/use-inactibe-timeout";
  */
@@ -33,22 +35,23 @@ export default function RootLayout({
   }, [hasBeenAnimated]);
 
   return (
-    <main className="min-h-screen  overflow-hidden flex justify-between flex-col">
+    <main className=" flex z-50">
       <div>
-        <Header />
+        <SideBar />
+      </div>
+      <div className="size-full">
+        <TopBar />
         <m.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="w-full min-h-[80%] px-8 lg:px-32 py-14 "
+          className="w-full  min-h-screen px-8 lg:px-32 py-14 z-10 relative"
         >
-          <Suspense>
-            {" "}
-            <FloatingIcons /> {children}
-          </Suspense>
+          <Suspense> {children}</Suspense>
         </m.div>
+        <FloatingIcons />
+        <Footer />
       </div>
-      <Footer />
     </main>
   );
 }
