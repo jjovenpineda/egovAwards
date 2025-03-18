@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { LazyMotion, domAnimation } from "motion/react";
 import { Toaster } from "@/components/ui/toaster";
+import { Suspense } from "react";
 
 const geistSans = localFont({
   src: "../public/assets/fonts/GeistVF.woff",
@@ -31,7 +32,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable}  antialiased`}
       >
         <LazyMotion features={domAnimation}>
-          {children}
+          <Suspense>{children}</Suspense>
           <Toaster />
         </LazyMotion>
       </body>
