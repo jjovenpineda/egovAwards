@@ -11,20 +11,22 @@ import FileViewer from "../shared/file-viewer";
 import { Trash2 } from "lucide-react";
 import { handleFileChange, WordCounter } from "./registration";
 import { ErrorMessage, Field, FormikValues, useFormikContext } from "formik";
+import { handleFileUpload } from "@/utils/file-upload";
 
 export default function Page6() {
-  const { values, setFieldValue, setFieldTouched, validateField } =
+  const { values, setFieldValue, setFieldTouched, validateField, errors } =
     useFormikContext<FormikValues>();
   const [count, setCount] = useState(0);
   const [fileURL, setFileURL] = useState<string>("");
+
   useEffect(() => {
-    if (values.innovationAnswer_file instanceof File) {
-      setFileURL(URL.createObjectURL(values.innovationAnswer_file));
+    if (values.innovationAnswer.file instanceof File) {
+      setFileURL(URL.createObjectURL(values.innovationAnswer.file));
     }
-    WordCounter(values.innovationAnswer_text, setCount, () => {
-      setFieldValue("innovationAnswer_text", "");
+    WordCounter(values.innovationAnswer.text, setCount, () => {
+      setFieldValue("innovationAnswer.text", "");
     });
-  }, [values.innovationAnswer_text, values.innovationAnswer_file]);
+  }, [values.innovationAnswer.text, values.innovationAnswer.file]);
 
   return (
     <div>
@@ -45,35 +47,33 @@ export default function Page6() {
               What specific technological advancements or digital solutions were
               implemented in your project, and how have they contributed to
               addressing the problems?
-            </p>
+            </p>{" "}
           </div>
           <p className="text-red-500">
             Please limit your answers to 500 - 1000 words
           </p>
         </div>
-
         <div>
           <div
             onFocus={() => {
-              setFieldTouched("innovationCheck", true),
-                validateField("innovationCheck");
+              setFieldTouched("innovationAnswer.text", true),
+                validateField("innovationAnswer");
             }}
             onBlur={() => {
-              validateField("innovationCheck");
+              validateField("innovationAnswer");
             }}
             className="h-min"
           >
             <Editor
-              defaultValue={values.innovationAnswer_text}
+              defaultValue={values.innovationAnswer.text}
               onChange={(e) => {
-                setFieldValue("innovationAnswer_text", e);
-                setFieldTouched("innovationAnswer_text", true);
-                // Trigger validation
-              }} // Trigger validation}}
+                setFieldValue("innovationAnswer.text", e);
+                setFieldTouched("innovationAnswer.text", true);
+              }}
             />
           </div>
           <ErrorMessage
-            name="innovationAnswer_text"
+            name="innovationAnswer.text"
             component="div"
             className=" text-xs text-red-500 font-semibold"
           />
@@ -91,13 +91,14 @@ export default function Page6() {
             <p>or Upload File </p>
             <div>
               <div className="overflow-hidden">
-                {values.innovationAnswer_file ? (
+                {values.innovationAnswer.file &&
+                typeof values.innovationAnswer.file === "string" ? (
                   <div className="flex items-center gap-2 ">
                     {" "}
                     <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
                       <div className="flex items-center gap-2">
                         <Image src={pdf} alt="" />
-                        {values.innovationAnswer_file.name}
+                        {values.innovationAnswer.file}{" "}
                       </div>
                       <FileViewer url={fileURL} />
                     </div>
@@ -105,9 +106,7 @@ export default function Page6() {
                       size={18}
                       color="red"
                       className="shrink-0"
-                      onClick={() =>
-                        setFieldValue("innovationAnswer_file", null)
-                      }
+                      onClick={() => setFieldValue("innovationAnswer.file", "")}
                     />
                   </div>
                 ) : (
@@ -116,33 +115,32 @@ export default function Page6() {
                     type="file"
                     onFocus={() => {
                       setTimeout(() => {
-                        setFieldTouched("innovationCheck", true),
-                          validateField("innovationCheck");
+                        setFieldTouched("innovationAnswer.file", true),
+                          validateField("innovationAnswer.file");
                       }, 3000);
                     }}
                     onBlur={() => {
                       setTimeout(() => {
-                        validateField("innovationCheck");
+                        validateField("innovationAnswer.file");
                       }, 3000);
                     }}
                     accept="application/pdf"
                     placeholder="Enter Project/Program Name"
                     className="w-full"
-                    onChange={(e) => {
-                      handleFileChange(e, () => {
-                        setFieldValue(
-                          "innovationAnswer_file",
-                          e.target.files && e.target.files[0]
-                        ),
-                          setFieldTouched("innovationCheck", true),
-                          validateField("innovationCheck");
+                    onChange={async (e) => {
+                      const file = await handleFileUpload(e, () => {
+                        setFieldValue("innovationAnswer.file", e),
+                          setFieldTouched("innovationAnswer.file", true),
+                          validateField("innovationAnswer.file");
                       });
+
+                      setFieldValue("innovationAnswer.file", file);
                     }}
                   />
                 )}
               </div>
               <ErrorMessage
-                name="innovationAnswer_file"
+                name="innovationAnswer.file"
                 component="div"
                 className=" text-sm text-red-500 font-semibold"
               />
@@ -151,11 +149,14 @@ export default function Page6() {
               </p>
             </div>
           </div>
-          <ErrorMessage
-            name="innovationCheck"
-            component="div"
-            className=" text-xs text-red-500"
-          />
+          {errors.innovationAnswer &&
+            typeof errors.innovationAnswer === "string" && (
+              <ErrorMessage
+                name="innovationAnswer"
+                component="div"
+                className=" text-sm text-red-500 font-semibold"
+              />
+            )}
         </div>
       </div>
     </div>

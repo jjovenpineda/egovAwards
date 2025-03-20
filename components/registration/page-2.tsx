@@ -19,6 +19,7 @@ import {
 } from "formik";
 import { AnimatePresence, m } from "motion/react";
 import { toast } from "@/hooks/use-toast";
+import { apiPost } from "@/utils/api";
 export const categories = [
   {
     id: "r1",
@@ -52,12 +53,12 @@ export const categories = [
 export default function Page2() {
   const { values, setFieldValue, setFieldTouched } =
     useFormikContext<FormikValues>();
-  const handleFileChange = (
+  const handleFileChange = async (
     event: React.ChangeEvent<HTMLInputElement>,
     index: number,
     arrayHelpers: any
   ) => {
-    const files = event.target.files;
+    const files = event.target.files?.[0];
     const size = event.target.files?.[0]?.size;
     if (size) {
       if (size > 3 * 1024 * 1024) {
@@ -71,10 +72,8 @@ export default function Page2() {
       }
     }
 
-    if (files && files.length > 0) {
-      if (
-        values.supportingDoc.map((e: any) => e.name).includes(files[0].name)
-      ) {
+    if (files) {
+      if (values.supportingDoc.map((e: any) => e).includes(files.name)) {
         toast({
           title: "Duplicate File",
           description: "This file has already been uploaded.",
@@ -82,7 +81,15 @@ export default function Page2() {
           duration: 2500,
         });
       } else {
-        setFieldValue(`supportingDoc.${index}`, files[0]);
+        const formData = new FormData();
+        formData.append("file", files);
+
+        try {
+          const { data } = await apiPost("/api/entry/upload", formData);
+          setFieldValue(`supportingDoc.${index}`, data.dir);
+        } catch (e) {
+          console.error("File upload failed:", e);
+        }
       }
       setFieldTouched("supportingDoc", true, true);
     }
@@ -226,13 +233,13 @@ export default function Page2() {
 
                       return (
                         <div key={index} className="overflow-hidden">
-                          {item.name ? (
+                          {typeof item === "string" ? (
                             <div className="flex items-center gap-2 ">
                               {" "}
                               <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
                                 <div className="flex items-center gap-2">
                                   <Image src={pdf} alt="" />
-                                  {item.name}
+                                  {item}
                                 </div>
                                 <FileViewer url={fileURL} />
                               </div>

@@ -11,20 +11,22 @@ import FileViewer from "../shared/file-viewer";
 import { Trash2 } from "lucide-react";
 import { handleFileChange, WordCounter } from "./registration";
 import { ErrorMessage, Field, FormikValues, useFormikContext } from "formik";
+import { handleFileUpload } from "@/utils/file-upload";
 
 export default function Page3() {
-  const { values, setFieldValue, setFieldTouched, validateField } =
+  const { values, setFieldValue, setFieldTouched, validateField, errors } =
     useFormikContext<FormikValues>();
   const [count, setCount] = useState(0);
   const [fileURL, setFileURL] = useState<string>("");
+
   useEffect(() => {
-    if (values.impactAnswer_file instanceof File) {
-      setFileURL(URL.createObjectURL(values.impactAnswer_file));
+    if (values.impactAnswer.file instanceof File) {
+      setFileURL(URL.createObjectURL(values.impactAnswer.file));
     }
-    WordCounter(values.impactAnswer_text, setCount, () => {
-      setFieldValue("impactAnswer_text", "");
+    WordCounter(values.impactAnswer.text, setCount, () => {
+      setFieldValue("impactAnswer.text", "");
     });
-  }, [values.impactAnswer_text, values.impactAnswer_file]);
+  }, [values.impactAnswer.text, values.impactAnswer.file]);
 
   return (
     <div>
@@ -49,25 +51,24 @@ export default function Page3() {
         <div>
           <div
             onFocus={() => {
-              setFieldTouched("impactCheck", true),
-                validateField("impactCheck");
+              setFieldTouched("impactAnswer.text", true),
+                validateField("impactAnswer");
             }}
             onBlur={() => {
-              validateField("impactCheck");
+              validateField("impactAnswer");
             }}
             className="h-min"
           >
             <Editor
-              defaultValue={values.impactAnswer_text}
+              defaultValue={values.impactAnswer.text}
               onChange={(e) => {
-                setFieldValue("impactAnswer_text", e);
-                setFieldTouched("impactAnswer_text", true);
-                // Trigger validation
-              }} // Trigger validation}}
+                setFieldValue("impactAnswer.text", e);
+                setFieldTouched("impactAnswer.text", true);
+              }}
             />
           </div>
           <ErrorMessage
-            name="impactAnswer_text"
+            name="impactAnswer.text"
             component="div"
             className=" text-xs text-red-500 font-semibold"
           />
@@ -85,13 +86,14 @@ export default function Page3() {
             <p>or Upload File </p>
             <div>
               <div className="overflow-hidden">
-                {values.impactAnswer_file ? (
+                {values.impactAnswer.file &&
+                typeof values.impactAnswer.file === "string" ? (
                   <div className="flex items-center gap-2 ">
                     {" "}
                     <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
                       <div className="flex items-center gap-2">
                         <Image src={pdf} alt="" />
-                        {values.impactAnswer_file.name}
+                        {values.impactAnswer.file}{" "}
                       </div>
                       <FileViewer url={fileURL} />
                     </div>
@@ -99,7 +101,7 @@ export default function Page3() {
                       size={18}
                       color="red"
                       className="shrink-0"
-                      onClick={() => setFieldValue("impactAnswer_file", null)}
+                      onClick={() => setFieldValue("impactAnswer.file", "")}
                     />
                   </div>
                 ) : (
@@ -108,33 +110,32 @@ export default function Page3() {
                     type="file"
                     onFocus={() => {
                       setTimeout(() => {
-                        setFieldTouched("impactCheck", true),
-                          validateField("impactCheck");
+                        setFieldTouched("impactAnswer.file", true),
+                          validateField("impactAnswer.file");
                       }, 3000);
                     }}
                     onBlur={() => {
                       setTimeout(() => {
-                        validateField("impactCheck");
+                        validateField("impactAnswer.file");
                       }, 3000);
                     }}
                     accept="application/pdf"
                     placeholder="Enter Project/Program Name"
                     className="w-full"
-                    onChange={(e) => {
-                      handleFileChange(e, () => {
-                        setFieldValue(
-                          "impactAnswer_file",
-                          e.target.files && e.target.files[0]
-                        ),
-                          setFieldTouched("impactCheck", true),
-                          validateField("impactCheck");
+                    onChange={async (e) => {
+                      const file = await handleFileUpload(e, () => {
+                        setFieldValue("impactAnswer.file", e),
+                          setFieldTouched("impactAnswer.file", true),
+                          validateField("impactAnswer.file");
                       });
+
+                      setFieldValue("impactAnswer.file", file);
                     }}
                   />
                 )}
               </div>
               <ErrorMessage
-                name="impactAnswer_file"
+                name="impactAnswer.file"
                 component="div"
                 className=" text-sm text-red-500 font-semibold"
               />
@@ -143,11 +144,13 @@ export default function Page3() {
               </p>
             </div>
           </div>
-          <ErrorMessage
-            name="impactCheck"
-            component="div"
-            className=" text-xs text-red-500"
-          />
+          {errors.impactAnswer && typeof errors.impactAnswer === "string" && (
+            <ErrorMessage
+              name="impactAnswer"
+              component="div"
+              className=" text-sm text-red-500 font-semibold"
+            />
+          )}
         </div>
       </div>
     </div>

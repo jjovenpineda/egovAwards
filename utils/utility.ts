@@ -25,11 +25,11 @@ export const decrypt = (text: string) => {
 };
 
 export const tokenValue = () => {
-  const account = storage.getItem("account");
+  const account = storage.getItem("account_data");
   if (account) {
     const _account = decrypt(account);
     if (_account) {
-      return _account.token;
+      return _account.accessToken;
     } else {
       return null;
     }
@@ -39,7 +39,7 @@ export const tokenValue = () => {
 };
 
 export const getUserInfo = () => {
-  const account = storage.getItem("account");
+  const account = storage.getItem("account_data");
   if (account) {
     const _account = decrypt(account);
     if (_account) {

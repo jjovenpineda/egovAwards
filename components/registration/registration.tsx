@@ -36,16 +36,15 @@ import { m } from "motion/react";
 import { apiGet, apiPost } from "@/utils/api";
 
 const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
-interface IRegistration {
-  page: number;
-}
-const countWords = (html: string) => {
+
+const countWords = (html?: string) => {
   if (!html) return 0;
   const text = html.replace(/<[^>]*>/g, " ").trim();
+
   return text ? text.split(/\s+/).length : 0;
 };
 const validationSchema = Yup.object().shape({
-  lgu_name: Yup.string()
+  /* lgu_name: Yup.string()
     .required("This field is required")
     .max(200, "Limit: 100 characters"),
   lgu_abbr: Yup.string()
@@ -85,11 +84,12 @@ const validationSchema = Yup.object().shape({
       /^(https?:\/\/)?([\w.-]+)\.([a-z]{2,})(\/.*)?$/i,
       "Must be a valid website URL"
     )
-    .max(200, "Limit: 200 characters"),
+    .max(200, "Limit: 200 characters")
+
   joinCount: Yup.string()
     .required("This field is required")
-    .max(200, "Limit: 200 characters"),
-
+    .max(200, "Limit: 200 characters"),, */
+  //////////////////////
   project: Yup.string()
     .required("This field is required")
     .max(200, "Limit: 100 characters"),
@@ -106,225 +106,140 @@ const validationSchema = Yup.object().shape({
       "Must be a valid website URL"
     )
     .max(200, "Limit: 200 characters"),
-  supportingDoc: Yup.mixed()
-    .test("fileSize", "Max 3MB per file", (value) => {
-      if (!value || !Array.isArray(value)) return true; // Allow empty
-      return value.every((file) => file.size <= 3 * 1024 * 1024); // 3MB limit
+  supportingDoc: Yup.mixed().test("fileCount", "Max 5 files", (value) => {
+    if (!value || !Array.isArray(value)) return true;
+    return value.length <= 5;
+  }),
+  impactAnswer: Yup.object()
+    .shape({
+      text: Yup.string().test("maxWords", "Limit: 1000 words", (value) => {
+        if (!value) return true;
+        return countWords(value || "") <= 1000;
+      }),
+      file: Yup.mixed().nullable(),
     })
-    .test("fileCount", "Max 5 files", (value) => {
-      if (!value || !Array.isArray(value)) return true;
-      return value.length <= 5;
-    }),
-  impactAnswer_text: Yup.string().test(
-    "maxWords",
-    "Limit: 1000 words",
-    (value) => {
-      if (!value) return true;
+    .test(
+      "eitherTextOrFile",
+      "At least one input field must be filled",
+      function (value) {
+        const hasText = !!value?.text?.trim();
+        const hasFile = !!value?.file;
+        return hasText || hasFile;
+      }
+    ),
+  relevanceAnswer: Yup.object()
+    .shape({
+      text: Yup.string().test("maxWords", "Limit: 1000 words", (value) => {
+        if (!value) return true;
+        return countWords(value || "") <= 1000;
+      }),
+      file: Yup.mixed().nullable(),
+    })
+    .test(
+      "eitherTextOrFile",
+      "At least one input field must be filled",
+      function (value) {
+        const hasText = !!value?.text?.trim();
+        const hasFile = !!value?.file;
+        return hasText || hasFile;
+      }
+    ),
 
-      return countWords(value) <= 1000;
-    }
-  ),
-  impactAnswer_file: Yup.mixed()
-    .nullable()
-    .test("fileSize", "Max 3MB per file", (value: any) => {
-      if (!value) return true;
-      return value.size <= 3 * 1024 * 1024;
-    }),
-  impactCheck: Yup.mixed().test(
-    "eitherTextOrFile",
-    "At least one input field must be filled",
-    function () {
-      const { impactAnswer_text, impactAnswer_file } = this.parent;
+  sustainabilityAnswer: Yup.object()
+    .shape({
+      text: Yup.string().test("maxWords", "Limit: 1000 words", (value) => {
+        if (!value) return true;
+        return countWords(value || "") <= 1000;
+      }),
+      file: Yup.mixed().nullable(),
+    })
+    .test(
+      "eitherTextOrFile",
+      "At least one input field must be filled",
+      function (value) {
+        const hasText = !!value?.text?.trim();
+        const hasFile = !!value?.file;
+        return hasText || hasFile;
+      }
+    ),
 
-      const hasText = !!impactAnswer_text?.trim();
-      const hasFile = impactAnswer_file instanceof File;
+  innovationAnswer: Yup.object()
+    .shape({
+      text: Yup.string().test("maxWords", "Limit: 1000 words", (value) => {
+        if (!value) return true;
+        return countWords(value || "") <= 1000;
+      }),
+      file: Yup.mixed().nullable(),
+    })
+    .test(
+      "eitherTextOrFile",
+      "At least one input field must be filled",
+      function (value) {
+        const hasText = !!value?.text?.trim();
+        const hasFile = !!value?.file;
+        return hasText || hasFile;
+      }
+    ),
 
-      return hasText || hasFile;
-    }
-  ),
-  relevanceAnswer_text: Yup.string().test(
-    "maxWords",
-    "Limit: 1000 words",
-    (value) => {
-      if (!value) return true;
+  alignmentAnswerDICT: Yup.object()
+    .shape({
+      text: Yup.string().test("maxWords", "Limit: 1000 words", (value) => {
+        if (!value) return true;
+        return countWords(value || "") <= 1000;
+      }),
+      file: Yup.mixed().nullable(),
+    })
+    .test(
+      "eitherTextOrFile",
+      "At least one input field must be filled",
+      function (value) {
+        const hasText = !!value?.text?.trim();
+        const hasFile = !!value?.file;
+        return hasText || hasFile;
+      }
+    ),
 
-      return countWords(value) <= 1000;
-    }
-  ),
-  relevanceAnswer_file: Yup.mixed()
-    .nullable()
-    .test("fileSize", "Max 3MB per file", (value: any) => {
-      if (!value) return true;
-      return value.size <= 3 * 1024 * 1024;
-    }),
-  relevanceCheck: Yup.mixed().test(
-    "eitherTextOrFile",
-    "At least one input field must be filled",
-    function () {
-      const { relevanceAnswer_text, relevanceAnswer_file } = this.parent;
-
-      const hasText = !!relevanceAnswer_text?.trim();
-      const hasFile = relevanceAnswer_file instanceof File;
-
-      return hasText || hasFile;
-    }
-  ),
-  sustainabilityAnswer_text: Yup.string().test(
-    "maxWords",
-    "Limit: 1000 words",
-    (value) => {
-      if (!value) return true;
-
-      return countWords(value) <= 1000;
-    }
-  ),
-  sustainabilityAnswer_file: Yup.mixed()
-    .nullable()
-    .test("fileSize", "Max 3MB per file", (value: any) => {
-      if (!value) return true;
-      return value.size <= 3 * 1024 * 1024;
-    }),
-  sustainabilityCheck: Yup.mixed().test(
-    "eitherTextOrFile",
-    "At least one input field must be filled",
-    function () {
-      const { sustainabilityAnswer_text, sustainabilityAnswer_file } =
-        this.parent;
-
-      const hasText = !!sustainabilityAnswer_text?.trim();
-      const hasFile = sustainabilityAnswer_file instanceof File;
-
-      return hasText || hasFile;
-    }
-  ),
-  innovationAnswer_text: Yup.string().test(
-    "maxWords",
-    "Limit: 1000 words",
-    (value) => {
-      if (!value) return true;
-
-      return countWords(value) <= 1000;
-    }
-  ),
-  innovationAnswer_file: Yup.mixed()
-    .nullable()
-    .test("fileSize", "Max 3MB per file", (value: any) => {
-      if (!value) return true;
-      return value.size <= 3 * 1024 * 1024;
-    }),
-  innovationCheck: Yup.mixed().test(
-    "eitherTextOrFile",
-    "At least one input field must be filled",
-    function () {
-      const { innovationAnswer_text, innovationAnswer_file } = this.parent;
-
-      const hasText = !!innovationAnswer_text?.trim();
-      const hasFile = innovationAnswer_file instanceof File;
-
-      return hasText || hasFile;
-    }
-  ),
-  alignmentSDG_answer_text: Yup.string().test(
-    "maxWords",
-    "Limit: 1000 words",
-    (value) => {
-      if (!value) return true;
-
-      return countWords(value) <= 1000;
-    }
-  ),
-  alignmentSDG_answer_file: Yup.mixed()
-    .nullable()
-    .test("fileSize", "Max 3MB per file", (value: any) => {
-      if (!value) return true;
-      return value.size <= 3 * 1024 * 1024;
-    }),
-  goal1Check: Yup.mixed().test(
-    "eitherTextOrFile",
-    "At least one input field must be filled",
-    function () {
-      const { alignmentSDG_answer_text, alignmentSDG_answer_file } =
-        this.parent;
-
-      const hasText = !!alignmentSDG_answer_text?.trim();
-      const hasFile = alignmentSDG_answer_file instanceof File;
-
-      return hasText || hasFile;
-    }
-  ),
-  goalTexalignmentAnswerDICT_textt2: Yup.string().test(
-    "maxWords",
-    "Limit: 1000 words",
-    (value) => {
-      if (!value) return true;
-
-      return countWords(value) <= 1000;
-    }
-  ),
-  alignmentAnswerDICT_file: Yup.mixed()
-    .nullable()
-    .test("fileSize", "Max 3MB per file", (value: any) => {
-      if (!value) return true;
-      return value.size <= 3 * 1024 * 1024;
-    }),
-  goal2Check: Yup.mixed().test(
-    "eitherTextOrFile",
-    "At least one input field must be filled",
-    function () {
-      const { alignmentAnswerDICT_text, alignmentAnswerDICT_file } =
-        this.parent;
-
-      const hasText = !!alignmentAnswerDICT_text?.trim();
-      const hasFile = alignmentAnswerDICT_file instanceof File;
-
-      return hasText || hasFile;
-    }
-  ),
-  alignmentSDG_target: Yup.mixed().test(
-    "required",
-    "At least one goal is required",
-    (value) => {
-      if (typeof value === "string") return value.trim().length > 0;
-      if (Array.isArray(value)) return value.length > 0;
-      return false;
-    }
-  ),
+  alignmentSDG: Yup.object().shape({
+    target: Yup.mixed().test(
+      "required",
+      "At least one goal is required",
+      (value) => {
+        if (typeof value === "string") return value.trim().length > 0;
+        if (Array.isArray(value)) return value.length > 0;
+        return false;
+      }
+    ),
+    answer: Yup.object()
+      .shape({
+        text: Yup.string().test("maxWords", "Limit: 1000 words", (value) => {
+          if (!value) return true;
+          return countWords(value || "") <= 1000;
+        }),
+        file: Yup.mixed().nullable(),
+      })
+      .test(
+        "eitherTextOrFile",
+        "At least one input field must be filled",
+        function (value) {
+          const hasText = !!value?.text?.trim();
+          const hasFile = !!value?.file;
+          return hasText || hasFile;
+        }
+      ),
+  }),
 });
-const handleSubmit = async (values: any /* { region: string } */) => {
-  const transformedValues = Object.keys(values).reduce<Record<string, any>>(
-    (acc, key) => {
-      const newKey = key.includes("_") ? key.replace(/_/g, ".") : key;
-      acc[newKey] = values[key];
-      return acc;
-    },
-    {}
-  );
+const handleSubmit = async (values: any) => {
+  console.log("values :", values);
+  const filteredValues = {
+    ...values,
+    supportingDoc: values.supportingDoc.filter(
+      (key: any) => typeof key === "string"
+    ),
+  };
 
-  const formData = new FormData();
+  console.log("filteredValues :", filteredValues);
 
-  Object.keys(transformedValues).forEach((key) => {
-    if (
-      key === "alignmentSDG.target" &&
-      Array.isArray(transformedValues[key])
-    ) {
-      formData.append(
-        "alignmentSDG.target",
-        JSON.stringify(transformedValues[key])
-      );
-    } else if (key == "supportingDoc") {
-      transformedValues[key].forEach((file) => {
-        // Iterate over the array of Files
-        formData.append("supportingDoc", file); // Append each File object
-      });
-      console.log("transformedValues[key] :", transformedValues[key]);
-    } else {
-      formData.append(key, transformedValues[key]);
-    }
-  });
-
-  console.log("formData :", formData);
-
-  await apiPost("/api/entry/create", formData)
+  await apiPost("/api/entry/create", filteredValues)
     .then((res) => {
       const { success, message, data } = res;
       if (success) {
@@ -345,15 +260,9 @@ const handleSubmit = async (values: any /* { region: string } */) => {
         duration: 2000,
       });
     });
-  /* router.push("/"); */
-
-  /*   setTimeout(() => {
-    router.push("/");
-    setIsLoading(false);
-  }, 2000); */
 };
 const initialValues = {
-  lgu_name: "",
+  /*  lgu_name: "",
   lgu_abbr: "",
   lgu_province: "",
   lgu_region: "",
@@ -364,8 +273,8 @@ const initialValues = {
   lgu_contactPersonOfficeNo: "",
   lgu_contactPersonMobileNo: "",
   lgu_website: "",
-  lgu_facebook: "",
-  joinCount: "",
+  lgu_facebook: "", */
+  /* joinCount: "",
   project: "",
   category: "",
   projectPeriod: "",
@@ -384,7 +293,40 @@ const initialValues = {
   alignmentAnswerDICT_text: "",
   alignmentAnswerDICT_file: null,
 
-  alignmentSDG_target: [],
+  alignmentSDG_target: [], */
+  project: "",
+  projectURL: "",
+  category: "",
+  projectPeriod: "",
+  supportingDoc: [],
+  impactAnswer: {
+    text: "",
+    file: "",
+  },
+  relevanceAnswer: {
+    text: "",
+    file: "",
+  },
+  sustainabilityAnswer: {
+    text: "",
+    file: "",
+  },
+  innovationAnswer: {
+    text: "",
+    file: "",
+  },
+
+  alignmentAnswerDICT: {
+    text: "",
+    file: "",
+  },
+  alignmentSDG: {
+    target: [],
+    answer: {
+      text: "",
+      file: "",
+    },
+  },
 };
 export const WordCounter = (
   value: string,
@@ -392,6 +334,7 @@ export const WordCounter = (
 
   reset: Function
 ) => {
+  if (!value) return;
   const plainText = value.replace(/<[^>]*>/g, "");
   const words = plainText
     .trim()
@@ -430,7 +373,7 @@ export default function Registration() {
   const router = useRouter();
   const [submitDialog, setSubmitDialog] = useState(false);
   const [successDialog, setSuccessDialog] = useState(false);
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(7);
 
   const fields: Record<number, string[]> = {
     1: ["lgu", "email", "website"],
@@ -459,7 +402,7 @@ export default function Registration() {
   return (
     <Formik
       initialValues={initialValues}
-      validationSchema={/* validationSchema */ ""}
+      validationSchema={validationSchema}
       validateOnBlur={true}
       onSubmit={handleSubmit}
     >
@@ -486,11 +429,26 @@ export default function Registration() {
 
         return (
           <Form className=" flex flex-col gap-6 ">
+            <div className="space-y-2">
+              <p className="text-blue-900 text-base ">
+                11th eGOV Awards: Excellence in Governance Through Information
+                and Communications Technology Awards
+              </p>
+              <h2 className="text-slate-600 font-bold text-2xl">
+                Application Form
+              </h2>
+              {page == 7 && (
+                <p className="text-red-500 text-base">
+                  Please review if all information are correct and accurate
+                  before you submit.{" "}
+                </p>
+              )}
+            </div>
             <section>
               <>
                 {
                   [
-                    <Page1 />,
+                    /*  <Page1 />, */
                     <Page2 />,
                     <Page3 />,
                     <Page4 />,
@@ -500,8 +458,6 @@ export default function Registration() {
                     <Summary />,
                   ][page - 1]
                 }
-                <Button type="submit">SUbmit</Button>
-                {/*   <Button type="button" onClick={()=> setvalues (initialValues)}>Set Test dat</Button> */}
               </>
             </section>
 

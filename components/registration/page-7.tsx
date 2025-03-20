@@ -18,6 +18,7 @@ import pdf from "@/public/assets/svgs/pdf.svg";
 import FileViewer from "../shared/file-viewer";
 import { Trash2 } from "lucide-react";
 import { handleFileChange, WordCounter } from "./registration";
+import { handleFileUpload } from "@/utils/file-upload";
 
 const goals = [
   {
@@ -126,7 +127,7 @@ const goals = [
 ];
 
 export default function Page7() {
-  const { values, setFieldValue, setFieldTouched, validateField } =
+  const { values, setFieldValue, setFieldTouched, errors, validateField } =
     useFormikContext<FormikValues>();
   const [content, setContent] = useState("");
   const [count, setCount] = useState(0);
@@ -135,21 +136,21 @@ export default function Page7() {
   const [fileURL2, setFileURL2] = useState<string>("");
 
   useEffect(() => {
-    if (values.alignmentSDG_answer_file instanceof File) {
-      setFileURL1(URL.createObjectURL(values.alignmentSDG_answer_file));
+    if (values.alignmentSDG.answer.file instanceof File) {
+      setFileURL1(URL.createObjectURL(values.alignmentSDG.answer.file));
     }
-    WordCounter(values.alignmentSDG_answer_text, setCount, () => {
-      setFieldValue("alignmentSDG_answer_text", "");
+    WordCounter(values.alignmentSDG.answer.text, setCount, () => {
+      setFieldValue("alignmentSDG.answer.text", "");
     });
-  }, [values.alignmentSDG_answer_text, values.alignmentSDG_answer_file]);
+  }, [values.alignmentSDG.answer.text, values.alignmentSDG.answer.file]);
   useEffect(() => {
-    if (values.alignmentAnswerDICT_file instanceof File) {
-      setFileURL2(URL.createObjectURL(values.alignmentAnswerDICT_file));
+    if (values.alignmentAnswerDICT.file instanceof File) {
+      setFileURL2(URL.createObjectURL(values.alignmentAnswerDICT.file));
     }
-    WordCounter(values.alignmentAnswerDICT_text, setCount, () => {
-      setFieldValue("alignmentAnswerDICT_text", "");
+    WordCounter(values.alignmentAnswerDICT.text, setCount, () => {
+      setFieldValue("alignmentAnswerDICT.text", "");
     });
-  }, [values.alignmentAnswerDICT_text, values.alignmentAnswerDICT_file]);
+  }, [values.alignmentAnswerDICT.text, values.alignmentAnswerDICT.file]);
   return (
     <div>
       <section className="space-y-2 pt-6 lg:pt-0">
@@ -168,29 +169,29 @@ export default function Page7() {
             <span className="text-red-500 text-base">*</span>
           </p>
           <ErrorMessage
-            name="alignmentSDG_target"
+            name="alignmentSDG.target"
             component="div"
             className=" text-xs text-red-500 font-semibold"
           />
         </div>
         <FieldArray
-          name="alignmentSDG_target"
+          name="alignmentSDG.target"
           render={(arrayHelpers) => (
             <div className="grid items-start lg:grid-cols-2 xl:grid-cols-3 gap-5 w-full">
               {goals.map((goal, index) => (
                 <div key={index} className="flex items-start gap-3">
                   <Field
                     type="checkbox"
-                    name="alignmentSDG_target"
+                    name="alignmentSDG.target"
                     className=" mt-1.5"
                     id={goal.title}
                     value={goal.title}
-                    checked={values.alignmentSDG_target.includes(goal.title)}
+                    checked={values.alignmentSDG.target.includes(goal.title)}
                     onChange={(e: any) => {
                       if (e.target.checked) {
                         arrayHelpers.push(goal.title);
                       } else {
-                        const idx = values.alignmentSDG_target.indexOf(
+                        const idx = values.alignmentSDG.target.indexOf(
                           goal.title
                         );
                         arrayHelpers.remove(idx);
@@ -248,24 +249,24 @@ export default function Page7() {
         <div>
           <div
             onFocus={() => {
-              setFieldTouched("goal1Check", true), validateField("goal1Check");
+              setFieldTouched("alignmentSDG.answer.text", true),
+                validateField("alignmentSDG.answer");
             }}
             onBlur={() => {
-              validateField("goal1Check");
+              validateField("alignmentSDG.answer");
             }}
             className="h-min"
           >
             <Editor
-              defaultValue={values.alignmentSDG_answer_text}
+              defaultValue={values.alignmentSDG.answer.text}
               onChange={(e) => {
-                setFieldValue("alignmentSDG_answer_text", e);
-                setFieldTouched("alignmentSDG_answer_text", true);
-                // Trigger validation
-              }} // Trigger validation}}
+                setFieldValue("alignmentSDG.answer.text", e);
+                setFieldTouched("alignmentSDG.answer.text", true);
+              }}
             />
           </div>
           <ErrorMessage
-            name="alignmentSDG_answer_text"
+            name="alignmentSDG.answer.text"
             component="div"
             className=" text-xs text-red-500 font-semibold"
           />
@@ -280,74 +281,81 @@ export default function Page7() {
           </div>
 
           <div className="flex flex-wrap gap-2 items-center my-4">
-            <p>or Upload File </p>
-            <div>
-              <div className="overflow-hidden">
-                {values.alignmentSDG_answer_file ? (
-                  <div className="flex items-center gap-2 ">
-                    {" "}
-                    <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
-                      <div className="flex items-center gap-2">
-                        <Image src={pdf} alt="" />
-                        {values.alignmentSDG_answer_file.name}
+            <div className="flex flex-wrap gap-2 items-center my-4">
+              <p>or Upload File </p>
+              <div>
+                <div className="overflow-hidden">
+                  {values.alignmentSDG.answer.file &&
+                  typeof values.alignmentSDG.answer.file === "string" ? (
+                    <div className="flex items-center gap-2 ">
+                      {" "}
+                      <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
+                        <div className="flex items-center gap-2">
+                          <Image src={pdf} alt="" />
+                          {values.alignmentSDG.answer.file}{" "}
+                        </div>
+                        <FileViewer url={fileURL1} />
                       </div>
-                      <FileViewer url={fileURL1} />
+                      <Trash2
+                        size={18}
+                        color="red"
+                        className="shrink-0"
+                        onClick={() =>
+                          setFieldValue("alignmentSDG.answer.file", "")
+                        }
+                      />
                     </div>
-                    <Trash2
-                      size={18}
-                      color="red"
-                      className="shrink-0"
-                      onClick={() =>
-                        setFieldValue("alignmentSDG_answer_file", null)
-                      }
+                  ) : (
+                    <Input
+                      value={""}
+                      type="file"
+                      onFocus={() => {
+                        setTimeout(() => {
+                          setFieldTouched("alignmentSDG.answer.file", true),
+                            validateField("alignmentSDG.answer.file");
+                        }, 3000);
+                      }}
+                      onBlur={() => {
+                        setTimeout(() => {
+                          validateField("alignmentSDG.answer.file");
+                        }, 3000);
+                      }}
+                      accept="application/pdf"
+                      placeholder="Enter Project/Program Name"
+                      className="w-full"
+                      onChange={async (e) => {
+                        const file = await handleFileUpload(e, () => {
+                          setFieldValue("alignmentSDG.answer.file", e),
+                            setFieldTouched("alignmentSDG.answer.file", true),
+                            validateField("alignmentSDG.answer.file");
+                        });
+
+                        setFieldValue("alignmentSDG.answer.file", file);
+                      }}
                     />
-                  </div>
-                ) : (
-                  <Input
-                    value={""}
-                    type="file"
-                    onFocus={() => {
-                      setTimeout(() => {
-                        setFieldTouched("goal1Check", true),
-                          validateField("goal1Check");
-                      }, 3000);
-                    }}
-                    onBlur={() => {
-                      setTimeout(() => {
-                        validateField("goal1Check");
-                      }, 3000);
-                    }}
-                    accept="application/pdf"
-                    placeholder="Enter Project/Program Name"
-                    className="w-full"
-                    onChange={(e) => {
-                      handleFileChange(e, () => {
-                        setFieldValue(
-                          "alignmentSDG_answer_file",
-                          e.target.files && e.target.files[0]
-                        ),
-                          setFieldTouched("goal1Check", true),
-                          validateField("goal1Check");
-                      });
-                    }}
-                  />
-                )}
+                  )}
+                </div>
+                <ErrorMessage
+                  name="alignmentSDG.answer.file"
+                  component="div"
+                  className=" text-sm text-red-500 font-semibold"
+                />
+                <p className="text-slate-500 text-sm">
+                  File size must not exceed 3MB.{" "}
+                </p>
               </div>
+            </div>
+          </div>
+          {errors.alignmentSDG &&
+            typeof errors.alignmentSDG === "object" &&
+            "answer" in errors.alignmentSDG &&
+            typeof errors.alignmentSDG.answer === "string" && (
               <ErrorMessage
-                name="alignmentSDG_answer_file"
+                name="alignmentSDG.answer"
                 component="div"
                 className=" text-sm text-red-500 font-semibold"
               />
-              <p className="text-slate-500 text-sm">
-                File size must not exceed 3MB.{" "}
-              </p>
-            </div>
-          </div>
-          <ErrorMessage
-            name="goal1Check"
-            component="div"
-            className=" text-xs text-red-500"
-          />
+            )}
         </div>
       </section>
       <section className="grid gap-8 lg:grid-cols-2 my-10">
@@ -366,24 +374,24 @@ export default function Page7() {
         <div>
           <div
             onFocus={() => {
-              setFieldTouched("goal2Check", true), validateField("goal2Check");
+              setFieldTouched("alignmentAnswerDICT.text", true),
+                validateField("alignmentAnswerDICT");
             }}
             onBlur={() => {
-              validateField("goal2Check");
+              validateField("alignmentAnswerDICT");
             }}
             className="h-min"
           >
             <Editor
-              defaultValue={values.alignmentAnswerDICT_text}
+              defaultValue={values.alignmentAnswerDICT.text}
               onChange={(e) => {
-                setFieldValue("alignmentAnswerDICT_text", e);
-                setFieldTouched("alignmentAnswerDICT_text", true);
-                // Trigger validation
-              }} // Trigger validation}}
+                setFieldValue("alignmentAnswerDICT.text", e);
+                setFieldTouched("alignmentAnswerDICT.text", true);
+              }}
             />
           </div>
           <ErrorMessage
-            name="alignmentAnswerDICT_text"
+            name="alignmentAnswerDICT.text"
             component="div"
             className=" text-xs text-red-500 font-semibold"
           />
@@ -401,13 +409,14 @@ export default function Page7() {
             <p>or Upload File </p>
             <div>
               <div className="overflow-hidden">
-                {values.alignmentAnswerDICT_file ? (
+                {values.alignmentAnswerDICT.file &&
+                typeof values.alignmentAnswerDICT.file === "string" ? (
                   <div className="flex items-center gap-2 ">
                     {" "}
                     <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
                       <div className="flex items-center gap-2">
                         <Image src={pdf} alt="" />
-                        {values.alignmentAnswerDICT_file.name}
+                        {values.alignmentAnswerDICT.file}{" "}
                       </div>
                       <FileViewer url={fileURL2} />
                     </div>
@@ -416,7 +425,7 @@ export default function Page7() {
                       color="red"
                       className="shrink-0"
                       onClick={() =>
-                        setFieldValue("alignmentAnswerDICT_file", null)
+                        setFieldValue("alignmentAnswerDICT.file", "")
                       }
                     />
                   </div>
@@ -426,33 +435,32 @@ export default function Page7() {
                     type="file"
                     onFocus={() => {
                       setTimeout(() => {
-                        setFieldTouched("goal2Check", true),
-                          validateField("goal2Check");
+                        setFieldTouched("alignmentAnswerDICT.file", true),
+                          validateField("alignmentAnswerDICT.file");
                       }, 3000);
                     }}
                     onBlur={() => {
                       setTimeout(() => {
-                        validateField("goal2Check");
+                        validateField("alignmentAnswerDICT.file");
                       }, 3000);
                     }}
                     accept="application/pdf"
                     placeholder="Enter Project/Program Name"
                     className="w-full"
-                    onChange={(e) => {
-                      handleFileChange(e, () => {
-                        setFieldValue(
-                          "alignmentAnswerDICT_file",
-                          e.target.files && e.target.files[0]
-                        ),
-                          setFieldTouched("goal2Check", true),
-                          validateField("goal2Check");
+                    onChange={async (e) => {
+                      const file = await handleFileUpload(e, () => {
+                        setFieldValue("alignmentAnswerDICT.file", e),
+                          setFieldTouched("alignmentAnswerDICT.file", true),
+                          validateField("alignmentAnswerDICT.file");
                       });
+
+                      setFieldValue("alignmentAnswerDICT.file", file);
                     }}
                   />
                 )}
               </div>
               <ErrorMessage
-                name="alignmentAnswerDICT_file"
+                name="alignmentAnswerDICT.file"
                 component="div"
                 className=" text-sm text-red-500 font-semibold"
               />
@@ -461,11 +469,14 @@ export default function Page7() {
               </p>
             </div>
           </div>
-          <ErrorMessage
-            name="goal2Check"
-            component="div"
-            className=" text-xs text-red-500"
-          />
+          {errors.alignmentAnswerDICT &&
+            typeof errors.alignmentAnswerDICT === "string" && (
+              <ErrorMessage
+                name="alignmentAnswerDICT"
+                component="div"
+                className=" text-sm text-red-500 font-semibold"
+              />
+            )}
         </div>
       </section>
     </div>

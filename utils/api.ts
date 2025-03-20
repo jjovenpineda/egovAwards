@@ -15,8 +15,9 @@ export const apiGet = async (url: string) => {
   try {
     const response = await axiosInstance.get(url);
     return response.data;
-  } catch (e) {
+  } catch (e: any) {
     console.log("Fetch request failed:", e);
+    return e.response?.data ?? { success: false, message: "An error occurred" };
   }
 };
 

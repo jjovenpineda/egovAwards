@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Popover,
   PopoverContent,
@@ -43,7 +43,7 @@ import {
 } from "lucide-react";
 import { Button } from "../ui/button";
 import { m } from "motion/react";
-import { deleteCookie } from "@/utils/utility";
+import { deleteCookie, getUserInfo } from "@/utils/utility";
 import { useRouter } from "next/navigation";
 import { storage } from "@/utils/useStorage";
 import {
@@ -54,7 +54,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { links } from "@/constants";
 import {
   Accordion,
   AccordionContent,
@@ -65,12 +64,19 @@ import Link from "next/link";
 export default function TopBar() {
   const router = useRouter();
   const [currentPath, setCurrentPath] = useState("");
+  const [userInfo, setuserInfo] = useState<any>({});
 
   const logout = () => {
     deleteCookie("authToken");
     storage.removeAll();
     router.push("/sign-in");
   };
+  useEffect(() => {
+    console.log("userInfo", userInfo);
+  }, [userInfo]);
+  useEffect(() => {
+    setuserInfo(getUserInfo());
+  }, []);
   return (
     <m.div
       initial={{
@@ -79,9 +85,9 @@ export default function TopBar() {
       }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.4, delay: 0.2 }}
-      className="flex items-center sticky top-0 z-50 shadow-[0_2px_4px_rgba(0,0,0,0.08)] px-16 p-3 justify-between w-full  bg-white "
+      className="flex items-center sticky top-0 z-50 shadow-[0_2px_4px_rgba(0,0,0,0.08)] px-16 p-3 justify-end w-full  bg-white "
     >
-      <Breadcrumb className="">
+      {/*  <Breadcrumb className="">
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink href="#" className="flex  items-center gap-1">
@@ -111,7 +117,7 @@ export default function TopBar() {
             <BreadcrumbPage>Breadcrumb</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
-      </Breadcrumb>
+      </Breadcrumb> */}
       <div className="hidden md:block">
         <Popover>
           <PopoverTrigger>
@@ -121,16 +127,18 @@ export default function TopBar() {
               <div className="flex items-center gap-2">
                 <div className="rounded-full size-6 overflow-hidden">
                   <img
-                    src={"https://mdbcdn.b-cdn.net/img/new/avatars/2.webp"}
+                    src={
+                      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRDwmG52pVI5JZfn04j9gdtsd8pAGbqjjLswg&s"
+                    }
                     alt=""
                     className="object-cover size-full"
                   />
                 </div>
 
-                <div className="flex gap-2 text-start text-nowrap">
-                  <p className="text-xs text-slate-900 ">
-                    {/*  {userInfo?.fullname} */}John Doe |{" "}
-                    <span className="text-slate-500">Admin</span>
+                <div className="flex gap-2 text-[13px] items-center text-start text-nowrap">
+                  {userInfo.firstname} |
+                  <p className=" text-slate-900 ">
+                    <span className="text-slate-500">{userInfo.role}</span>
                   </p>
                   <ChevronDown size={12} className=" h-4 w-4 text-slate-500" />
                 </div>

@@ -21,15 +21,7 @@ import {
 import { Input } from "@/components/ui/input";
 import ph from "@/public/assets/svgs/ph.svg";
 import { Label } from "@/components/ui/label";
-import {
-  ErrorMessage,
-  Field,
-  Form,
-  Formik,
-  FormikHelpers,
-  FormikProvider,
-  useFormikContext,
-} from "formik";
+import { ErrorMessage, Field, Form, Formik } from "formik";
 import { useRouter } from "next/navigation";
 import { ChevronDown, Info, Mail, Search, Trash2 } from "lucide-react";
 import { AnimatePresence, m } from "motion/react";
@@ -38,9 +30,7 @@ import { storage } from "@/utils/useStorage";
 import { apiGet, apiPost } from "@/utils/api";
 import { encrypt } from "@/utils/utility";
 import { toast } from "@/hooks/use-toast";
-import FloatingIcons from "@/components/shared/floating-icons";
 import FileViewer from "@/components/shared/file-viewer";
-import { sign } from "crypto";
 import { handleFileUpload } from "@/utils/file-upload";
 export interface ILGU {
   lgu: string;
@@ -55,6 +45,7 @@ export default function SignInPage() {
   const [lguPopover, setLguPopover] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [lguPage, setLguPage] = useState(1);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const getLGUList = async () => {
     try {
@@ -64,6 +55,35 @@ export default function SignInPage() {
       setLguList(data);
     } catch (e) {
       console.error("Error fetching LGU list:", e);
+    }
+  };
+
+  const verifyEmail = async (values: any) => {
+    try {
+      const res = await apiGet(
+        `/api/auth/forgot-password/verify/${values.email}`
+      );
+      const { success, message, data } = res;
+      if (!success) {
+        setIsLoading(false);
+        setPage("lgu");
+      } else if (success) {
+        toast({
+          title: "Email Already Exists",
+          description: "Try using a different email.",
+          variant: "destructive",
+          duration: 2000,
+        });
+      }
+    } catch (e) {
+      console.error("Error:", e);
+      setIsLoading(false);
+      toast({
+        title: "Something went wrong",
+        description: "Please try again later.",
+        variant: "destructive",
+        duration: 2000,
+      });
     }
   };
   const validationSchema = Yup.object().shape({
@@ -107,30 +127,22 @@ export default function SignInPage() {
   });
 
   const handleSubmit = async (values: any) => {
-    const { success, data, message } = await apiPost("/api/lgu/signup", values);
-
-    if (success) {
-      storage.setItem("verification_Code", encrypt(data.verificationCode));
+    try {
+      await apiPost("/api/lgu/signup", values);
       setPage("complete");
-    } else if (message?.includes("duplicate")) {
+    } catch (e) {
+      console.error("Error:", e);
+      setIsLoading(false);
       toast({
-        title: "Submission Failed",
+        title: "Something went wrong",
+        description: "Please try again later.",
         variant: "destructive",
-        description: "Email already registered.",
-        duration: 2000,
-      });
-    } else {
-      toast({
-        title: "Submission Failed",
-        variant: "destructive",
-        description: "Something went wrong. Please try again.",
         duration: 2000,
       });
     }
   };
   useEffect(() => {
     getLGUList();
-
     /*     setIsLoaded(true);
      */
   }, []);
@@ -142,7 +154,7 @@ export default function SignInPage() {
         duration: 0.6,
         ease: "easeOut",
       }}
-      className="relative size-full overflow-x-hidden "
+      className="relative size-full overflow-hidden lg:py-20"
     >
       <div className="z-30 flex size-full  relative items-center justify-center">
         <Formik
@@ -176,7 +188,7 @@ export default function SignInPage() {
               },
             };
             return (
-              <Form className="max-w-[380px] py-20 mx-auto lg:mx-0 max-h-screen  w-full">
+              <Form className="max-w-[380px]  mx-auto lg:mx-0 max-h-screen  w-full">
                 {" "}
                 <h2 className="font-bold text-base uppercase mb-4 text-center text-blue-600">
                   sign up
@@ -316,7 +328,7 @@ export default function SignInPage() {
                                     component="div"
                                     className=" text-xs text-red-500 font-semibold"
                                   />
-                                  <p className="text-sm text-gray-400 mt-1">
+                                  <p className="text-sm font-medium text-gray-400 mt-1">
                                     As the authorized representative of the LGU,
                                     you will be responsible for gathering and
                                     consolidating all entries and submissions of
@@ -333,11 +345,22 @@ export default function SignInPage() {
                             <div className="flex gap-4 justify-center">
                               <Button
                                 disabled={!values.email || !!errors.email}
-                                onClick={() => setPage("lgu")}
+                                onClick={() => {
+                                  verifyEmail(values);
+                                }}
                                 className={`bg-[#1F2937] flex justify-center w-full gap-2 text-sm font-semibold items-center transition-colors duration-300  hover:bg-slate-700 text-white p-2.5 px-6 rounded-md`}
                               >
                                 Next
                               </Button>
+                            </div>
+                            <div className="text-sm text-gray-400 mt-4">
+                              Already have an account?{" "}
+                              <span
+                                onClick={() => router.push("/sign-in")}
+                                className="text-blue-400 font-semibold hover:text-blue-600 cursor-pointer"
+                              >
+                                Login here
+                              </span>
                             </div>
                           </Card>
                         </m.div>
@@ -644,15 +667,10 @@ export default function SignInPage() {
                                             placeholder="Enter Project/Program Name"
                                             className="w-full"
                                             onChange={async (e) => {
-                                              const { data } =
-                                                await handleFileUpload(
-                                                  e.target.files?.[0]
-                                                );
+                                              const file =
+                                                await handleFileUpload(e);
 
-                                              setFieldValue(
-                                                "authLetter",
-                                                data.dir
-                                              );
+                                              setFieldValue("authLetter", file);
                                             }}
                                           />
                                         )}
@@ -904,7 +922,6 @@ export default function SignInPage() {
           }}
         </Formik>
       </div>
-      <FloatingIcons />
     </m.div>
   );
 }

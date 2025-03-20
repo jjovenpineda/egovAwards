@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Edit } from "lucide-react";
+import { DotIcon, Edit } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import Page1 from "./page-1";
 import ModalWrapper from "./modal-wrapper";
@@ -13,13 +13,12 @@ import Image from "next/image";
 import pdf from "@/public/assets/svgs/pdf.svg";
 
 import { storage } from "@/utils/useStorage";
-import { PSGC } from "@/constants";
 import FileViewer from "../shared/file-viewer";
 import { ErrorMessage, FormikValues, useFormikContext } from "formik";
 
 export default function Summary() {
-  const { values, setFieldValue } = useFormikContext<FormikValues>();
-  const aboutTheLguLabels = [
+  const { values, setFieldValue, errors } = useFormikContext<FormikValues>();
+  /* const aboutTheLguLabels = [
     { label: "LGU Name", value: "lgu_name" },
     { label: "LGU Abbreviation", value: "lgu_abbr" },
     { label: "Province", value: "lgu_province" },
@@ -38,7 +37,7 @@ export default function Summary() {
         "Number of times in joining eGOV, Digital Cities Awards, Digital Governance Awards from 2012 to 2022",
       value: "joinCount",
     },
-  ];
+  ]; */
 
   const aboutTheEntryLabels: AboutTheEntryLabel[] = [
     { label: "Project/Program Name", value: "project" },
@@ -68,39 +67,15 @@ export default function Summary() {
   const [page7Modal, setPage7Modal] = useState(false);
 
   return (
-    <div className="space-y-14 lg:w-3/4">
-      {/*    <section className="space-y-8">
-        <div className="space-y-3">
-          <p className="text-[#1E3A8A] text-base">
-            <strong>11th eGOV Awards:</strong> Excellence in Governance Through
-            Information and Communications Technology Awards Application Form
-          </p>
-          <h1 className="font-bold text-3xl texxt-slate-900">
-            Registration Form
-          </h1>
-          <p className="text-[#CC3535] text-base py-2">
-            Please review if all information are correct and accurate before you
-            submit.
-          </p>
-        </div>
-      </section> */}
+    <div className="space-y-14 lg:w-full">
       <section>
-        <p className="text-red-500 mb-6 text-base">
-          Please review if all information are correct and accurate before you
-          submit.{" "}
-        </p>
         <div className=" space-y-2 pt-6 lg:pt-0">
-          <div className="flex justify-between items-center">
+          <div className="flex flex-col">
             <h2 className="font-bold text-lg text-blue-900">ABOUT THE LGU </h2>
-            <Button
-              type="button"
-              onClick={() => setPage1Modal(!page1Modal)}
-              variant={"primary"}
-              className="bg-blue-900"
-              size={"sm"}
-            >
-              <Edit /> Edit
-            </Button>
+            <p className=" font-medium text-base text-slate-500">
+              To update LGU information, please go to Account Settings to do
+              changes.
+            </p>
 
             <ModalWrapper
               isEdit={true}
@@ -114,26 +89,76 @@ export default function Summary() {
           </div>
           <hr className="p-2 "></hr>
         </div>
-        <div className="grid text-base w-full grid-cols-2 md:grid-cols-[_40%,_60%] md:gap-2">
-          {aboutTheLguLabels.map((item, index) => {
-            return (
-              <React.Fragment key={index}>
-                <div className="flex justify-between">
-                  {item.label} <span className="mr-4">:</span>
-                </div>
-                <div>
-                  <div className=" font-medium text-slate-500">
-                    {values[item.value]}
-                  </div>
-                  <ErrorMessage
-                    name={item.value}
-                    component="div"
-                    className=" text-base text-red-500 italic "
-                  />
-                </div>
-              </React.Fragment>
-            );
-          })}
+        <div className="grid grid-cols-2">
+          {/*  */}
+          <div className="">
+            <h2 className="text-sm font-medium text-gray-900">
+              Calabanga, Camarines Sur
+            </h2>
+            <p className="text-slate-600 font-medium text-sm">
+              Region V - Bicol
+            </p>
+
+            <div className="mt-4">
+              <p className="text-slate-500 text-xs">Contact Person</p>
+              <h3 className="text-md font-medium text-gray-900">
+                Juan Dela Cruz
+              </h3>
+              <p className="text-gray-700 text-xs">
+                juandelacruz@calabanga.com
+              </p>
+              <p className="text-gray-700 text-xs">+639876543210</p>
+            </div>
+          </div>
+          {/*  */}
+          <div>
+            <div className="space-y-2 text-gray-900 text-xs">
+              <div className="flex">
+                <p className="w-48 font-medium">Name of LCE</p>
+                <p>
+                  : <span className="text-slate-700">Eugene S. Severo</span>
+                </p>
+              </div>
+              <div className="flex">
+                <p className="w-48 font-medium">Name of Office in LGU</p>
+                <p>
+                  : <span className="text-slate-700">IT Department</span>
+                </p>
+              </div>
+              <div className="flex py-4">
+                <p className="w-48 font-medium">Number of Times Joined</p>
+                <p>: 2</p>
+              </div>
+              <div className="flex">
+                <p className="w-48 font-medium">Office Number</p>
+                <p>: (02) 123 456</p>
+              </div>
+              <div className="flex">
+                <p className="w-48 font-medium">Website</p>
+                <p>
+                  :{" "}
+                  <a
+                    href="https://www.calabanga.com"
+                    className="text-slate-700 hover:underline"
+                  >
+                    www.calabanga.com
+                  </a>
+                </p>
+              </div>
+              <div className="flex">
+                <p className="w-48 font-medium">Facebook Page</p>
+                <p>
+                  :{" "}
+                  <a
+                    href="https://facebook.com/calabanga"
+                    className="text-slate-700 hover:underline"
+                  >
+                    facebook.com/calabanga
+                  </a>
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
       <section>
@@ -186,7 +211,7 @@ export default function Summary() {
                             item.name && URL.createObjectURL(item);
                           return (
                             <>
-                              {item.name != "" && item.name != undefined && (
+                              {typeof item === "string" && (
                                 <div
                                   key={index}
                                   className="flex items-center gap-2 w-fit"
@@ -195,7 +220,7 @@ export default function Summary() {
                                   <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
                                     <div className="flex items-center gap-2">
                                       <Image src={pdf} alt="" />
-                                      {item.name}
+                                      {item}
                                     </div>
                                     <FileViewer url={fileURL} />
                                   </div>
@@ -268,21 +293,22 @@ export default function Summary() {
           </h2>
           <p
             className="text-slate-500 text-base font-light leading-normal line-clamp-6"
-            dangerouslySetInnerHTML={{ __html: values.impactAnswer_text }}
+            dangerouslySetInnerHTML={{ __html: values.impactAnswer.text }}
           />
           <div className="mb-2 font-medium text-slate-500 col-span-2">
             <div className="flex flex-wrap gap-2 w-full ">
-              {values.impactAnswer_file &&
-                values.impactAnswer_file.name &&
+              {!!values.impactAnswer.file &&
+                typeof values.impactAnswer.file === "string" &&
                 (() => {
-                  const fileURL = URL.createObjectURL(values.impactAnswer_file);
+                  /*  const fileURL = URL.createObjectURL(values.impactAnswer.file); */
+                  const fileURL = "";
 
                   return (
                     <div className="flex items-center gap-2 w-fit">
                       <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
                         <div className="flex items-center gap-2">
                           <Image src={pdf} alt="PDF Icon" />
-                          {values.impactAnswer_file.name}
+                          {values.impactAnswer.file}
                         </div>
                         <FileViewer url={fileURL} />
                       </div>
@@ -290,11 +316,13 @@ export default function Summary() {
                   );
                 })()}
             </div>{" "}
-            <ErrorMessage
-              name="impactCheck"
-              component="div"
-              className=" text-base text-red-500 italic "
-            />
+            {errors.impactAnswer && typeof errors.impactAnswer === "string" && (
+              <ErrorMessage
+                name="impactAnswer"
+                component="div"
+                className=" text-sm text-red-500 font-semibold"
+              />
+            )}
           </div>
         </div>
       </section>
@@ -341,23 +369,22 @@ export default function Summary() {
           </h2>
           <p
             className="text-slate-500 text-base font-light leading-normal line-clamp-6"
-            dangerouslySetInnerHTML={{ __html: values.relevanceAnswer_text }}
+            dangerouslySetInnerHTML={{ __html: values.relevanceAnswer.text }}
           />
           <div className="mb-2 font-medium text-slate-500 col-span-2">
             <div className="flex flex-wrap gap-2 w-full ">
-              {values.relevanceAnswer_file &&
-                values.relevanceAnswer_file.name &&
+              {!!values.relevanceAnswer.file &&
+                typeof values.relevanceAnswer.file === "string" &&
                 (() => {
-                  const fileURL = URL.createObjectURL(
-                    values.relevanceAnswer_file
-                  );
+                  /*  const fileURL = URL.createObjectURL(values.relevanceAnswer.file); */
+                  const fileURL = "";
 
                   return (
                     <div className="flex items-center gap-2 w-fit">
                       <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
                         <div className="flex items-center gap-2">
                           <Image src={pdf} alt="PDF Icon" />
-                          {values.relevanceAnswer_file.name}
+                          {values.relevanceAnswer.file}
                         </div>
                         <FileViewer url={fileURL} />
                       </div>
@@ -365,11 +392,14 @@ export default function Summary() {
                   );
                 })()}
             </div>{" "}
-            <ErrorMessage
-              name="relevanceCheck"
-              component="div"
-              className=" text-base text-red-500 italic "
-            />
+            {errors.relevanceAnswer &&
+              typeof errors.relevanceAnswer === "string" && (
+                <ErrorMessage
+                  name="relevanceAnswer"
+                  component="div"
+                  className=" text-sm text-red-500 font-semibold"
+                />
+              )}
           </div>
         </div>
       </section>
@@ -417,36 +447,38 @@ export default function Summary() {
           <p
             className="text-slate-500 text-base font-light leading-normal line-clamp-6"
             dangerouslySetInnerHTML={{
-              __html: values.sustainabilityAnswer_text,
+              __html: values.sustainabilityAnswer.text,
             }}
           />
           <div className="mb-2 font-medium text-slate-500 col-span-2">
             <div className="flex flex-wrap gap-2 w-full ">
-              {values.sustainabilityAnswer_file &&
-                values.sustainabilityAnswer_file.name &&
+              {!!values.sustainabilityAnswer.file &&
+                typeof values.sustainabilityAnswer.file === "string" &&
                 (() => {
-                  const fileURL = URL.createObjectURL(
-                    values.sustainabilityAnswer_file
-                  );
+                  /*  const fileURL = URL.createObjectURL(values.sustainabilityAnswer.file); */
+                  const fileURL = "";
 
                   return (
                     <div className="flex items-center gap-2 w-fit">
                       <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
                         <div className="flex items-center gap-2">
                           <Image src={pdf} alt="PDF Icon" />
-                          {values.sustainabilityAnswer_file.name}
+                          {values.sustainabilityAnswer.file}
                         </div>
                         <FileViewer url={fileURL} />
                       </div>
                     </div>
                   );
                 })()}
-            </div>
-            <ErrorMessage
-              name="sustainabilityCheck"
-              component="div"
-              className=" text-base text-red-500 italic "
-            />
+            </div>{" "}
+            {errors.sustainabilityAnswer &&
+              typeof errors.sustainabilityAnswer === "string" && (
+                <ErrorMessage
+                  name="sustainabilityAnswer"
+                  component="div"
+                  className=" text-sm text-red-500 font-semibold"
+                />
+              )}
           </div>
         </div>
       </section>
@@ -490,23 +522,24 @@ export default function Summary() {
 
           <p
             className="text-slate-500 text-base font-light leading-normal line-clamp-6"
-            dangerouslySetInnerHTML={{ __html: values.innovationAnswer_text }}
+            dangerouslySetInnerHTML={{
+              __html: values.innovationAnswer.text,
+            }}
           />
           <div className="mb-2 font-medium text-slate-500 col-span-2">
             <div className="flex flex-wrap gap-2 w-full ">
-              {values.innovationAnswer_file &&
-                values.innovationAnswer_file.name &&
+              {!!values.innovationAnswer.file &&
+                typeof values.innovationAnswer.file === "string" &&
                 (() => {
-                  const fileURL = URL.createObjectURL(
-                    values.innovationAnswer_file
-                  );
+                  /*  const fileURL = URL.createObjectURL(values.innovationAnswer.file); */
+                  const fileURL = "";
 
                   return (
                     <div className="flex items-center gap-2 w-fit">
                       <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
                         <div className="flex items-center gap-2">
                           <Image src={pdf} alt="PDF Icon" />
-                          {values.innovationAnswer_file.name}
+                          {values.innovationAnswer.file}
                         </div>
                         <FileViewer url={fileURL} />
                       </div>
@@ -514,11 +547,14 @@ export default function Summary() {
                   );
                 })()}
             </div>{" "}
-            <ErrorMessage
-              name="innovationCheck"
-              component="div"
-              className=" text-base text-red-500 italic "
-            />
+            {errors.innovationAnswer &&
+              typeof errors.innovationAnswer === "string" && (
+                <ErrorMessage
+                  name="innovationAnswer"
+                  component="div"
+                  className=" text-sm text-red-500 font-semibold"
+                />
+              )}
           </div>
         </div>
       </section>
@@ -554,13 +590,18 @@ export default function Summary() {
             <p className=" font-semibold text-base text-slate-900">
               Sustainable Development Goals (SDGs) that your project focuses on.
             </p>
-            <ul className="list-disc list-inside ml-2 text-slate-600">
-              {values.alignmentSDG_target.map((goal: any, index: any) => (
-                <li key={index}>{goal}</li>
+            <ul className=" flex flex-wrap gap-2 text-slate-600">
+              {values.alignmentSDG.target.map((goal: any, index: any) => (
+                <li
+                  key={index}
+                  className="flex whitespace-nowrap bg-[#F3F4F6] px-2 rounded-full "
+                >
+                  <DotIcon /> {goal}
+                </li>
               ))}
             </ul>
             <ErrorMessage
-              name="alignmentSDG_target"
+              name="alignmentSDG.target"
               component="div"
               className=" text-base text-red-500 italic "
             />
@@ -586,24 +627,23 @@ export default function Summary() {
             <p
               className="text-slate-500 text-base font-light leading-normal line-clamp-6"
               dangerouslySetInnerHTML={{
-                __html: values.alignmentSDG_answer_text,
+                __html: values.alignmentSDG.text,
               }}
             />
             <div className="mb-2 font-medium text-slate-500 col-span-2">
               <div className="flex flex-wrap gap-2 w-full ">
-                {values.alignmentSDG_answer_file &&
-                  values.alignmentSDG_answer_file.name &&
+                {!!values.alignmentSDG.file &&
+                  typeof values.alignmentSDG.file === "string" &&
                   (() => {
-                    const fileURL = URL.createObjectURL(
-                      values.alignmentSDG_answer_file
-                    );
+                    /*  const fileURL = URL.createObjectURL(values.alignmentSDG.file); */
+                    const fileURL = "";
 
                     return (
                       <div className="flex items-center gap-2 w-fit">
                         <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
                           <div className="flex items-center gap-2">
                             <Image src={pdf} alt="PDF Icon" />
-                            {values.alignmentSDG_answer_file.name}
+                            {values.alignmentSDG.file}
                           </div>
                           <FileViewer url={fileURL} />
                         </div>
@@ -611,11 +651,16 @@ export default function Summary() {
                     );
                   })()}
               </div>{" "}
-              <ErrorMessage
-                name="goal1Check"
-                component="div"
-                className=" text-base text-red-500 italic "
-              />
+              {errors.alignmentSDG &&
+                typeof errors.alignmentSDG === "object" &&
+                "answer" in errors.alignmentSDG &&
+                typeof errors.alignmentSDG.answer === "string" && (
+                  <ErrorMessage
+                    name="alignmentSDG.answer"
+                    component="div"
+                    className=" text-sm text-red-500 font-semibold"
+                  />
+                )}
             </div>
           </div>
 
@@ -629,24 +674,23 @@ export default function Summary() {
             <p
               className="text-slate-500 text-base font-light leading-normal line-clamp-6"
               dangerouslySetInnerHTML={{
-                __html: values.alignmentAnswerDICT_text,
+                __html: values.alignmentAnswerDICT.text,
               }}
             />
             <div className="mb-2 font-medium text-slate-500 col-span-2">
               <div className="flex flex-wrap gap-2 w-full ">
-                {values.alignmentAnswerDICT_file &&
-                  values.alignmentAnswerDICT_file.name &&
+                {!!values.alignmentAnswerDICT.file &&
+                  typeof values.alignmentAnswerDICT.file === "string" &&
                   (() => {
-                    const fileURL = URL.createObjectURL(
-                      values.alignmentAnswerDICT_file
-                    );
+                    /*  const fileURL = URL.createObjectURL(values.alignmentAnswerDICT.file); */
+                    const fileURL = "";
 
                     return (
                       <div className="flex items-center gap-2 w-fit">
                         <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
                           <div className="flex items-center gap-2">
                             <Image src={pdf} alt="PDF Icon" />
-                            {values.alignmentAnswerDICT_file.name}
+                            {values.alignmentAnswerDICT.file}
                           </div>
                           <FileViewer url={fileURL} />
                         </div>
@@ -654,11 +698,14 @@ export default function Summary() {
                     );
                   })()}
               </div>{" "}
-              <ErrorMessage
-                name="goal2Check"
-                component="div"
-                className=" text-base text-red-500 italic "
-              />
+              {errors.alignmentAnswerDICT &&
+                typeof errors.alignmentAnswerDICT === "string" && (
+                  <ErrorMessage
+                    name="alignmentAnswerDICT"
+                    component="div"
+                    className=" text-sm text-red-500 font-semibold"
+                  />
+                )}
             </div>
           </div>
         </div>

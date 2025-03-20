@@ -11,20 +11,22 @@ import FileViewer from "../shared/file-viewer";
 import { Trash2 } from "lucide-react";
 import { handleFileChange, WordCounter } from "./registration";
 import { ErrorMessage, Field, FormikValues, useFormikContext } from "formik";
+import { handleFileUpload } from "@/utils/file-upload";
 
 export default function Page5() {
-  const { values, setFieldValue, setFieldTouched, validateField } =
+  const { values, setFieldValue, setFieldTouched, validateField, errors } =
     useFormikContext<FormikValues>();
   const [count, setCount] = useState(0);
   const [fileURL, setFileURL] = useState<string>("");
+
   useEffect(() => {
-    if (values.sustainabilityAnswer_file instanceof File) {
-      setFileURL(URL.createObjectURL(values.sustainabilityAnswer_file));
+    if (values.sustainabilityAnswer.file instanceof File) {
+      setFileURL(URL.createObjectURL(values.sustainabilityAnswer.file));
     }
-    WordCounter(values.sustainabilityAnswer_text, setCount, () => {
-      setFieldValue("sustainabilityAnswer_text", "");
+    WordCounter(values.sustainabilityAnswer.text, setCount, () => {
+      setFieldValue("sustainabilityAnswer.text", "");
     });
-  }, [values.sustainabilityAnswer_text, values.sustainabilityAnswer_file]);
+  }, [values.sustainabilityAnswer.text, values.sustainabilityAnswer.file]);
 
   return (
     <div>
@@ -44,7 +46,7 @@ export default function Page5() {
             <p className="text-base">
               What measures have been implemented to continuously update and
               improve the project to keep pace with technological advancements?
-            </p>
+            </p>{" "}
             <p className="text-base">
               How does the project incorporate community engagement and
               capacity-building to ensure ongoing local support and ownership?
@@ -57,25 +59,24 @@ export default function Page5() {
         <div>
           <div
             onFocus={() => {
-              setFieldTouched("sustainabilityCheck", true),
-                validateField("sustainabilityCheck");
+              setFieldTouched("sustainabilityAnswer.text", true),
+                validateField("sustainabilityAnswer");
             }}
             onBlur={() => {
-              validateField("sustainabilityCheck");
+              validateField("sustainabilityAnswer");
             }}
             className="h-min"
           >
             <Editor
-              defaultValue={values.sustainabilityAnswer_text}
+              defaultValue={values.sustainabilityAnswer.text}
               onChange={(e) => {
-                setFieldValue("sustainabilityAnswer_text", e);
-                setFieldTouched("sustainabilityAnswer_text", true);
-                // Trigger validation
-              }} // Trigger validation}}
+                setFieldValue("sustainabilityAnswer.text", e);
+                setFieldTouched("sustainabilityAnswer.text", true);
+              }}
             />
           </div>
           <ErrorMessage
-            name="sustainabilityAnswer_text"
+            name="sustainabilityAnswer.text"
             component="div"
             className=" text-xs text-red-500 font-semibold"
           />
@@ -93,13 +94,14 @@ export default function Page5() {
             <p>or Upload File </p>
             <div>
               <div className="overflow-hidden">
-                {values.sustainabilityAnswer_file ? (
+                {values.sustainabilityAnswer.file &&
+                typeof values.sustainabilityAnswer.file === "string" ? (
                   <div className="flex items-center gap-2 ">
                     {" "}
                     <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
                       <div className="flex items-center gap-2">
                         <Image src={pdf} alt="" />
-                        {values.sustainabilityAnswer_file.name}
+                        {values.sustainabilityAnswer.file}{" "}
                       </div>
                       <FileViewer url={fileURL} />
                     </div>
@@ -108,7 +110,7 @@ export default function Page5() {
                       color="red"
                       className="shrink-0"
                       onClick={() =>
-                        setFieldValue("sustainabilityAnswer_file", null)
+                        setFieldValue("sustainabilityAnswer.file", "")
                       }
                     />
                   </div>
@@ -118,33 +120,32 @@ export default function Page5() {
                     type="file"
                     onFocus={() => {
                       setTimeout(() => {
-                        setFieldTouched("sustainabilityCheck", true),
-                          validateField("sustainabilityCheck");
+                        setFieldTouched("sustainabilityAnswer.file", true),
+                          validateField("sustainabilityAnswer.file");
                       }, 3000);
                     }}
                     onBlur={() => {
                       setTimeout(() => {
-                        validateField("sustainabilityCheck");
+                        validateField("sustainabilityAnswer.file");
                       }, 3000);
                     }}
                     accept="application/pdf"
                     placeholder="Enter Project/Program Name"
                     className="w-full"
-                    onChange={(e) => {
-                      handleFileChange(e, () => {
-                        setFieldValue(
-                          "sustainabilityAnswer_file",
-                          e.target.files && e.target.files[0]
-                        ),
-                          setFieldTouched("sustainabilityCheck", true),
-                          validateField("sustainabilityCheck");
+                    onChange={async (e) => {
+                      const file = await handleFileUpload(e, () => {
+                        setFieldValue("sustainabilityAnswer.file", e),
+                          setFieldTouched("sustainabilityAnswer.file", true),
+                          validateField("sustainabilityAnswer.file");
                       });
+
+                      setFieldValue("sustainabilityAnswer.file", file);
                     }}
                   />
                 )}
               </div>
               <ErrorMessage
-                name="sustainabilityAnswer_file"
+                name="sustainabilityAnswer.file"
                 component="div"
                 className=" text-sm text-red-500 font-semibold"
               />
@@ -153,11 +154,14 @@ export default function Page5() {
               </p>
             </div>
           </div>
-          <ErrorMessage
-            name="sustainabilityCheck"
-            component="div"
-            className=" text-xs text-red-500"
-          />
+          {errors.sustainabilityAnswer &&
+            typeof errors.sustainabilityAnswer === "string" && (
+              <ErrorMessage
+                name="sustainabilityAnswer"
+                component="div"
+                className=" text-sm text-red-500 font-semibold"
+              />
+            )}
         </div>
       </div>
     </div>

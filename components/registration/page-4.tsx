@@ -11,20 +11,22 @@ import FileViewer from "../shared/file-viewer";
 import { Trash2 } from "lucide-react";
 import { handleFileChange, WordCounter } from "./registration";
 import { ErrorMessage, Field, FormikValues, useFormikContext } from "formik";
+import { handleFileUpload } from "@/utils/file-upload";
 
 export default function Page4() {
-  const { values, setFieldValue, setFieldTouched, validateField } =
+  const { values, setFieldValue, setFieldTouched, validateField, errors } =
     useFormikContext<FormikValues>();
   const [count, setCount] = useState(0);
   const [fileURL, setFileURL] = useState<string>("");
+
   useEffect(() => {
-    if (values.relevanceAnswer_file instanceof File) {
-      setFileURL(URL.createObjectURL(values.relevanceAnswer_file));
+    if (values.relevanceAnswer.file instanceof File) {
+      setFileURL(URL.createObjectURL(values.relevanceAnswer.file));
     }
-    WordCounter(values.relevanceAnswer_text, setCount, () => {
-      setFieldValue("relevanceAnswer_text", "");
+    WordCounter(values.relevanceAnswer.text, setCount, () => {
+      setFieldValue("relevanceAnswer.text", "");
     });
-  }, [values.relevanceAnswer_text, values.relevanceAnswer_file]);
+  }, [values.relevanceAnswer.text, values.relevanceAnswer.file]);
 
   return (
     <div>
@@ -44,7 +46,7 @@ export default function Page4() {
             <p className="text-base">
               How does the project directly address and mitigate the identified
               problem or challenge?
-            </p>
+            </p>{" "}
             <p className="text-base">
               What measurable improvements or outcomes have been observed since
               the implementation of the project in relation to the problem it
@@ -58,25 +60,24 @@ export default function Page4() {
         <div>
           <div
             onFocus={() => {
-              setFieldTouched("relevanceCheck", true),
-                validateField("relevanceCheck");
+              setFieldTouched("relevanceAnswer.text", true),
+                validateField("relevanceAnswer");
             }}
             onBlur={() => {
-              validateField("relevanceCheck");
+              validateField("relevanceAnswer");
             }}
             className="h-min"
           >
             <Editor
-              defaultValue={values.relevanceAnswer_text}
+              defaultValue={values.relevanceAnswer.text}
               onChange={(e) => {
-                setFieldValue("relevanceAnswer_text", e);
-                setFieldTouched("relevanceAnswer_text", true);
-                // Trigger validation
-              }} // Trigger validation}}
+                setFieldValue("relevanceAnswer.text", e);
+                setFieldTouched("relevanceAnswer.text", true);
+              }}
             />
           </div>
           <ErrorMessage
-            name="relevanceAnswer_text"
+            name="relevanceAnswer.text"
             component="div"
             className=" text-xs text-red-500 font-semibold"
           />
@@ -94,13 +95,14 @@ export default function Page4() {
             <p>or Upload File </p>
             <div>
               <div className="overflow-hidden">
-                {values.relevanceAnswer_file ? (
+                {values.relevanceAnswer.file &&
+                typeof values.relevanceAnswer.file === "string" ? (
                   <div className="flex items-center gap-2 ">
                     {" "}
                     <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
                       <div className="flex items-center gap-2">
                         <Image src={pdf} alt="" />
-                        {values.relevanceAnswer_file.name}
+                        {values.relevanceAnswer.file}{" "}
                       </div>
                       <FileViewer url={fileURL} />
                     </div>
@@ -108,9 +110,7 @@ export default function Page4() {
                       size={18}
                       color="red"
                       className="shrink-0"
-                      onClick={() =>
-                        setFieldValue("relevanceAnswer_file", null)
-                      }
+                      onClick={() => setFieldValue("relevanceAnswer.file", "")}
                     />
                   </div>
                 ) : (
@@ -119,33 +119,32 @@ export default function Page4() {
                     type="file"
                     onFocus={() => {
                       setTimeout(() => {
-                        setFieldTouched("relevanceCheck", true),
-                          validateField("relevanceCheck");
+                        setFieldTouched("relevanceAnswer.file", true),
+                          validateField("relevanceAnswer.file");
                       }, 3000);
                     }}
                     onBlur={() => {
                       setTimeout(() => {
-                        validateField("relevanceCheck");
+                        validateField("relevanceAnswer.file");
                       }, 3000);
                     }}
                     accept="application/pdf"
                     placeholder="Enter Project/Program Name"
                     className="w-full"
-                    onChange={(e) => {
-                      handleFileChange(e, () => {
-                        setFieldValue(
-                          "relevanceAnswer_file",
-                          e.target.files && e.target.files[0]
-                        ),
-                          setFieldTouched("relevanceCheck", true),
-                          validateField("relevanceCheck");
+                    onChange={async (e) => {
+                      const file = await handleFileUpload(e, () => {
+                        setFieldValue("relevanceAnswer.file", e),
+                          setFieldTouched("relevanceAnswer.file", true),
+                          validateField("relevanceAnswer.file");
                       });
+
+                      setFieldValue("relevanceAnswer.file", file);
                     }}
                   />
                 )}
               </div>
               <ErrorMessage
-                name="relevanceAnswer_file"
+                name="relevanceAnswer.file"
                 component="div"
                 className=" text-sm text-red-500 font-semibold"
               />
@@ -154,11 +153,14 @@ export default function Page4() {
               </p>
             </div>
           </div>
-          <ErrorMessage
-            name="relevanceCheck"
-            component="div"
-            className=" text-xs text-red-500"
-          />
+          {errors.relevanceAnswer &&
+            typeof errors.relevanceAnswer === "string" && (
+              <ErrorMessage
+                name="relevanceAnswer"
+                component="div"
+                className=" text-sm text-red-500 font-semibold"
+              />
+            )}
         </div>
       </div>
     </div>

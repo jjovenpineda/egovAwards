@@ -10,6 +10,7 @@ import egov from "@/public/assets/images/egov.svg";
 import lgus from "@/public/assets/images/lgus.webp";
 
 import { AnimatePresence, m } from "motion/react";
+import FloatingIcons from "@/components/shared/floating-icons";
 
 export default function RootLayout({
   children,
@@ -17,10 +18,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <main className="min-h-screen overflow-hidden grid lg:grid-cols-[_60%,_40%] items-center justify-center">
+    <main className="min-h-screen overflow-hidden flex flex-col  lg:grid lg:grid-cols-[_60%,_40%] ">
       <AuthLayout />
+      <div className="size-full relative">
+        {children}
 
-      {children}
+        <FloatingIcons />
+      </div>
       {/* <Footer /> */}
     </main>
   );
@@ -50,42 +54,46 @@ const AuthLayout = () => {
         duration: 0.6,
         ease: "easeOut",
       }}
-      className="flex flex-col items-center  justify-end h-full "
+      className="flex flex-col items-center  justify-end  md:h-full "
     >
-      <div className="relative  size-full flex flex-col">
-        <div className="p-16 flex flex-col justify-end gap-4 z-10 0 h-full">
-          <div className="w-full max-w-[300px]">
-            <Image src={egov} alt="bg" className="z-10 object-contain" />
+      <div className="relative  size-full flex flex-col  ">
+        <div className="relative flex flex-col justify-center  items-center md:items-start md:justify-end gap-4 z-10 p-7 md:pl-16 h-full ">
+          <div className="w-full max-w-[300px] z-10">
+            <Image
+              src={egov}
+              alt="bg"
+              className="w-[70%] md:w-full h-auto mx-auto object-contain"
+            />
           </div>
-          <div className="w-full max-w-[320px]">
+          <div className="w-[70%] md:w-full max-w-[320px] ml-12 md:ml-0 z-10">
             <Image src={lgus} alt="bg" className="z-10  object-contain" />
           </div>
+          <div className="absolute inset-0 bg-gradient-to-r from-[#F4F7FFE5] via-[#F4F7FFE5] md:via-[#B1C6FC73] to-[#B1C6FC73]"></div>
         </div>
-        <div className=" z-20 bg-gradient-to-l from-[#1F293700] to-[#1E3A77]  top-0 left-0 right-0 h-full max-h-[160px]">
-          <div className="max-w-[65%] px-16 py-2">
-            <h2 className="font-bold drop-shadow-2xl text-[40px] text-white">
+        {/* md:bg-gradient-to-l from-[#1F293700] to-[#1E3A77]  */}
+        <div className="flex items-center z-20  h-full max-h-[160px] bg-gradient-to-tr from-blue-900 via-transparent to-transparent">
+          <div className="xl:max-w-[65%] w-full p-4 py-8 md:px-16 md:py-2 flex flex-col bg-white md:bg-transparent">
+            <h2 className="font-bold drop-shadow-2xl text-2xl md:text-[40px] text-slate-900 md:text-white">
               11th eGOV Awards
             </h2>
-            <h2 className="text-xl text-white drop-shadow-2xl">
+            <h2 className="text-base md:text-xl text-slate-900 md:text-white drop-shadow-2xl">
               Excellence in Governance Through Information and Communications
               Technology Awards{" "}
             </h2>
           </div>
         </div>
-        <div className="absolute z-10 bg-gradient-to-l from-white to-red-500"></div>
         <Image
           src={login}
           alt="bg"
           fill
           className=" bg-cover pointer-events-none  object-cover object-right  bg-right bg-fixed absolute"
         />{" "}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#F4F7FFE5] via-[#B1C6FC73] to-[#6E94F900]"></div>
       </div>{" "}
-      <div className="size-full relative  right-0 block max-h-[213px]  h-full overflow-hidden">
+      <div className="hidden md:block size-full relative  right-0  max-h-[213px]  h-full overflow-hidden ">
         <AnimatePresence mode="wait">
           <div
             key={slides[index].id}
-            className={`absolute w-full h-full  flex items-center justify-center rounded-xl shadow-md `}
+            className={` w-full h-full  flex items-center justify-center rounded-xl shadow-md py-4`}
           >
             <div className="size-full">
               {index == 0 && (
@@ -213,7 +221,7 @@ const AuthLayout = () => {
                         WebkitMaskImage:
                           "linear-gradient(to right, transparent, black 100%, transparent 100%)",
                         maskImage:
-                          "linear-gradient(to right, transparent, black 80%, transparent 95%)",
+                          "linear-gradient(to right, transparent, black 80%, transparent 100%)",
                       }}
                     />
                   </m.div>
