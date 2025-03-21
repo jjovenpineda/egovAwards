@@ -173,6 +173,9 @@ export default function Page2() {
               type="text"
               autoComplete="off"
               name="projectPeriod"
+              onInput={(e: any) => {
+                e.target.value = e.target.value.replace(/[^0-9]/g, "");
+              }}
               placeholder="Enter Project Period"
               as={Input}
               className=" space-y-8 rounded-md bg-white "

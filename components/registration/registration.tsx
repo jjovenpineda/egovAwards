@@ -481,7 +481,7 @@ export default function Registration() {
                 >
                   <ArrowLeft size={15} /> Back
                 </Button>
-                {page < 8 ? (
+                {page < 7 ? (
                   <Button
                     type="button"
                     onClick={() => {

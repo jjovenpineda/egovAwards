@@ -13,9 +13,6 @@ export default function Page() {
   return (
     <div className="flex flex-col gap-6 ">
       <section>
-        {/* {["login", "signup", "reset"].includes(action || "") && (
-          <AuthModal action={action} page={page} />
-        )} */}
         <Registration />
       </section>
     </div>
