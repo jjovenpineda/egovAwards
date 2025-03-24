@@ -20,7 +20,7 @@ export default function RootLayout({
   return (
     <main className="min-h-screen overflow-hidden flex flex-col  lg:grid lg:grid-cols-[_60%,_40%] ">
       <AuthLayout />
-      <div className="size-full relative">
+      <div className="size-full relative mt-2">
         {children}
 
         <FloatingIcons />
@@ -89,13 +89,13 @@ const AuthLayout = () => {
           className=" bg-cover pointer-events-none  object-cover object-right  bg-right bg-fixed absolute"
         />{" "}
       </div>{" "}
-      <div className="hidden md:block size-full relative  right-0  max-h-[213px]  h-full overflow-hidden ">
+      <div className="hidden md:block size-full relative  right-0  h-[213px] py-4   overflow-hidden ">
         <AnimatePresence mode="wait">
           <div
             key={slides[index].id}
-            className={` w-full h-full  flex items-center justify-center rounded-xl shadow-md py-4`}
+            className={` size-full flex items-center justify-center rounded-xl overflow-hidden`}
           >
-            <div className="size-full">
+            <div className="size-full ">
               {index == 0 && (
                 <div className="flex px-16 size-full items-center gap-2 ">
                   <m.div
