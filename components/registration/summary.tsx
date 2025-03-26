@@ -220,7 +220,9 @@ export default function Summary() {
                                   <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
                                     <div className="flex items-center gap-2">
                                       <Image src={pdf} alt="" />
-                                      {item}
+                                      <span className="line-clamp-2">
+                                        {item}
+                                      </span>
                                     </div>
                                     <FileViewer url={fileURL} />
                                   </div>
@@ -308,7 +310,9 @@ export default function Summary() {
                       <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
                         <div className="flex items-center gap-2">
                           <Image src={pdf} alt="PDF Icon" />
-                          {values.impactAnswer.file}
+                          <span className="line-clamp-2">
+                            {values.impactAnswer.file}
+                          </span>
                         </div>
                         <FileViewer url={fileURL} />
                       </div>
@@ -384,7 +388,9 @@ export default function Summary() {
                       <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
                         <div className="flex items-center gap-2">
                           <Image src={pdf} alt="PDF Icon" />
-                          {values.relevanceAnswer.file}
+                          <span className="line-clamp-2">
+                            {values.relevanceAnswer.file}
+                          </span>
                         </div>
                         <FileViewer url={fileURL} />
                       </div>
@@ -463,7 +469,9 @@ export default function Summary() {
                       <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
                         <div className="flex items-center gap-2">
                           <Image src={pdf} alt="PDF Icon" />
-                          {values.sustainabilityAnswer.file}
+                          <span className="line-clamp-2">
+                            {values.sustainabilityAnswer.file}
+                          </span>
                         </div>
                         <FileViewer url={fileURL} />
                       </div>
@@ -539,7 +547,9 @@ export default function Summary() {
                       <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
                         <div className="flex items-center gap-2">
                           <Image src={pdf} alt="PDF Icon" />
-                          {values.innovationAnswer.file}
+                          <span className="line-clamp-2">
+                            {values.innovationAnswer.file}
+                          </span>
                         </div>
                         <FileViewer url={fileURL} />
                       </div>
@@ -643,7 +653,9 @@ export default function Summary() {
                         <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
                           <div className="flex items-center gap-2">
                             <Image src={pdf} alt="PDF Icon" />
-                            {values.alignmentSDG.file}
+                            <span className="line-clamp-2">
+                              {values.alignmentSDG.file}
+                            </span>
                           </div>
                           <FileViewer url={fileURL} />
                         </div>
@@ -690,7 +702,9 @@ export default function Summary() {
                         <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
                           <div className="flex items-center gap-2">
                             <Image src={pdf} alt="PDF Icon" />
-                            {values.alignmentAnswerDICT.file}
+                            <span className="line-clamp-2">
+                              {values.alignmentAnswerDICT.file}
+                            </span>
                           </div>
                           <FileViewer url={fileURL} />
                         </div>

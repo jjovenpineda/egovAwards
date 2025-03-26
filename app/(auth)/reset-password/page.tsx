@@ -27,6 +27,7 @@ import FloatingIcons from "@/components/shared/floating-icons";
 import Loading from "@/components/shared/loading";
 import { storage } from "@/utils/useStorage";
 import { decrypt } from "@/utils/utility";
+import Loaders from "@/components/ui/loaders";
 
 export default function SignInPage() {
   const searchParams = useSearchParams();
@@ -342,9 +343,10 @@ export default function SignInPage() {
                                           className={`bg-[#1F2937] flex justify-center w-full gap-2 text-sm font-semibold items-center transition-colors duration-300  hover:bg-slate-700 text-white p-2 px-6 rounded-md`}
                                         >
                                           {DisableSubmit ? (
-                                            <Loader2
-                                              size={18}
-                                              className=" animate-spin"
+                                            <Loaders
+                                              loader={"wobble"}
+                                              color="white"
+                                              size={30}
                                             />
                                           ) : (
                                             <span>Submit</span>

@@ -40,6 +40,7 @@ import { Label } from "@/components/ui/label";
 import Loading from "@/components/shared/loading";
 import { storage } from "@/utils/useStorage";
 import FloatingIcons from "@/components/shared/floating-icons";
+import Loaders from "@/components/ui/loaders";
 
 export default function SignInPage() {
   const [index, setIndex] = useState(0);
@@ -83,6 +84,14 @@ export default function SignInPage() {
               router.push("/");
             }, 2500);
           }, 2000);
+        } else {
+          toast({
+            title: "Login failed",
+            variant: "destructive",
+            description: "Invalid email or password",
+            duration: 2000,
+          });
+          setIsLoading(false);
         }
       } catch (e) {
         console.error("Error:", e);
@@ -118,7 +127,7 @@ export default function SignInPage() {
     }
   };
   return (
-    <div className="overflow-hidden min-h-screen  -z-10 size-full ">
+    <div className="overflow-hidden md:min-h-screen  -z-10 size-full ">
       {showLoading && <Loading />}
 
       <div className="size-full overflow-hidden items-center justify-center">
@@ -302,11 +311,24 @@ export default function SignInPage() {
                               type="submit"
                             >
                               {isLoading ? (
-                                <Loader2 size={18} className=" animate-spin" />
+                                <Loaders
+                                  loader={"wobble"}
+                                  color="white"
+                                  size={30}
+                                />
                               ) : (
                                 <span>Login</span>
                               )}
                             </Button>
+                            <div className="text-gray-400 text-sm mt-2">
+                              Don’t have an account yet?
+                              <Link
+                                href="/sign-up"
+                                className="text-blue-400 hover:text-blue-500 cursor-pointer ml-1 font-semibold"
+                              >
+                                Sign Up here
+                              </Link>
+                            </div>
                           </Card>
                         </m.div>
                       )}
@@ -354,6 +376,11 @@ export default function SignInPage() {
                                     component="div"
                                     className=" text-xs text-red-500"
                                   />
+                                  <p className="text-sm font-medium text-gray-400 mt-1">
+                                    Please provide the email linked to your
+                                    account. A password reset link will be sent
+                                    to that email.
+                                  </p>
                                 </div>
                               </div>
 
@@ -376,9 +403,10 @@ export default function SignInPage() {
                                 className={`bg-[#1F2937] flex justify-center w-full gap-2 text-sm font-semibold items-center transition-colors duration-300  hover:bg-slate-700 text-white p-2.5 px-6 rounded-md`}
                               >
                                 {isLoading ? (
-                                  <Loader2
-                                    size={18}
-                                    className=" animate-spin"
+                                  <Loaders
+                                    loader={"wobble"}
+                                    color="white"
+                                    size={30}
                                   />
                                 ) : (
                                   <span>

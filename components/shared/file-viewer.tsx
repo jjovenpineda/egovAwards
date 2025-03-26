@@ -20,13 +20,13 @@ export default function FileViewer({ url }: any) {
         <DialogTrigger asChild className="hover:cursor-pointer">
           <View size={15}></View>
         </DialogTrigger>
-        <DialogContent className="h-[80vh] overflow-auto ">
+        <DialogContent className="h-[100vh] sm:h-[90vh] overflow-auto ">
           <DialogHeader>
             <DialogTitle></DialogTitle>
             <DialogDescription></DialogDescription>
           </DialogHeader>
-          <div className="h-[80vh]">
-            <iframe src={url} className="w-full h-full" />
+          <div className="h-[80vh] sm:h-[70vh] ">
+            <iframe src={url} className="size-full" />
           </div>
           <DialogFooter>
             <DialogClose asChild className="w-full">

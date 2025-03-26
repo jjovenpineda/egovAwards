@@ -120,9 +120,8 @@ export default function SignInPage() {
     region: Yup.string().trim().required("Required"),
 
     mobile: Yup.string()
-      .matches(/^09\d{9}$/, "Invalid PH number")
+      .matches(/^[1-9]\d{9}$/, "Invalid number")
       .required("Required"),
-
     authLetter: Yup.string().required("Required"),
   });
 
@@ -621,8 +620,13 @@ export default function SignInPage() {
                                               size={18}
                                             />
                                           </TooltipTrigger>
-                                          <TooltipContent>
-                                            <p>Lorem ipsum</p>
+                                          <TooltipContent side="right">
+                                            <p className="max-w-[230px] text-center">
+                                              Number of times in joining eGOV,
+                                              Digital Cities Awards, Digital
+                                              Governance Awards from 2012 to
+                                              2022.
+                                            </p>
                                           </TooltipContent>
                                         </Tooltip>
                                       </TooltipProvider>
@@ -644,10 +648,12 @@ export default function SignInPage() {
                                             <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
                                               <div className="flex items-center gap-2">
                                                 <Image src={pdf} alt="" />
-                                                {values.authLetter}
+                                                <span className="line-clamp-2">
+                                                  {values.authLetter}
+                                                </span>
                                               </div>
                                               <FileViewer
-                                                url={/* fileURL */ ""}
+                                                url={values.authLetter}
                                               />
                                             </div>
                                             <Trash2

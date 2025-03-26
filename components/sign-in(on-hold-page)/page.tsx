@@ -20,6 +20,7 @@ import { AnimatePresence, m } from "motion/react";
 import { encrypt, setCookie } from "@/utils/utility";
 import { apiPost } from "@/utils/api";
 import { toast } from "@/hooks/use-toast";
+import Loaders from "../ui/loaders";
 
 export default function SignInPage() {
   const router = useRouter();
@@ -206,7 +207,7 @@ export default function SignInPage() {
                     type="submit"
                   >
                     {isLoading ? (
-                      <Loader2 size={18} className=" animate-spin" />
+                      <Loaders loader={"wobble"} color="white" size={30} />
                     ) : (
                       <span>Login</span>
                     )}

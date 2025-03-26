@@ -71,9 +71,7 @@ export default function TopBar() {
     storage.removeAll();
     router.push("/sign-in");
   };
-  useEffect(() => {
-    console.log("userInfo", userInfo);
-  }, [userInfo]);
+
   useEffect(() => {
     setuserInfo(getUserInfo());
   }, []);

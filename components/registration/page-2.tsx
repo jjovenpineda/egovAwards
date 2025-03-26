@@ -232,8 +232,6 @@ export default function Page2() {
                   {values.supportingDoc &&
                     values.supportingDoc.length > 0 &&
                     values.supportingDoc.map((item: any, index: any) => {
-                      const fileURL = item.name && URL.createObjectURL(item);
-
                       return (
                         <div key={index} className="overflow-hidden">
                           {typeof item === "string" ? (
@@ -242,9 +240,9 @@ export default function Page2() {
                               <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
                                 <div className="flex items-center gap-2">
                                   <Image src={pdf} alt="" />
-                                  {item}
+                                  <span className="line-clamp-2">{item}</span>
                                 </div>
-                                <FileViewer url={fileURL} />
+                                <FileViewer url={item} />
                               </div>
                               <Trash2
                                 size={18}

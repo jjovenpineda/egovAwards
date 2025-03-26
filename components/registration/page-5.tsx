@@ -101,7 +101,9 @@ export default function Page5() {
                     <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
                       <div className="flex items-center gap-2">
                         <Image src={pdf} alt="" />
-                        {values.sustainabilityAnswer.file}{" "}
+                        <span className="line-clamp-2">
+                          {values.sustainabilityAnswer.file}
+                        </span>
                       </div>
                       <FileViewer url={fileURL} />
                     </div>

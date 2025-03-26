@@ -291,7 +291,11 @@ export default function AuthModal({ action, page }: IAuthModal) {
                             type="submit"
                           >
                             {isLoading ? (
-                              <Loader2 size={18} className=" animate-spin" />
+                              <Loaders
+                                loader={"wobble"}
+                                color="white"
+                                size={30}
+                              />
                             ) : (
                               <span className="font-semibold">Login</span>
                             )}

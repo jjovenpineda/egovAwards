@@ -262,38 +262,6 @@ const handleSubmit = async (values: any) => {
     });
 };
 const initialValues = {
-  /*  lgu_name: "",
-  lgu_abbr: "",
-  lgu_province: "",
-  lgu_region: "",
-  lgu_lceName: "",
-  lgu_officeName: "",
-  lgu_contactPerson: "",
-  lgu_contactPersonEmail: "",
-  lgu_contactPersonOfficeNo: "",
-  lgu_contactPersonMobileNo: "",
-  lgu_website: "",
-  lgu_facebook: "", */
-  /* joinCount: "",
-  project: "",
-  category: "",
-  projectPeriod: "",
-  projectURL: "",
-  supportingDoc: [],
-  impactAnswer_text: "",
-  impactAnswer_file: null,
-  relevanceAnswer_text: "",
-  relevanceAnswer_file: null,
-  sustainabilityAnswer_text: "",
-  sustainabilityAnswer_file: null,
-  innovationAnswer_text: "",
-  innovationAnswer_file: null,
-  alignmentSDG_answer_text: "",
-  alignmentSDG_answer_file: null,
-  alignmentAnswerDICT_text: "",
-  alignmentAnswerDICT_file: null,
-
-  alignmentSDG_target: [], */
   project: "",
   projectURL: "",
   category: "",
@@ -373,7 +341,7 @@ export default function Registration() {
   const router = useRouter();
   const [submitDialog, setSubmitDialog] = useState(false);
   const [successDialog, setSuccessDialog] = useState(false);
-  const [page, setPage] = useState(7);
+  const [page, setPage] = useState(1);
 
   const fields: Record<number, string[]> = {
     1: ["lgu", "email", "website"],
