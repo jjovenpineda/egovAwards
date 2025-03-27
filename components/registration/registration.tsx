@@ -228,39 +228,7 @@ const validationSchema = Yup.object().shape({
       ),
   }),
 });
-const handleSubmit = async (values: any) => {
-  console.log("values :", values);
-  const filteredValues = {
-    ...values,
-    supportingDoc: values.supportingDoc.filter(
-      (key: any) => typeof key === "string"
-    ),
-  };
 
-  console.log("filteredValues :", filteredValues);
-
-  await apiPost("/api/entry/create", filteredValues)
-    .then((res) => {
-      const { success, message, data } = res;
-      if (success) {
-      }
-      toast({
-        title: " Success!",
-        description: message,
-        duration: 2000,
-      });
-    })
-    .catch((e) => {
-      console.log(e);
-
-      toast({
-        title: " failed",
-
-        description: "Invalid email or password",
-        duration: 2000,
-      });
-    });
-};
 const initialValues = {
   project: "",
   projectURL: "",
@@ -342,7 +310,32 @@ export default function Registration() {
   const [submitDialog, setSubmitDialog] = useState(false);
   const [successDialog, setSuccessDialog] = useState(false);
   const [page, setPage] = useState(1);
+  const handleSubmit = async (values: any) => {
+    setSubmitDialog(false);
+    const filteredValues = {
+      ...values,
+      supportingDoc: values.supportingDoc.filter(
+        (key: any) => typeof key === "string"
+      ),
+    };
 
+    await apiPost("/api/entry/create", filteredValues)
+      .then((res) => {
+        const { success, message, data } = res;
+        if (success) {
+          setSuccessDialog(true);
+        }
+      })
+      .catch((e) => {
+        console.log(e);
+        toast({
+          title: "Something went wrong",
+          description: "Please try again later.",
+          variant: "destructive",
+          duration: 2000,
+        });
+      });
+  };
   const fields: Record<number, string[]> = {
     1: ["lgu", "email", "website"],
     2: ["projectName"],
@@ -548,8 +541,6 @@ export default function Registration() {
                      }} */
                       onClick={() => {
                         handleSubmit(values);
-                        setSubmitDialog(false);
-                        setSuccessDialog(true);
                       }}
                       className="w-full size-full flex items-center justify-center rounded-0 bg-[#2563EB] p-3 text-base text-white font-semibold group-hover:bg-[#3674fa] transition-colos duration-300"
                     >

@@ -26,9 +26,7 @@ import { useRouter } from "next/navigation";
 import { ChevronDown, Info, Mail, Search, Trash2 } from "lucide-react";
 import { AnimatePresence, m } from "motion/react";
 import { signupInitialValues } from "@/constants";
-import { storage } from "@/utils/useStorage";
 import { apiGet, apiPost } from "@/utils/api";
-import { encrypt } from "@/utils/utility";
 import { toast } from "@/hooks/use-toast";
 import FileViewer from "@/components/shared/file-viewer";
 import { handleFileUpload } from "@/utils/file-upload";
@@ -66,7 +64,7 @@ export default function SignInPage() {
       const { success, message, data } = res;
       if (!success) {
         setIsLoading(false);
-        setPage("lgu");
+        setPage("info");
       } else if (success) {
         toast({
           title: "Email Already Exists",
@@ -102,6 +100,7 @@ export default function SignInPage() {
       .required("Required"),
 
     middlename: Yup.string().trim().max(50, "Max 50 characters").nullable(),
+    suffix: Yup.string().trim().max(10, "Max 10 characters").nullable(),
 
     joinCount: Yup.number()
       .typeError("Must be a number")
@@ -114,8 +113,6 @@ export default function SignInPage() {
     abbr: Yup.string().trim().max(10, "Max 10 characters").required("Required"),
 
     province: Yup.string().trim().required("Required"),
-
-    suffix: Yup.string().trim().max(10, "Max 10 characters").nullable(),
 
     region: Yup.string().trim().required("Required"),
 
@@ -200,7 +197,6 @@ export default function SignInPage() {
                     >
                       <div className="flex justify-center mb-2 items-center gap-4 h-11 pointer-events-none">
                         <div
-                          onClick={() => setPage("email")}
                           className={`flex  items-center cursor-pointer  ${
                             page == "email"
                               ? "text-slate-900 font-semibold"
@@ -235,16 +231,15 @@ export default function SignInPage() {
                         <hr className="border max-w-8 w-full "></hr>
 
                         <div
-                          onClick={() => setPage("lgu")}
                           className={`flex  items-center cursor-pointer  ${
-                            page == "lgu"
+                            page == "info"
                               ? "text-slate-900 font-semibold"
                               : "text-[#6B7280]"
                           } `}
                         >
                           <div
                             className={`shadow-md  rounded-full size-7 mr-2 flex items-center justify-center  text-xs ${
-                              page == "info" || page == "complete"
+                              page == "complete"
                                 ? "bg-blue-600 text-white"
                                 : "bg-slate-100"
                             }`}
@@ -254,21 +249,18 @@ export default function SignInPage() {
                           </div>{" "}
                           <h3
                             className={`${
-                              page == "info" || page == "complete"
-                                ? "text-blue-600 "
-                                : ""
+                              page == "complete" ? "text-blue-600 " : ""
                             } text-xs `}
                           >
-                            LGU
+                            Personal Info
                           </h3>
                         </div>
 
                         <hr className="border max-w-8 w-full "></hr>
 
                         <div
-                          onClick={() => setPage("info")}
                           className={`flex  items-center cursor-pointer  ${
-                            page == "info"
+                            page == "lgu"
                               ? "text-slate-900 font-semibold"
                               : "text-[#6B7280]"
                           } `}
@@ -288,7 +280,7 @@ export default function SignInPage() {
                               page == "complete" ? "text-blue-600 " : ""
                             } text-xs `}
                           >
-                            Personal Info
+                            LGU
                           </h3>
                         </div>
                       </div>
@@ -694,11 +686,10 @@ export default function SignInPage() {
                                   </div>
                                 </div>
                               </CardContent>
-
                               <section className="flex w-full items-center gap-4">
                                 <Button
                                   type="button"
-                                  onClick={() => setPage("email")}
+                                  onClick={() => setPage("lgu")}
                                   variant={"secondary"}
                                   className="w-full"
                                 >
@@ -719,11 +710,11 @@ export default function SignInPage() {
                                     !!errors.joinCount ||
                                     !!errors.authLetter
                                   }
-                                  type="button"
+                                  type="submit"
+                                  onClick={() => handleSubmit(values)}
                                   className="w-full"
-                                  onClick={() => setPage("info")}
                                 >
-                                  Next
+                                  Sign Up
                                 </Button>
                               </section>
                             </Card>
@@ -874,7 +865,7 @@ export default function SignInPage() {
                               <section className="flex w-full items-center gap-4">
                                 <Button
                                   type="button"
-                                  onClick={() => setPage("lgu")}
+                                  onClick={() => setPage("email")}
                                   variant={"secondary"}
                                   className="w-full"
                                 >
@@ -889,11 +880,11 @@ export default function SignInPage() {
                                     !!errors.lastname ||
                                     !!errors.mobile
                                   }
-                                  type="submit"
-                                  onClick={() => handleSubmit(values)}
+                                  type="button"
                                   className="w-full"
+                                  onClick={() => setPage("lgu")}
                                 >
-                                  Sign Up
+                                  Next
                                 </Button>
                               </section>
                             </Card>
