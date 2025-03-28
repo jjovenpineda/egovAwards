@@ -9,7 +9,6 @@ import dynamic from "next/dynamic";
 import warning from "@/public/assets/triangle-warning.json";
 import success from "@/public/assets/images/success.webp";
 import Image from "next/image";
-import Page1 from "@/components/registration/page-1";
 import Page2 from "@/components/registration/page-2";
 import Page3 from "@/components/registration/page-3";
 import Page4 from "@/components/registration/page-4";
@@ -27,13 +26,12 @@ import {
 } from "@/components/ui/dialog";
 import * as Yup from "yup";
 
-import Link from "next/link";
-import { Form, Formik, FormikHelpers, useFormikContext } from "formik";
+import { Form, Formik } from "formik";
 import { storage } from "@/utils/useStorage";
 import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
 import { m } from "motion/react";
-import { apiGet, apiPost } from "@/utils/api";
+import { apiPost } from "@/utils/api";
 
 const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
 
@@ -44,52 +42,6 @@ const countWords = (html?: string) => {
   return text ? text.split(/\s+/).length : 0;
 };
 const validationSchema = Yup.object().shape({
-  /* lgu_name: Yup.string()
-    .required("This field is required")
-    .max(200, "Limit: 100 characters"),
-  lgu_abbr: Yup.string()
-    .required("This field is required")
-    .max(200, "Limit: 200 characters"),
-  lgu_province: Yup.string().max(200, "Limit: 200 characters"),
-  lgu_region: Yup.string()
-    .required("This field is required")
-    .max(200, "Limit: 200 characters"),
-  lgu_lceName: Yup.string()
-    .required("This field is required")
-    .max(200, "Limit: 200 characters"),
-  lgu_officeName: Yup.string()
-    .required("This field is required")
-    .max(200, "Limit: 200 characters"),
-  lgu_contactPerson: Yup.string()
-    .required("This field is required")
-    .max(200, "Limit: 200 characters"),
-  lgu_contactPersonEmail: Yup.string()
-    .email("Invalid email address")
-    .required("This field is required")
-    .max(200, "Limit: 200 characters"),
-  lgu_contactPersonOfficeNo: Yup.string()
-    .required("This field is required")
-    .max(15, "Invalid"),
-  lgu_contactPersonMobileNo: Yup.string()
-    .required("This field is required")
-    .max(15, "Invalid"),
-  lgu_website: Yup.string()
-    .matches(
-      /^(https?:\/\/)?([\w.-]+)\.([a-z]{2,})(\/.*)?$/i,
-      "Must be a valid website URL"
-    )
-    .max(200, "Limit: 200 characters"),
-  lgu_facebook: Yup.string()
-    .matches(
-      /^(https?:\/\/)?([\w.-]+)\.([a-z]{2,})(\/.*)?$/i,
-      "Must be a valid website URL"
-    )
-    .max(200, "Limit: 200 characters")
-
-  joinCount: Yup.string()
-    .required("This field is required")
-    .max(200, "Limit: 200 characters"),, */
-  //////////////////////
   project: Yup.string()
     .required("This field is required")
     .max(200, "Limit: 100 characters"),
@@ -306,8 +258,8 @@ export const handleFileChange = (
 };
 
 export default function Registration() {
-  const router = useRouter();
   const [submitDialog, setSubmitDialog] = useState(false);
+  const [refNumber, setRefNumber] = useState("");
   const [successDialog, setSuccessDialog] = useState(false);
   const [page, setPage] = useState(1);
   const handleSubmit = async (values: any) => {
@@ -323,7 +275,10 @@ export default function Registration() {
       .then((res) => {
         const { success, message, data } = res;
         if (success) {
+          setRefNumber(data.referenceNumber);
           setSuccessDialog(true);
+          /*           setRefNumber()
+           */
         }
       })
       .catch((e) => {
@@ -371,7 +326,6 @@ export default function Registration() {
         validateForm,
         values,
         validateField,
-        errors,
 
         setFieldTouched,
         resetForm,
@@ -568,7 +522,7 @@ export default function Registration() {
                         <h3 className="text-sm font-medium">
                           REFERENCE NUMBER{" "}
                         </h3>
-                        <h3 className="font-bold text-3xl">25G2BCAL</h3>
+                        <h3 className="font-bold text-3xl">{refNumber}</h3>
                       </div>
                       <p className="font-semibold text-center text-sm lg:text-base">
                         Thank you for submitting your application.

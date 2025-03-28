@@ -33,13 +33,12 @@ import {
 import { apiGet, apiPost, apiPut } from "@/utils/api";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "@/hooks/use-toast";
-import { storage } from "@/utils/useStorage";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { handleFileUpload } from "@/utils/file-upload";
 import FileViewer from "@/components/shared/file-viewer";
 import Loaders from "@/components/ui/loaders";
 import { m } from "motion/react";
+import { getUserInfo } from "@/utils/utility";
 interface ILGU {
   lgu: string;
   province: string;
@@ -56,6 +55,7 @@ export default function Page1() {
   const [lguPopover, setLguPopover] = useState(false);
   const [selectedPage, setSelectedPage] = useState("lgu");
   const [pwdBtnLoading, setPwdBtnLoading] = useState(false);
+
   const getLGUList = async () => {
     try {
       const res = await apiGet("/api/lgu/list");
@@ -66,10 +66,21 @@ export default function Page1() {
       console.error("Error fetching LGU list:", e);
     }
   };
-
+  const getUser = async () => {
+    try {
+      const { authRep } = getUserInfo();
+      const res = await apiGet(`/api/auth/users/list/${authRep._id}`);
+      const { data } = res;
+      if (!data) return;
+      console.log("data :", data);
+      setLguList(data);
+    } catch (e) {
+      console.error("Error fetching LGU list:", e);
+    }
+  };
   useEffect(() => {
     getLGUList();
-
+    getUser();
     setIsLoaded(true);
   }, []);
 
@@ -81,7 +92,7 @@ export default function Page1() {
             .trim()
             .max(10, "Max 10 characters")
             .required("Required"),
-          province: Yup.string().trim().required("Required"),
+          province: Yup.string().trim(),
           region: Yup.string().trim().required("Required"),
           authLetter: Yup.string().required("Required"),
           lceName: Yup.string()
@@ -164,67 +175,31 @@ export default function Page1() {
 
   const handleSubmit = async (values: any) => {
     console.log("values :", values);
-    selectedPage === "lgu"
-      ? "" /*   try {
-      setisloading(true);
-            const { success } = await apiPut(
-              `/api/auth/change/password/${code}`,
-              values
-            );
-            if (success) {
-                setisloading(false);
-  
-      toast({
-    title: "Update Successful",
-    description: "Your changes have been saved.",
-    variant: "success",
-    duration: 2000,
-  });
-            
-            }
-          } catch (e) {
-                         setisloading(false);
-  
-            console.error("Error:", e);
-            toast({
-              title: "Something went wrong",
-              description: "Please try again later.",
-              variant: "destructive",
-              duration: 2000,
-            });
-            setDisableSubmit(false);
-          }
-        };*/
-      : "" /*   try {
-        setisloading(true);
-              const { success } = await apiPut(
-                `/api/auth/change/password/${code}`,
-                values
-              );
-              if (success) {
-                  setisloading(false);
-    
+    try {
+      setIsLoading(true);
+
+      const { success } = await apiPut(`/api/lgu/add/info`, values);
+
+      if (success) {
         toast({
-      title: "Update Successful",
-      description: "Your changes have been saved.",
-      variant: "success",
-      duration: 2000,
-    });
-              
-              }
-            } catch (e) {
-                           setisloading(false);
-    
-              console.error("Error:", e);
-              toast({
-                title: "Something went wrong",
-                description: "Please try again later.",
-                variant: "destructive",
-                duration: 2000,
-              });
-              setDisableSubmit(false);
-            }
-          };*/;
+          title: "Update Successful",
+          description: "Your changes have been saved.",
+          variant: "default",
+          duration: 2000,
+        });
+      }
+    } catch (e) {
+      console.error("Error:", e);
+
+      toast({
+        title: "Something went wrong",
+        description: "Please try again later.",
+        variant: "destructive",
+        duration: 2000,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -252,7 +227,14 @@ export default function Page1() {
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
-        {({ values, setFieldValue, setFieldTouched, dirty, isValid }) => {
+        {({
+          values,
+          setFieldValue,
+          setFieldTouched,
+          dirty,
+          isValid,
+          errors,
+        }) => {
           useEffect(() => {
             const selectedLgu = LguList.find((lgu) => lgu.lgu === values.lgu);
 
@@ -871,6 +853,9 @@ export default function Page1() {
                    />
                  </div> */}
                     </div>{" "}
+                    {Object.values(errors).map((error, index) => (
+                      <p key={index}>{error}</p>
+                    ))}
                     <div className="flex justify-end pt-16">
                       <Button
                         disabled={!isValid || !dirty}
