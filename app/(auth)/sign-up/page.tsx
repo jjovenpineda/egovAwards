@@ -7,6 +7,7 @@ import Image from "next/image";
 import dict from "@/public/assets/images/dict2.webp";
 import pdf from "@/public/assets/svgs/pdf.svg";
 import { ScrollArea } from "@/components/ui/scroll-area";
+
 import {
   Tooltip,
   TooltipContent,
@@ -23,19 +24,90 @@ import ph from "@/public/assets/svgs/ph.svg";
 import { Label } from "@/components/ui/label";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import { useRouter } from "next/navigation";
-import { ChevronDown, Info, Mail, Search, Trash2 } from "lucide-react";
+import {
+  ChevronDown,
+  FileTextIcon,
+  Info,
+  Mail,
+  Search,
+  Trash2,
+} from "lucide-react";
 import { AnimatePresence, m } from "motion/react";
 import { signupInitialValues } from "@/constants";
 import { apiGet, apiPost } from "@/utils/api";
 import { toast } from "@/hooks/use-toast";
 import FileViewer from "@/components/shared/file-viewer";
 import { handleFileUpload } from "@/utils/file-upload";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { DialogClose } from "@radix-ui/react-dialog";
 export interface ILGU {
   lgu: string;
   province: string;
   region: string;
   tenDigitCode: string;
 }
+
+const terms = [
+  {
+    title: "Introduction",
+    content: `Welcome to the <strong>eGov Awards</strong>. By submitting an application, you agree to follow and be bound by these Terms and Conditions. If you do not agree with any part of these terms, please do not proceed with the application"`,
+  },
+  {
+    title: "Eligibility",
+    content:
+      "Applicants must meet the eligibility criteria outlined in the award guidelines. Submissions that do not meet the requirements may be disqualified.",
+  },
+  {
+    title: "Application Submission",
+    content: [
+      "All applications must be submitted before the deadline specified on our official platform.",
+      "Submitted materials must be original and must not infringe on any third-party rights.",
+      "Incomplete or falsified applications will be rejected.",
+    ],
+  },
+  {
+    title: "Evaluation and Selection",
+    content:
+      "A designated panel of judges will review all applications. The selection process is based on predefined criteria, and the decision of the panel is final.",
+  },
+  {
+    title: "Privacy and data use",
+    content: `By submitting an application, you agree that your personal and project-related data may be collected, stored, and used for evaluating your application and for promotional activities related to the awards. For more details, please refer to our <a href='/privacy-policy' class='text-blue-500'>Privacy Policy</a>.`,
+  },
+  {
+    title: "Intellectual Property",
+    content:
+      "Applicants own their materials. However, by submitting an application, you give eGov Awards the right to use, copy, and show your project details for marketing and storage.",
+  },
+  {
+    title: "Award Disbursement",
+    content:
+      "Winners will be notified through the contact details provided in the application. Prizes, grants, or recognitions will be awarded as per the terms specified in the award program.",
+  },
+  {
+    title: "Disqualification and Termination",
+    content:
+      "We reserve the right to disqualify any application that violates these terms, includes false information, or engages in misconduct.",
+  },
+  {
+    title: "Amendments",
+    content:
+      "We may update these Terms and Conditions from time to time. Continued participation in the award program constitutes acceptance of any changes.",
+  },
+  {
+    title: "Contact Information",
+    content:
+      "For any inquiries regarding these terms, please contact us at [Your Contact Email or Address].",
+  },
+];
 export default function SignInPage() {
   const [page, setPage] = useState("email");
   const router = useRouter();
@@ -44,7 +116,6 @@ export default function SignInPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [lguPage, setLguPage] = useState(1);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
   const getLGUList = async () => {
     try {
       const res = await apiGet("/api/lgu/list");
@@ -166,14 +237,14 @@ export default function SignInPage() {
             touched,
             errors,
           }) => {
-            useEffect(() => {
+            /*  useEffect(() => {
               const selectedLgu = LguList.find((lgu) => lgu.lgu === values.lgu);
 
               if (selectedLgu) {
                 setFieldValue("province", selectedLgu.province);
                 setFieldValue("region", selectedLgu.region);
               }
-            }, [values.lgu]);
+            }, [values.lgu]); */
             const animation = {
               initial: { opacity: 0, y: 20 },
               animate: { opacity: 1, y: 0 },
@@ -239,7 +310,7 @@ export default function SignInPage() {
                         >
                           <div
                             className={`shadow-md  rounded-full size-7 mr-2 flex items-center justify-center  text-xs ${
-                              page == "complete"
+                              page == "lgu" || page == "complete"
                                 ? "bg-blue-600 text-white"
                                 : "bg-slate-100"
                             }`}
@@ -249,7 +320,9 @@ export default function SignInPage() {
                           </div>{" "}
                           <h3
                             className={`${
-                              page == "complete" ? "text-blue-600 " : ""
+                              page == "lgu" || page == "complete"
+                                ? "text-blue-600 "
+                                : ""
                             } text-xs `}
                           >
                             Personal Info
@@ -354,6 +427,52 @@ export default function SignInPage() {
                               </span>
                             </div>
                           </Card>
+                          <div className="text-sm text-gray-500 mt-4 text-center font-normal">
+                            By continuing to sign up, you agree to our{" "}
+                            <Dialog>
+                              <DialogTrigger>
+                                <div className="text-teal-500 font-semibold hover:text-teal-600 cursor-pointer">
+                                  Terms of Service and Privacy Policy.{" "}
+                                </div>{" "}
+                              </DialogTrigger>
+                              <DialogContent x className="sm:max-w-3xl">
+                                <DialogHeader>
+                                  <DialogTitle>
+                                    <div className="flex items-center gap-1 text-teal-600 font-semibold">
+                                      <FileTextIcon size={15} />
+                                      Terms of Service and Privacy Policy
+                                    </div>
+                                  </DialogTitle>
+                                  <DialogDescription></DialogDescription>
+                                </DialogHeader>
+                                <ScrollArea className="h-full max-h-[80vh] w-full">
+                                  <div className=" mx-auto p-6">
+                                    {terms.map((term, index) => (
+                                      <div key={index} className="mb-6">
+                                        <h2 className="text-lg font-bold mb-2">
+                                          {index + 1}. {term.title}
+                                        </h2>
+                                        {Array.isArray(term.content) ? (
+                                          <ul className="list-disc pl-5">
+                                            {term.content.map((point, i) => (
+                                              <li key={i}>{point}</li>
+                                            ))}
+                                          </ul>
+                                        ) : (
+                                          <p
+                                            className="text-gray-700"
+                                            dangerouslySetInnerHTML={{
+                                              __html: term.content,
+                                            }}
+                                          />
+                                        )}
+                                      </div>
+                                    ))}
+                                  </div>
+                                </ScrollArea>
+                              </DialogContent>
+                            </Dialog>
+                          </div>
                         </m.div>
                       )}
                       {page == "lgu" && (
@@ -454,14 +573,29 @@ export default function SignInPage() {
                                                             "lgu",
                                                             item.lgu
                                                           );
+                                                          setFieldValue(
+                                                            "province",
+                                                            item.province
+                                                          );
+                                                          setFieldValue(
+                                                            "region",
+                                                            item.region
+                                                          );
                                                           setTimeout(() => {},
                                                           500);
 
                                                           setLguPopover(false);
                                                         }}
-                                                        className="hover:bg-slate-100 cursor-pointer py-0.5 p-2 rounded-md my-1"
+                                                        className=" group hover:text-blue-700  cursor-pointer py-0.5 p-2 rounded-md my-1"
                                                       >
-                                                        {item.lgu}
+                                                        {item.lgu.trim()}
+                                                        {item.province && (
+                                                          <span>, </span>
+                                                        )}
+
+                                                        <span className="group-hover:text-blue-700 text-slate-500">
+                                                          {item.province}
+                                                        </span>
                                                       </div>
                                                     ))}
 
@@ -497,12 +631,29 @@ export default function SignInPage() {
                                                             "lgu",
                                                             item.lgu
                                                           );
+                                                          setFieldValue(
+                                                            "province",
+                                                            item.province
+                                                          );
+                                                          setFieldValue(
+                                                            "region",
+                                                            item.region
+                                                          );
+                                                          setTimeout(() => {},
+                                                          500);
 
                                                           setLguPopover(false);
                                                         }}
-                                                        className="hover:bg-slate-100 cursor-pointer py-0.5 p-2 rounded-md  my-1"
+                                                        className=" group hover:text-blue-700  cursor-pointer py-0.5 p-2 rounded-md my-1"
                                                       >
-                                                        {item.lgu}
+                                                        {item.lgu.trim()}
+                                                        {item.province && (
+                                                          <span>, </span>
+                                                        )}
+
+                                                        <span className="group-hover:text-blue-700 text-slate-500">
+                                                          {item.province}
+                                                        </span>
                                                       </div>
                                                     )
                                                   )}
@@ -583,7 +734,7 @@ export default function SignInPage() {
                                       type="text"
                                       autoComplete="off"
                                       name="joinCount"
-                                      placeholder="Enter Times Joined "
+                                      placeholder="Enter Number of Times Joined"
                                       as={Input}
                                       onInput={(e: any) => {
                                         e.target.value = e.target.value.replace(
@@ -641,7 +792,9 @@ export default function SignInPage() {
                                               <div className="flex items-center gap-2">
                                                 <Image src={pdf} alt="" />
                                                 <span className="line-clamp-2">
-                                                  {values.authLetter}
+                                                  {values.authLetter
+                                                    .split("-")
+                                                    .pop()}
                                                 </span>
                                               </div>
                                               <FileViewer
@@ -651,7 +804,7 @@ export default function SignInPage() {
                                             <Trash2
                                               size={18}
                                               color="red"
-                                              className="shrink-0"
+                                              className="shrink-0 cursor-pointer"
                                               onClick={() =>
                                                 setFieldValue("authLetter", "")
                                               }
@@ -689,7 +842,7 @@ export default function SignInPage() {
                               <section className="flex w-full items-center gap-4">
                                 <Button
                                   type="button"
-                                  onClick={() => setPage("lgu")}
+                                  onClick={() => setPage("info")}
                                   variant={"secondary"}
                                   className="w-full"
                                 >
@@ -840,11 +993,14 @@ export default function SignInPage() {
                                         onInput={(
                                           e: React.ChangeEvent<HTMLInputElement>
                                         ) => {
-                                          e.target.value =
-                                            e.target.value.replace(
-                                              /[^0-9]/g,
-                                              ""
-                                            );
+                                          let value = e.target.value.replace(
+                                            /[^0-9]/g,
+                                            ""
+                                          );
+                                          value = value.replace(/^0+/, "");
+                                          if (value.length > 0) {
+                                            e.target.value = value;
+                                          }
                                         }}
                                         className="pl-[70px] space-y-8 h-[46px] rounded-md bg-white "
                                       />

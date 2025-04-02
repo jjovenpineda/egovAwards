@@ -10,14 +10,8 @@ import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { getUserInfo } from "@/utils/utility";
 import Image from "next/image";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+
 import eGOVLogo from "@/public/assets/images/eGOV_Logo.webp";
-import { storage } from "@/utils/useStorage";
 import { Label } from "../ui/label";
 interface Info {
   email: string;
@@ -29,15 +23,17 @@ interface Info {
 export default function SideBar() {
   const router = useRouter();
   const [isCollapsed, setCollapse] = useState(false);
-  const [userInfo, setUserInfo] = useState<Info>();
   const [currentPath, setCurrentPath] = useState("");
   const searchParams = useSearchParams();
   const filter = searchParams.get("filter");
 
   const getInfo = () => {
     const info = getUserInfo();
-    if (info) {
-      setUserInfo(info);
+    if (
+      info.authRep.isNewAccount &&
+      !window.location.pathname.includes("settings")
+    ) {
+      window.location.href = "/settings";
     }
   };
 
@@ -51,6 +47,7 @@ export default function SideBar() {
     CurrentPathname();
     getInfo();
   }, []);
+
   return (
     <AnimatePresence>
       <m.div

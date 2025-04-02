@@ -103,7 +103,12 @@ export default function Page4() {
                       <div className="flex items-center gap-2">
                         <Image src={pdf} alt="" />
                         <span className="line-clamp-2">
-                          {values.relevanceAnswer.file}{" "}
+                          {values.relevanceAnswer.file
+                            .split("/")
+                            .pop()
+                            .split("-")
+                            .slice(1)
+                            .join("-")}{" "}
                         </span>
                       </div>
                       <FileViewer url={fileURL} />

@@ -100,7 +100,12 @@ export default function Page6() {
                         <Image src={pdf} alt="" />
 
                         <span className="line-clamp-2">
-                          {values.innovationAnswer.file}
+                          {values.innovationAnswer.file
+                            .split("/")
+                            .pop()
+                            .split("-")
+                            .slice(1)
+                            .join("-")}
                         </span>
                       </div>
                       <FileViewer url={fileURL} />

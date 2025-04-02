@@ -15,7 +15,7 @@ export default function Page() {
 
   useEffect(() => {
     const { authRep } = getUserInfo();
-    setisApproved(authRep.isApproved); // current problem is. still need to relogin to get the updated value of isApproved
+    setisApproved(authRep.isApproved);
   }, []);
 
   return (

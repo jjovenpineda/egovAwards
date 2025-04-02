@@ -98,6 +98,16 @@ export default function SignInPage() {
           setTimer(30);
           setIsLoading(false);
         }
+        if (message.includes("not found")) {
+          setIsLoading(false);
+
+          toast({
+            title: "Email Not Found",
+            description: "Please check and try again.",
+            variant: "destructive",
+            duration: 2500,
+          });
+        }
       } catch (e) {
         console.error("Error:", e);
         setIsLoading(false);
@@ -346,13 +356,28 @@ export default function SignInPage() {
                                       className="absolute top-1/2 -translate-y-1/2 left-3"
                                     />
                                   </div>
-                                  {isSubmitted && (
+                                  {isSubmitted ? (
                                     <m.p
                                       initial={{ opacity: 0 }}
                                       animate={{ opacity: 1 }}
                                       className="text-xs text-emerald-500"
                                     >
-                                      Password reset link sent.
+                                      Password reset link sent. <br /> <br />
+                                      Please check your email for the password
+                                      reset link. If you haven’t received it,
+                                      ensure that you have entered the correct
+                                      email address.{" "}
+                                    </m.p>
+                                  ) : (
+                                    <m.p
+                                      initial={{ opacity: 0 }}
+                                      animate={{ opacity: 1 }}
+                                    >
+                                      <p className="text-sm font-medium text-gray-400 mt-1">
+                                        Please provide the email linked to your
+                                        account. A password reset link will be
+                                        sent to that email.
+                                      </p>
                                     </m.p>
                                   )}
                                   <ErrorMessage

@@ -23,28 +23,28 @@ import { apiPost } from "@/utils/api";
 export const categories = [
   {
     id: "r1",
-    value: "1",
+    value: "G2A",
     label:
       "G2A Government Solutions Providing Access through Interoperability to Stakeholders",
   },
   {
     id: "r2",
-    value: "2",
+    value: "G2B",
     label: "G2B Government Solutions to Improve Business Climate",
   },
   {
     id: "r3",
-    value: "3",
+    value: "G2C",
     label: "G2C Governments Solutions to Serve Citizens Needs",
   },
   {
     id: "r4",
-    value: "4",
+    value: "G2D",
     label: "G2D Government Solutions to Harnessing Data for Specific Use Cases",
   },
   {
     id: "r5",
-    value: "5",
+    value: "G2E",
     label:
       "G2E Government solutions providing Education and Training to citizens",
   },
@@ -240,7 +240,14 @@ export default function Page2() {
                               <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
                                 <div className="flex items-center gap-2">
                                   <Image src={pdf} alt="" />
-                                  <span className="line-clamp-2">{item}</span>
+                                  <span className="line-clamp-2">
+                                    {item
+                                      ?.split("/")
+                                      .pop()
+                                      ?.split("-")
+                                      .slice(1)
+                                      .join("-")}
+                                  </span>
                                 </div>
                                 <FileViewer url={item} />
                               </div>

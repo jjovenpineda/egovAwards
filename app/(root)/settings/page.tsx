@@ -55,7 +55,7 @@ export default function Page1() {
   const [lguPopover, setLguPopover] = useState(false);
   const [selectedPage, setSelectedPage] = useState("lgu");
   const [pwdBtnLoading, setPwdBtnLoading] = useState(false);
-
+  const [userInfo, setUserInfo] = useState<any>({});
   const getLGUList = async () => {
     try {
       const res = await apiGet("/api/lgu/list");
@@ -68,12 +68,11 @@ export default function Page1() {
   };
   const getUser = async () => {
     try {
-      const { authRep } = getUserInfo();
-      const res = await apiGet(`/api/auth/users/list/${authRep._id}`);
+      const { _id } = getUserInfo();
+      const res = await apiGet(`/api/auth/fetch/user/${_id}`);
       const { data } = res;
       if (!data) return;
-      console.log("data :", data);
-      setLguList(data);
+      setUserInfo(data);
     } catch (e) {
       console.error("Error fetching LGU list:", e);
     }
@@ -173,14 +172,15 @@ export default function Page1() {
     }
   };
 
-  const handleSubmit = async (values: any) => {
-    console.log("values :", values);
+  const handleSubmit = async (values: any, errors: any) => {
+    if (errors.length >= 0) return null;
     try {
       setIsLoading(true);
 
       const { success } = await apiPut(`/api/lgu/add/info`, values);
 
       if (success) {
+        getUser();
         toast({
           title: "Update Successful",
           description: "Your changes have been saved.",
@@ -209,20 +209,25 @@ export default function Page1() {
         initialValues={
           selectedPage === "lgu"
             ? {
-                lgu: "",
-                province: "",
-                region: "",
-                abbr: "",
-                lceName: "",
-                officeName: "",
-                officeNo: "",
-                website: "",
-                facebook: "",
-                mobile: "",
-                logo: "",
-                authLetter: "",
+                lgu: userInfo?.authRep?.lgu || "",
+                province: userInfo?.authRep?.province || "",
+                region: userInfo?.authRep?.region || "",
+                abbr: userInfo?.authRep?.abbr || "",
+                lceName: userInfo?.authRep?.lceName || "",
+                officeName: userInfo?.authRep?.officeName || "",
+                officeNo: userInfo?.authRep?.officeNo || "",
+                website: userInfo?.authRep?.website || "",
+                facebook: userInfo?.authRep?.facebook || "",
+                mobile: userInfo?.mobile || "",
+                logo: userInfo?.authRep?.logo || "",
+                authLetter: userInfo?.authRep?.authLetter || "",
               }
-            : { firstname: "", middlename: "", lastname: "", suffix: "" }
+            : {
+                firstname: userInfo?.firstname || "",
+                middlename: userInfo?.middlename || "",
+                lastname: userInfo?.lastname || "",
+                suffix: userInfo?.suffix || "",
+              }
         }
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
@@ -235,14 +240,6 @@ export default function Page1() {
           isValid,
           errors,
         }) => {
-          useEffect(() => {
-            const selectedLgu = LguList.find((lgu) => lgu.lgu === values.lgu);
-
-            if (selectedLgu) {
-              setFieldValue("province", selectedLgu.province);
-              setFieldValue("region", selectedLgu.region);
-            }
-          }, [values.lgu]);
           return (
             <Form>
               {isloaded && (
@@ -271,7 +268,7 @@ export default function Page1() {
                     </h2>
                     <section className="flex gap-8 items-center">
                       <div className="flex flex-col items-center gap-4">
-                        <div className="relative flex flex-col  overflow-hidden items-center border justify-center size-[88px] bg-gray-100 rounded-full   transition-all">
+                        <div className="relative flex flex-col  overflow-hidden items-center border-[8px] border-slate-200 justify-center size-[88px] bg-gray-100 rounded-full   transition-all">
                           {values.logo ? (
                             <>
                               <img
@@ -281,11 +278,47 @@ export default function Page1() {
                               />
                             </>
                           ) : (
-                            <div className="bg-zinc-200 size-full flex items-center">
-                              <LandmarkIcon
-                                size={40}
-                                className="text-zinc-400 m-auto"
-                              />
+                            <div className="bg-slate-300 size-full flex justify-center uppercase items-center">
+                              <svg
+                                width="42"
+                                height="29"
+                                viewBox="0 0 42 29"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  d="M0 11.1555V0.643723H2.33536V9.32314H7.0708V11.1555H0Z"
+                                  fill="#94A3B8"
+                                />
+                                <path
+                                  d="M18.4136 5.89962C18.4136 7.04593 18.1853 8.02115 17.7287 8.82527C17.2756 9.6294 16.6572 10.2436 15.8733 10.6679C15.0931 11.0888 14.2157 11.2992 13.2413 11.2992C12.2597 11.2992 11.3788 11.0871 10.5985 10.6628C9.81829 10.2385 9.20164 9.62427 8.74859 8.82014C8.29554 8.01602 8.06901 7.04251 8.06901 5.89962C8.06901 4.75332 8.29554 3.7781 8.74859 2.97397C9.20164 2.16985 9.81829 1.55734 10.5985 1.13646C11.3788 0.712155 12.2597 0.5 13.2413 0.5C14.2157 0.5 15.0931 0.712155 15.8733 1.13646C16.6572 1.55734 17.2756 2.16985 17.7287 2.97397C18.1853 3.7781 18.4136 4.75332 18.4136 5.89962ZM16.0459 5.89962C16.0459 5.15709 15.9291 4.5309 15.6953 4.02105C15.4652 3.5112 15.1398 3.12453 14.7191 2.86105C14.2984 2.59757 13.8058 2.46583 13.2413 2.46583C12.6768 2.46583 12.1842 2.59757 11.7635 2.86105C11.3428 3.12453 11.0156 3.5112 10.7819 4.02105C10.5518 4.5309 10.4367 5.15709 10.4367 5.89962C10.4367 6.64216 10.5518 7.26834 10.7819 7.77819C11.0156 8.28804 11.3428 8.67472 11.7635 8.93819C12.1842 9.20167 12.6768 9.33341 13.2413 9.33341C13.8058 9.33341 14.2984 9.20167 14.7191 8.93819C15.1398 8.67472 15.4652 8.28804 15.6953 7.77819C15.9291 7.26834 16.0459 6.64216 16.0459 5.89962Z"
+                                  fill="#94A3B8"
+                                />
+                                <path
+                                  d="M27.5438 4.04158C27.4683 3.79179 27.3622 3.57108 27.2256 3.37945C27.089 3.18441 26.9218 3.02017 26.724 2.88672C26.5298 2.74984 26.3069 2.64548 26.0552 2.57362C25.8071 2.50176 25.5321 2.46583 25.23 2.46583C24.6655 2.46583 24.1693 2.59928 23.7414 2.86618C23.3171 3.13309 22.9864 3.52147 22.749 4.03132C22.5117 4.53774 22.3931 5.15709 22.3931 5.88936C22.3931 6.62163 22.5099 7.2444 22.7436 7.75767C22.9774 8.27094 23.3082 8.66274 23.736 8.93306C24.1639 9.19996 24.6691 9.33341 25.2516 9.33341C25.7801 9.33341 26.2314 9.24444 26.6053 9.06651C26.9829 8.88515 27.2705 8.63023 27.4683 8.30173C27.6697 7.97324 27.7703 7.58487 27.7703 7.13661L28.245 7.20333H25.3972V5.53006H30.0194V6.85431C30.0194 7.7782 29.8144 8.57206 29.4045 9.23589C28.9946 9.8963 28.4301 10.4061 27.711 10.7654C26.9919 11.1213 26.1685 11.2992 25.2408 11.2992C24.2053 11.2992 23.2956 11.082 22.5117 10.6474C21.7279 10.2094 21.1166 9.58834 20.678 8.78421C20.2429 7.97666 20.0254 7.01855 20.0254 5.90989C20.0254 5.05786 20.1548 4.29822 20.4137 3.63097C20.6762 2.96029 21.0429 2.39226 21.5139 1.9269C21.985 1.46153 22.5333 1.10738 23.1589 0.864431C23.7846 0.621482 24.4624 0.5 25.1923 0.5C25.8179 0.5 26.4004 0.587261 26.9397 0.761774C27.4791 0.932865 27.9573 1.17581 28.3744 1.49062C28.7951 1.80543 29.1385 2.18012 29.4045 2.61469C29.6706 3.04584 29.8414 3.52146 29.9169 4.04158H27.5438Z"
+                                  fill="#94A3B8"
+                                />
+                                <path
+                                  d="M42 5.89962C42 7.04593 41.7717 8.02115 41.315 8.82527C40.862 9.6294 40.2435 10.2436 39.4597 10.6679C38.6794 11.0888 37.8021 11.2992 36.8277 11.2992C35.8461 11.2992 34.9652 11.0871 34.1849 10.6628C33.4047 10.2385 32.788 9.62427 32.335 8.82014C31.8819 8.01602 31.6554 7.04251 31.6554 5.89962C31.6554 4.75332 31.8819 3.7781 32.335 2.97397C32.788 2.16985 33.4047 1.55734 34.1849 1.13646C34.9652 0.712155 35.8461 0.5 36.8277 0.5C37.8021 0.5 38.6794 0.712155 39.4597 1.13646C40.2435 1.55734 40.862 2.16985 41.315 2.97397C41.7717 3.7781 42 4.75332 42 5.89962ZM39.6323 5.89962C39.6323 5.15709 39.5154 4.5309 39.2817 4.02105C39.0516 3.5112 38.7262 3.12453 38.3055 2.86105C37.8848 2.59757 37.3922 2.46583 36.8277 2.46583C36.2632 2.46583 35.7706 2.59757 35.3499 2.86105C34.9292 3.12453 34.602 3.5112 34.3683 4.02105C34.1382 4.5309 34.0231 5.15709 34.0231 5.89962C34.0231 6.64216 34.1382 7.26834 34.3683 7.77819C34.602 8.28804 34.9292 8.67472 35.3499 8.93819C35.7706 9.20167 36.2632 9.33341 36.8277 9.33341C37.3922 9.33341 37.8848 9.20167 38.3055 8.93819C38.7262 8.67472 39.0516 8.28804 39.2817 7.77819C39.5154 7.26834 39.6323 6.64216 39.6323 5.89962Z"
+                                  fill="#94A3B8"
+                                />
+                                <path
+                                  d="M1.80208 28.5V17.9882H4.13744V22.3253H8.87827V17.9882H11.2082V28.5H8.87827V24.1577H4.13744V28.5H1.80208Z"
+                                  fill="#94A3B8"
+                                />
+                                <path
+                                  d="M13.2096 28.5V17.9882H20.6526V19.8206H15.545V22.3253H20.2696V24.1577H15.545V26.6676H20.6742V28.5H13.2096Z"
+                                  fill="#94A3B8"
+                                />
+                                <path
+                                  d="M22.5852 28.5V17.9882H26.9431C27.7773 17.9882 28.4892 18.1302 29.0789 18.4142C29.6722 18.6948 30.1234 19.0934 30.4327 19.6101C30.7455 20.1234 30.9019 20.7274 30.9019 21.422C30.9019 22.12 30.7437 22.7206 30.4273 23.2236C30.1109 23.7232 29.6524 24.1064 29.052 24.3733C28.4551 24.6402 27.7324 24.7736 26.8838 24.7736H23.9659V22.9875H26.5062C26.9521 22.9875 27.3224 22.9293 27.6173 22.813C27.9121 22.6966 28.1315 22.5221 28.2753 22.2894C28.4227 22.0567 28.4964 21.7676 28.4964 21.422C28.4964 21.073 28.4227 20.7787 28.2753 20.5392C28.1315 20.2996 27.9103 20.1183 27.6119 19.9951C27.3171 19.8685 26.9449 19.8052 26.4955 19.8052H24.9206V28.5H22.5852ZM28.5504 23.7163L31.2956 28.5H28.7176L26.0316 23.7163H28.5504Z"
+                                  fill="#94A3B8"
+                                />
+                                <path
+                                  d="M32.6282 28.5V17.9882H40.0712V19.8206H34.9636V22.3253H39.6882V24.1577H34.9636V26.6676H40.0928V28.5H32.6282Z"
+                                  fill="#94A3B8"
+                                />
+                              </svg>
                             </div>
                           )}
                         </div>
@@ -294,7 +327,7 @@ export default function Page1() {
                         <input
                           type="file"
                           className="hidden "
-                          accept="image/*"
+                          accept=".png, .jpg, .jpeg, .webp"
                           ref={fileInputRef}
                           onChange={async (e) => {
                             const file = await handleImageUpload(e);
@@ -398,11 +431,26 @@ export default function Page1() {
                                               key={index}
                                               onClick={() => {
                                                 setFieldValue("lgu", item.lgu);
+                                                setFieldValue(
+                                                  "province",
+                                                  item.province
+                                                );
+                                                setFieldValue(
+                                                  "region",
+                                                  item.region
+                                                );
+                                                setTimeout(() => {}, 500);
+
                                                 setLguPopover(false);
                                               }}
-                                              className="hover:bg-slate-100 cursor-pointer py-0.5 p-2 rounded-md my-1"
+                                              className=" group hover:text-blue-700  cursor-pointer py-0.5 p-2 rounded-md my-1"
                                             >
-                                              {item.lgu}
+                                              {item.lgu.trim()}
+                                              {item.province && <span>, </span>}
+
+                                              <span className="group-hover:text-blue-700 text-slate-500">
+                                                {item.province}
+                                              </span>
                                             </div>
                                           ))}
 
@@ -429,11 +477,26 @@ export default function Page1() {
                                             key={index}
                                             onClick={() => {
                                               setFieldValue("lgu", item.lgu);
+                                              setFieldValue(
+                                                "province",
+                                                item.province
+                                              );
+                                              setFieldValue(
+                                                "region",
+                                                item.region
+                                              );
+                                              setTimeout(() => {}, 500);
+
                                               setLguPopover(false);
                                             }}
-                                            className="hover:bg-slate-100 cursor-pointer py-0.5 p-2 rounded-md  my-1"
+                                            className=" group hover:text-blue-700  cursor-pointer py-0.5 p-2 rounded-md my-1"
                                           >
-                                            {item.lgu}
+                                            {item.lgu.trim()}
+                                            {item.province && <span>, </span>}
+
+                                            <span className="group-hover:text-blue-700 text-slate-500">
+                                              {item.province}
+                                            </span>
                                           </div>
                                         ))}
                                         {LguList.length >
@@ -485,7 +548,7 @@ export default function Page1() {
                                 Province{" "}
                               </Label>
                               <ErrorMessage
-                                name="region"
+                                name="province"
                                 component="div"
                                 className=" text-xs text-red-500 font-semibold"
                               />
@@ -691,10 +754,14 @@ export default function Page1() {
                               onInput={(
                                 e: React.ChangeEvent<HTMLInputElement>
                               ) => {
-                                e.target.value = e.target.value.replace(
+                                let value = e.target.value.replace(
                                   /[^0-9]/g,
                                   ""
                                 );
+                                value = value.replace(/^0+/, "");
+                                if (value.length > 0) {
+                                  e.target.value = value;
+                                }
                               }}
                               className=" space-y-8 rounded-md bg-white pl-[70px]"
                             />
@@ -730,18 +797,23 @@ export default function Page1() {
                             <Field
                               type="text"
                               disabled
-                              value={"test"}
+                              value={
+                                userInfo.firstname +
+                                " " +
+                                userInfo.middlename +
+                                " " +
+                                userInfo.lastname +
+                                " " +
+                                userInfo.suffix
+                              }
                               autoComplete="off"
                               as={Input}
                               className=" space-y-8 rounded-md pr-36 bg-white "
                             />
 
-                            <span
-                              onClick={() => setActive(!active)}
-                              className="absolute right-3 top-1/2 -translate-y-1/2 text-[15px] cursor-pointer"
-                            >
+                            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[15px] cursor-pointer">
                               <>
-                                {active ? (
+                                {userInfo?.authRep?.isApproved ? (
                                   <div className="text-[#14B8A6] flex gap-2 items-center">
                                     <CheckCircle2 size={15} /> Verified
                                   </div>
@@ -765,6 +837,7 @@ export default function Page1() {
                               disabled
                               autoComplete="off"
                               name="email"
+                              value={userInfo.email}
                               as={Input}
                               className=" space-y-8 rounded-md bg-white pl-9"
                             />
@@ -784,19 +857,24 @@ export default function Page1() {
                                     <div className="flex items-center gap-2">
                                       <Image src={pdf} alt="" />
                                       <span className="line-clamp-2">
-                                        {values.authLetter}
+                                        {values.authLetter
+                                          ?.split("/")
+                                          .pop()
+                                          ?.split("-")
+                                          .slice(1)
+                                          .join("-")}
                                       </span>
                                     </div>
                                     <FileViewer url={values.authLetter ?? ""} />
                                   </div>
-                                  <Trash2
+                                  {/*   <Trash2
                                     size={18}
                                     color="red"
                                     className="shrink-0"
                                     onClick={() =>
                                       setFieldValue("authLetter", "")
                                     }
-                                  />
+                                  /> */}
                                 </div>
                               ) : (
                                 <div className="space-y-1">
@@ -853,14 +931,10 @@ export default function Page1() {
                    />
                  </div> */}
                     </div>{" "}
-                    {Object.values(errors).map((error, index) => (
-                      <p key={index}>{error}</p>
-                    ))}
                     <div className="flex justify-end pt-16">
                       <Button
-                        disabled={!isValid || !dirty}
                         type="submit"
-                        onClick={() => handleSubmit(values)}
+                        onClick={() => handleSubmit(values, errors)}
                         className="bg-blue-500 text-primary-foreground shadow hover:bg-blue-600"
                       >
                         {isLoading ? (
@@ -888,6 +962,7 @@ export default function Page1() {
                             <Input
                               disabled
                               type="email"
+                              value={userInfo?.email}
                               autoComplete="off"
                               className="space-y-8 rounded-md bg-white pl-9 border border-gray-300 focus:border-blue-500"
                             />
@@ -952,7 +1027,9 @@ export default function Page1() {
                               animate={{ opacity: 1 }}
                               className="text-xs text-emerald-500 pt-1 absolute"
                             >
-                              Password reset link sent.
+                              Please check your email for the password reset
+                              link. If you haven’t received it, ensure that you
+                              have entered the correct email address.{" "}
                             </m.p>
                           )}
                         </div>
