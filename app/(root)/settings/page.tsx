@@ -951,10 +951,10 @@ export default function Page1() {
                   </TabsContent>
                   <TabsContent value="profile" className="py-6  ">
                     <section className="grid lg:grid-cols-2 lg:gap-x-8 lg:gap-y-2 gap-2">
-                      <div className="col-span-2 grid md:grid-cols-2 gap-4 lg:gap-8  items-end mb-8">
+                      <div className="col-span-2 grid md:grid-cols-2 gap-4 lg:gap-8 mt-8 items-start mb-8">
                         <div>
-                          <div className="flex gap-1 items-center">
-                            <Label className="font-semibold text-sm text-[#1F2937]">
+                          <div className="flex relative gap-1 items-center">
+                            <Label className="font-semibold absolute -top-6 text-sm text-[#1F2937]">
                               Email
                             </Label>
                           </div>
@@ -964,7 +964,7 @@ export default function Page1() {
                               type="email"
                               value={userInfo?.email}
                               autoComplete="off"
-                              className="space-y-8 rounded-md bg-white pl-9 border border-gray-300 focus:border-blue-500"
+                              className="space-y-8 rounded-md bg-white pl-9  border-gray-300 focus:border-blue-500"
                             />
                             <Mail
                               size={15}
@@ -972,7 +972,7 @@ export default function Page1() {
                             />
                           </div>
                         </div>
-                        <div className="relative justify-self-end  md:justify-self-start">
+                        <div className="relative  justify-self-end  md:justify-self-start">
                           <Button
                             type="button"
                             onClick={() => {
@@ -1025,7 +1025,7 @@ export default function Page1() {
                             <m.p
                               initial={{ opacity: 0 }}
                               animate={{ opacity: 1 }}
-                              className="text-xs text-emerald-500 pt-1 absolute"
+                              className="text-xs text-emerald-500 pt-1 max-w-[70%] relative col-span-2 "
                             >
                               Please check your email for the password reset
                               link. If you haven’t received it, ensure that you
