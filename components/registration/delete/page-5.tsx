@@ -7,32 +7,32 @@ import pdf from "@/public/assets/svgs/pdf.svg";
 
 import Editor from "@/components/shared/rich-text-editor";
 import Image from "next/image";
-import FileViewer from "../shared/file-viewer";
+import FileViewer from "../../shared/file-viewer";
 import { Trash2 } from "lucide-react";
-import { handleFileChange, WordCounter } from "./registration";
+import { handleFileChange, WordCounter } from "../registration";
 import { ErrorMessage, Field, FormikValues, useFormikContext } from "formik";
 import { handleFileUpload } from "@/utils/file-upload";
 
-export default function Page6() {
+export default function Page5() {
   const { values, setFieldValue, setFieldTouched, validateField, errors } =
     useFormikContext<FormikValues>();
   const [count, setCount] = useState(0);
   const [fileURL, setFileURL] = useState<string>("");
 
   useEffect(() => {
-    if (values.innovationAnswer.file instanceof File) {
-      setFileURL(URL.createObjectURL(values.innovationAnswer.file));
+    if (values.sustainabilityAnswer.file instanceof File) {
+      setFileURL(URL.createObjectURL(values.sustainabilityAnswer.file));
     }
-    WordCounter(values.innovationAnswer.text, setCount, () => {
-      setFieldValue("innovationAnswer.text", "");
+    WordCounter(values.sustainabilityAnswer.text, setCount, () => {
+      setFieldValue("sustainabilityAnswer.text", "");
     });
-  }, [values.innovationAnswer.text, values.innovationAnswer.file]);
+  }, [values.sustainabilityAnswer.text, values.sustainabilityAnswer.file]);
 
   return (
     <div>
       <section className="space-y-2 pt-6 lg:pt-0">
         <h2 className="font-bold text-lg text-blue-900">
-          INNOVATION ASPECT OF THE PROJECT{" "}
+          SUSTAINABILITY AND REPLICABILITY OF THE PROJECT{" "}
         </h2>
         <hr className="border border-blue-900"></hr>
       </section>
@@ -40,14 +40,17 @@ export default function Page6() {
         <div>
           <div className="space-y-4">
             <p className="text-base">
-              How has the innovation in your project improved service delivery
-              and operational efficiency within your local government unit?
+              Describe how you ensure the project long-term sustainability and
+              the strategies in place to maintain the project over the years.
             </p>
             <p className="text-base">
-              What specific technological advancements or digital solutions were
-              implemented in your project, and how have they contributed to
-              addressing the problems?
+              What measures have been implemented to continuously update and
+              improve the project to keep pace with technological advancements?
             </p>{" "}
+            <p className="text-base">
+              How does the project incorporate community engagement and
+              capacity-building to ensure ongoing local support and ownership?
+            </p>
           </div>
           <p className="text-red-500">
             Please limit your answers to 500 - 1000 words
@@ -56,24 +59,24 @@ export default function Page6() {
         <div>
           <div
             onFocus={() => {
-              setFieldTouched("innovationAnswer.text", true),
-                validateField("innovationAnswer");
+              setFieldTouched("sustainabilityAnswer.text", true),
+                validateField("sustainabilityAnswer");
             }}
             onBlur={() => {
-              validateField("innovationAnswer");
+              validateField("sustainabilityAnswer");
             }}
             className="h-min"
           >
             <Editor
-              defaultValue={values.innovationAnswer.text}
+              defaultValue={values.sustainabilityAnswer.text}
               onChange={(e) => {
-                setFieldValue("innovationAnswer.text", e);
-                setFieldTouched("innovationAnswer.text", true);
+                setFieldValue("sustainabilityAnswer.text", e);
+                setFieldTouched("sustainabilityAnswer.text", true);
               }}
             />
           </div>
           <ErrorMessage
-            name="innovationAnswer.text"
+            name="sustainabilityAnswer.text"
             component="div"
             className=" text-xs text-red-500 font-semibold"
           />
@@ -91,16 +94,15 @@ export default function Page6() {
             <p>or Upload File </p>
             <div>
               <div className="overflow-hidden">
-                {values.innovationAnswer.file &&
-                typeof values.innovationAnswer.file === "string" ? (
+                {values.sustainabilityAnswer.file &&
+                typeof values.sustainabilityAnswer.file === "string" ? (
                   <div className="flex items-center gap-2 ">
                     {" "}
                     <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
                       <div className="flex items-center gap-2">
                         <Image src={pdf} alt="" />
-
                         <span className="line-clamp-2">
-                          {values.innovationAnswer.file
+                          {values.sustainabilityAnswer.file
                             .split("/")
                             .pop()
                             .split("-")
@@ -114,7 +116,9 @@ export default function Page6() {
                       size={18}
                       color="red"
                       className="shrink-0"
-                      onClick={() => setFieldValue("innovationAnswer.file", "")}
+                      onClick={() =>
+                        setFieldValue("sustainabilityAnswer.file", "")
+                      }
                     />
                   </div>
                 ) : (
@@ -123,13 +127,13 @@ export default function Page6() {
                     type="file"
                     onFocus={() => {
                       setTimeout(() => {
-                        setFieldTouched("innovationAnswer.file", true),
-                          validateField("innovationAnswer.file");
+                        setFieldTouched("sustainabilityAnswer.file", true),
+                          validateField("sustainabilityAnswer.file");
                       }, 3000);
                     }}
                     onBlur={() => {
                       setTimeout(() => {
-                        validateField("innovationAnswer.file");
+                        validateField("sustainabilityAnswer.file");
                       }, 3000);
                     }}
                     accept="application/pdf"
@@ -137,18 +141,18 @@ export default function Page6() {
                     className="w-full"
                     onChange={async (e) => {
                       const file = await handleFileUpload(e, () => {
-                        setFieldValue("innovationAnswer.file", e),
-                          setFieldTouched("innovationAnswer.file", true),
-                          validateField("innovationAnswer.file");
+                        setFieldValue("sustainabilityAnswer.file", e),
+                          setFieldTouched("sustainabilityAnswer.file", true),
+                          validateField("sustainabilityAnswer.file");
                       });
 
-                      setFieldValue("innovationAnswer.file", file);
+                      setFieldValue("sustainabilityAnswer.file", file);
                     }}
                   />
                 )}
               </div>
               <ErrorMessage
-                name="innovationAnswer.file"
+                name="sustainabilityAnswer.file"
                 component="div"
                 className=" text-sm text-red-500 font-semibold"
               />
@@ -157,10 +161,10 @@ export default function Page6() {
               </p>
             </div>
           </div>
-          {errors.innovationAnswer &&
-            typeof errors.innovationAnswer === "string" && (
+          {errors.sustainabilityAnswer &&
+            typeof errors.sustainabilityAnswer === "string" && (
               <ErrorMessage
-                name="innovationAnswer"
+                name="sustainabilityAnswer"
                 component="div"
                 className=" text-sm text-red-500 font-semibold"
               />

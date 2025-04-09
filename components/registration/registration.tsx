@@ -9,12 +9,7 @@ import dynamic from "next/dynamic";
 import warning from "@/public/assets/triangle-warning.json";
 import success from "@/public/assets/images/success.webp";
 import Image from "next/image";
-import Page2 from "@/components/registration/page-2";
-import Page3 from "@/components/registration/page-3";
-import Page4 from "@/components/registration/page-4";
-import Page5 from "@/components/registration/page-5";
-import Page6 from "@/components/registration/page-6";
-import Page7 from "@/components/registration/page-7";
+
 import Summary from "@/components/registration/summary";
 import {
   Dialog,
@@ -28,10 +23,11 @@ import * as Yup from "yup";
 
 import { Form, Formik } from "formik";
 import { storage } from "@/utils/useStorage";
-import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
 import { m } from "motion/react";
 import { apiPost } from "@/utils/api";
+import AboutTheEntry from "@/components/registration/AboutTheEntry";
+import ProjectEvaluationForm from "@/components/registration/ProjectEvaluationForm";
 
 const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
 
@@ -41,6 +37,7 @@ const countWords = (html?: string) => {
 
   return text ? text.split(/\s+/).length : 0;
 };
+
 const validationSchema = Yup.object().shape({
   project: Yup.string()
     .required("This field is required")
@@ -51,105 +48,53 @@ const validationSchema = Yup.object().shape({
   projectPeriod: Yup.string()
     .required("This field is required")
     .max(200, "Limit: 200 characters"),
-  projectURL: Yup.string()
-    .required("This field is required")
-    .matches(
-      /^(https?:\/\/)?([\w.-]+)\.([a-z]{2,})(\/.*)?$/i,
-      "Must be a valid website URL"
-    )
-    .max(200, "Limit: 200 characters"),
+  projectURL: Yup.array()
+    .required("This field is required") // Ensures the array itself is not empty
+    .min(1, "At least one URL is required") // Ensures there is at least one URL
+    .test("no-empty-strings", "This field is required", (urls) => {
+      // Ensure no empty strings or invalid values inside the array
+      return urls.every((url) => typeof url === "string" && url.trim() !== "");
+    })
+    .of(
+      Yup.string()
+        .matches(
+          /^(https?:\/\/)?([\w.-]+)\.([a-z]{2,})(\/.*)?$/i,
+          "Must be a valid website URL" // Child error message for invalid format
+        )
+        .max(200, "Each URL must be less than or equal to 200 characters") // Child error message for max length
+    ),
+
   supportingDoc: Yup.mixed().test("fileCount", "Max 5 files", (value) => {
     if (!value || !Array.isArray(value)) return true;
     return value.length <= 5;
   }),
-  impactAnswer: Yup.object()
-    .shape({
-      text: Yup.string().test("maxWords", "Limit: 1000 words", (value) => {
-        if (!value) return true;
-        return countWords(value || "") <= 1000;
-      }),
-      file: Yup.mixed().nullable(),
-    })
-    .test(
-      "eitherTextOrFile",
-      "At least one input field must be filled",
-      function (value) {
-        const hasText = !!value?.text?.trim();
-        const hasFile = !!value?.file;
-        return hasText || hasFile;
-      }
-    ),
-  relevanceAnswer: Yup.object()
-    .shape({
-      text: Yup.string().test("maxWords", "Limit: 1000 words", (value) => {
-        if (!value) return true;
-        return countWords(value || "") <= 1000;
-      }),
-      file: Yup.mixed().nullable(),
-    })
-    .test(
-      "eitherTextOrFile",
-      "At least one input field must be filled",
-      function (value) {
-        const hasText = !!value?.text?.trim();
-        const hasFile = !!value?.file;
-        return hasText || hasFile;
-      }
-    ),
 
-  sustainabilityAnswer: Yup.object()
-    .shape({
-      text: Yup.string().test("maxWords", "Limit: 1000 words", (value) => {
-        if (!value) return true;
-        return countWords(value || "") <= 1000;
-      }),
-      file: Yup.mixed().nullable(),
-    })
-    .test(
-      "eitherTextOrFile",
-      "At least one input field must be filled",
-      function (value) {
-        const hasText = !!value?.text?.trim();
-        const hasFile = !!value?.file;
-        return hasText || hasFile;
-      }
-    ),
-
-  innovationAnswer: Yup.object()
-    .shape({
-      text: Yup.string().test("maxWords", "Limit: 1000 words", (value) => {
-        if (!value) return true;
-        return countWords(value || "") <= 1000;
-      }),
-      file: Yup.mixed().nullable(),
-    })
-    .test(
-      "eitherTextOrFile",
-      "At least one input field must be filled",
-      function (value) {
-        const hasText = !!value?.text?.trim();
-        const hasFile = !!value?.file;
-        return hasText || hasFile;
-      }
-    ),
-
-  alignmentAnswerDICT: Yup.object()
-    .shape({
-      text: Yup.string().test("maxWords", "Limit: 1000 words", (value) => {
-        if (!value) return true;
-        return countWords(value || "") <= 1000;
-      }),
-      file: Yup.mixed().nullable(),
-    })
-    .test(
-      "eitherTextOrFile",
-      "At least one input field must be filled",
-      function (value) {
-        const hasText = !!value?.text?.trim();
-        const hasFile = !!value?.file;
-        return hasText || hasFile;
-      }
-    ),
+  ...[
+    "impactAnswer",
+    "sustainabilityAnswer",
+    "innovationAnswer",
+    "relevanceAnswer",
+    "alignmentAnswerDICT",
+  ].reduce((acc: any, field) => {
+    acc[field] = Yup.object()
+      .shape({
+        text: Yup.string().test("maxWords", "Limit: 1000 words", (value) => {
+          if (!value) return true;
+          return countWords(value || "") <= 1000;
+        }),
+        fileLocation: Yup.string(),
+      })
+      .test(
+        "eitherTextOrFile",
+        "At least one input field must be filled",
+        function (value) {
+          const hasText = !!value?.text?.trim();
+          const hasFile = !!value?.fileLocation;
+          return hasText || hasFile;
+        }
+      );
+    return acc;
+  }, {}),
 
   alignmentSDG: Yup.object().shape({
     target: Yup.mixed().test(
@@ -167,14 +112,14 @@ const validationSchema = Yup.object().shape({
           if (!value) return true;
           return countWords(value || "") <= 1000;
         }),
-        file: Yup.mixed().nullable(),
+        fileLocation: Yup.mixed().nullable(),
       })
       .test(
         "eitherTextOrFile",
         "At least one input field must be filled",
         function (value) {
           const hasText = !!value?.text?.trim();
-          const hasFile = !!value?.file;
+          const hasFile = !!value?.fileLocation;
           return hasText || hasFile;
         }
       ),
@@ -183,36 +128,42 @@ const validationSchema = Yup.object().shape({
 
 const initialValues = {
   project: "",
-  projectURL: "",
+  projectURL: [""],
   category: "",
   projectPeriod: "",
   supportingDoc: [],
   impactAnswer: {
     text: "",
-    file: "",
+    filename: "",
+    fileLocation: "",
   },
   relevanceAnswer: {
     text: "",
-    file: "",
+    filename: "",
+    fileLocation: "",
   },
   sustainabilityAnswer: {
     text: "",
-    file: "",
+    filename: "",
+    fileLocation: "",
   },
   innovationAnswer: {
     text: "",
-    file: "",
+    filename: "",
+    fileLocation: "",
   },
 
   alignmentAnswerDICT: {
     text: "",
-    file: "",
+    filename: "",
+    fileLocation: "",
   },
   alignmentSDG: {
     target: [],
     answer: {
       text: "",
-      file: "",
+      filename: "",
+      fileLocation: "",
     },
   },
 };
@@ -267,18 +218,19 @@ export default function Registration() {
     const filteredValues = {
       ...values,
       supportingDoc: values.supportingDoc.filter(
-        (key: any) => typeof key === "string"
+        (key: any) => key.fileLocation != ""
       ),
     };
 
-    await apiPost("/api/entry/create", filteredValues)
+    console.log("filteredValues :", filteredValues);
+
+    /*  await apiPost("/api/entry/create", filteredValues)
       .then((res) => {
         const { success, message, data } = res;
         if (success) {
           setRefNumber(data.referenceNumber);
           setSuccessDialog(true);
-          /*           setRefNumber()
-           */
+         
         }
       })
       .catch((e) => {
@@ -289,7 +241,7 @@ export default function Registration() {
           variant: "destructive",
           duration: 2000,
         });
-      });
+      }); */
   };
   const fields: Record<number, string[]> = {
     1: ["lgu", "email", "website"],
@@ -320,6 +272,7 @@ export default function Registration() {
       initialValues={initialValues}
       validationSchema={validationSchema}
       validateOnBlur={true}
+      validateOnSubmit={true}
       onSubmit={handleSubmit}
     >
       {({
@@ -363,17 +316,22 @@ export default function Registration() {
               <>
                 {
                   [
-                    /*  <Page1 />, */
-                    <Page2 />,
-                    <Page3 />,
-                    <Page4 />,
-                    <Page5 />,
-                    <Page6 />,
-                    <Page7 />,
+                    <AboutTheEntry />,
+                    ...[
+                      "impact",
+                      "relevance",
+                      "sustainability",
+                      "innovation",
+                      "alignment",
+                    ].map((item, index) => (
+                      <ProjectEvaluationForm key={index} category={item} />
+                    )),
+
                     <Summary />,
                   ][page - 1]
                 }
               </>
+              <Button type="submit">test</Button>
             </section>
 
             {page < 9 && page != 0 && (

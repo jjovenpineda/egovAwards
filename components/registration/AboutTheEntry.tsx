@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { File, Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import FileViewer from "../shared/file-viewer";
@@ -17,9 +17,10 @@ import {
   FormikValues,
   useFormikContext,
 } from "formik";
-import { AnimatePresence, m } from "motion/react";
+
 import { toast } from "@/hooks/use-toast";
 import { apiPost } from "@/utils/api";
+import { set } from "lodash";
 export const categories = [
   {
     id: "r1",
@@ -50,8 +51,31 @@ export const categories = [
   },
 ];
 
-export default function Page2() {
-  const { values, setFieldValue, setFieldTouched } =
+export default function AboutTheEntry() {
+  const [years, setYears] = useState<any>(null);
+  const [month, setMonth] = useState<any>(null);
+
+  useEffect(() => {
+    if (month && Number(month) >= 12) {
+      setYears((prev: any) => (Number(prev ?? 0) + 1).toString());
+      setMonth("");
+    }
+  }, [month]);
+
+  useEffect(() => {
+    let period = "";
+    if (years) {
+      period += `${years} Year${years === "1" ? "" : "s"}`;
+    }
+    if (month) {
+      if (period) period += " - ";
+      period += `${month} Month${month === "1" ? "" : "s"}`;
+    }
+    setFieldValue("projectPeriod", period);
+    console.log("period :", period);
+  }, [years, month]);
+
+  const { values, setFieldValue, setFieldTouched, errors } =
     useFormikContext<FormikValues>();
   const handleFileChange = async (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -86,7 +110,8 @@ export default function Page2() {
 
         try {
           const { data } = await apiPost("/api/entry/upload", formData);
-          setFieldValue(`supportingDoc.${index}`, data.dir);
+          setFieldValue(`supportingDoc.${index}.filename`, data.filename);
+          setFieldValue(`supportingDoc.${index}.fileLocation`, data.location);
         } catch (e) {
           console.error("File upload failed:", e);
         }
@@ -154,7 +179,7 @@ export default function Page2() {
             ))}
           </RadioGroup>
         </div>
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-6">
           <div>
             <div className="flex flex-wrap justify-between">
               <div className="flex gap-1 items-center">
@@ -169,45 +194,135 @@ export default function Page2() {
                 />
               </div>
             </div>
-            <Field
-              type="text"
-              autoComplete="off"
-              name="projectPeriod"
-              onInput={(e: any) => {
-                e.target.value = e.target.value.replace(/[^0-9]/g, "");
-              }}
-              placeholder="Enter Project Period"
-              as={Input}
-              className=" space-y-8 rounded-md bg-white "
-            />
+
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-1 my-1">
+                <Input
+                  type="text"
+                  autoComplete="off"
+                  name={""}
+                  value={years ?? ""}
+                  onChange={(e: any) => {
+                    e.target.value = e.target.value
+                      .replace(/\D/g, "")
+                      .replace(/^0+(?!$)/, "");
+                    if (e.target.value.length > 2) {
+                      e.target.value = e.target.value.slice(0, 2);
+                    }
+                    setYears(e.target.value);
+                  }}
+                  className="w-11"
+                />
+                <label className="text-slate-900 text-sm font-semibold">
+                  Year(s)
+                </label>
+              </div>
+              <div className="flex items-center gap-1">
+                <Input
+                  type="text"
+                  autoComplete="off"
+                  name={""}
+                  value={month ?? ""}
+                  onChange={(e: any) => {
+                    e.target.value = e.target.value
+                      .replace(/\D/g, "")
+                      .replace(/^0+(?!$)/, "");
+                    if (e.target.value.length > 2) {
+                      e.target.value = e.target.value.slice(0, 2);
+                    }
+                    setMonth(e.target.value);
+                  }}
+                  className="w-11"
+                />
+                <label className="text-slate-900 text-sm font-semibold">
+                  Month(s)
+                </label>
+              </div>
+            </div>
+
             <p className="text-slate-500 text-sm">
               Must be existing for a minimum of one year
             </p>
           </div>
-          <div>
-            <div className="flex gap-1 items-center">
-              <Label className="font-semibold text-sm text-[#1F2937]">
-                Project URL <span className="text-red-500 text-base">*</span>
-              </Label>
-              <ErrorMessage
-                name="projectURL"
-                component="div"
-                className=" text-xs text-red-500 font-semibold"
-              />
-            </div>
-            <Field
-              type="text"
-              autoComplete="off"
-              name="projectURL"
-              placeholder="Enter Project URL"
-              as={Input}
-              className=" space-y-8 rounded-md bg-white "
-            />
+          <FieldArray
+            name="projectURL"
+            render={(arrayHelpers: ArrayHelpers) => (
+              <div className="flex flex-col gap-2 w-full relative">
+                <div>
+                  <div className="flex flex-col gap-1 ">
+                    <div className="flex gap-1 items-center">
+                      <Label className="font-semibold text-sm text-[#1F2937]">
+                        Project URL{" "}
+                        <span className="text-red-500 text-base">*</span>
+                      </Label>
+                      {Array.isArray(errors.projectURL) ? null : (
+                        <div className="text-xs text-red-500 font-semibold">
+                          {typeof errors.projectURL === "string"
+                            ? errors.projectURL
+                            : null}
+                        </div>
+                      )}
+                    </div>
+                    <p className="text-sm text-slate-900 ">
+                      Please provide at least one (1) link for virtual access to
+                      the project.
+                    </p>
+                  </div>
 
-            <p className="text-slate-500 text-sm">
-              Please provide any link for virtual access to the project.
-            </p>
-          </div>
+                  {values.projectURL &&
+                    values.projectURL.length > 0 &&
+                    values.projectURL.map((item: any, index: any) => {
+                      return (
+                        <React.Fragment key={index}>
+                          <div className="space-y-2">
+                            <div className="flex gap-2 items-center my-2">
+                              <Field
+                                type="text"
+                                name={`projectURL.${index}`}
+                                placeholder="Enter Project URL"
+                                as={Input}
+                              />
+                              {index != 0 && (
+                                <Trash2
+                                  onClick={() => {
+                                    arrayHelpers.remove(index);
+                                  }}
+                                  className="cursor-pointer text-red-500 hover:text-red-400"
+                                  size={15}
+                                />
+                              )}
+                            </div>
+                            {/* Show individual error for each URL */}
+                            {errors?.projectURL != "This field is required" && (
+                              <ErrorMessage
+                                name={`projectURL[${index}]`} // This targets the individual URL in the array
+                                component="div"
+                                className={`text-xs text-red-500 font-semibold ${errors?.projectURL}`}
+                              />
+                            )}
+                          </div>
+                        </React.Fragment>
+                      );
+                    })}
+
+                  <p className="text-slate-500 text-sm">
+                    The link should be publicly available for viewing.
+                  </p>
+                </div>
+
+                <Button
+                  variant={"primary"}
+                  size={"sm"}
+                  type="button"
+                  onClick={() => arrayHelpers.push("")}
+                  className="w-fit"
+                >
+                  <Plus />
+                  Add Link
+                </Button>
+              </div>
+            )}
+          />
         </div>
         <div className="space-y-3 pt-20 pb-10">
           <div className="flex gap-1 items-center">
@@ -234,28 +349,25 @@ export default function Page2() {
                     values.supportingDoc.map((item: any, index: any) => {
                       return (
                         <div key={index} className="overflow-hidden">
-                          {typeof item === "string" ? (
+                          {item.filename ? (
                             <div className="flex items-center gap-2 ">
                               {" "}
                               <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
                                 <div className="flex items-center gap-2">
                                   <Image src={pdf} alt="" />
                                   <span className="line-clamp-2">
-                                    {item
-                                      ?.split("/")
-                                      .pop()
-                                      ?.split("-")
-                                      .slice(1)
-                                      .join("-")}
+                                    {item.filename}
                                   </span>
                                 </div>
-                                <FileViewer url={item} />
+                                <FileViewer url={item.fileLocation} />
                               </div>
                               <Trash2
-                                size={18}
+                                size={15}
                                 color="red"
-                                className="shrink-0"
-                                onClick={() => arrayHelpers.remove(index)}
+                                className="cursor-pointer text-red-500 hover:text-red-400"
+                                onClick={() =>
+                                  setFieldValue(`supportingDoc.${index}`, "")
+                                }
                               />
                               <ErrorMessage
                                 name={`supportingDoc`}
@@ -264,16 +376,25 @@ export default function Page2() {
                               />
                             </div>
                           ) : (
-                            <Input
-                              value={values.supportingDoc[index].name}
-                              type="file"
-                              accept="application/pdf"
-                              placeholder="Enter Project/Program Name"
-                              className="w-full"
-                              onChange={(e) => {
-                                handleFileChange(e, index, arrayHelpers);
-                              }}
-                            />
+                            <div className="flex gap-2 items-center ">
+                              <Input
+                                value={values.supportingDoc[index].filename}
+                                type="file"
+                                accept="application/pdf"
+                                className="w-full"
+                                onChange={(e) => {
+                                  handleFileChange(e, index, arrayHelpers);
+                                }}
+                              />
+
+                              <Trash2
+                                onClick={() => {
+                                  arrayHelpers.remove(index);
+                                }}
+                                className="cursor-pointer text-red-500 hover:text-red-400"
+                                size={15}
+                              />
+                            </div>
                           )}
                         </div>
                       );
@@ -290,10 +411,8 @@ export default function Page2() {
                         type="button"
                         onClick={() =>
                           arrayHelpers.push({
-                            name: "",
-                            lastModified: Date.now(),
-                            type: "application/pdf",
-                            size: 1,
+                            filename: "",
+                            fileLocation: "",
                           })
                         }
                         className="w-fit"

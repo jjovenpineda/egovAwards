@@ -33,7 +33,6 @@ import {
   Trash2,
 } from "lucide-react";
 import { AnimatePresence, m } from "motion/react";
-import { signupInitialValues } from "@/constants";
 import { apiGet, apiPost } from "@/utils/api";
 import { toast } from "@/hooks/use-toast";
 import FileViewer from "@/components/shared/file-viewer";
@@ -181,7 +180,7 @@ export default function SignInPage() {
 
     lgu: Yup.string().trim().required("Required"),
 
-    abbr: Yup.string().trim().max(10, "Max 10 characters").required("Required"),
+    abbr: Yup.string().trim().max(10, "Max 10 characters"),
 
     province: Yup.string().trim().required("Required"),
 
@@ -190,7 +189,8 @@ export default function SignInPage() {
     mobile: Yup.string()
       .matches(/^[1-9]\d{9}$/, "Invalid number")
       .required("Required"),
-    authLetter: Yup.string().required("Required"),
+    authLetterFilename: Yup.string().required("Required"),
+    authLetterFileLocation: Yup.string().required("Required"),
   });
 
   const handleSubmit = async (values: any) => {
@@ -225,7 +225,21 @@ export default function SignInPage() {
     >
       <div className="z-30 flex size-full  relative items-center justify-center">
         <Formik
-          initialValues={{ ...signupInitialValues }}
+          initialValues={{
+            email: "",
+            firstname: "",
+            lastname: "",
+            middlename: "",
+            joinCount: "",
+            lgu: "",
+            abbr: "",
+            province: "",
+            suffix: "",
+            region: "",
+            mobile: "",
+            authLetterFilename: "",
+            authLetterFileLocation: "",
+          }}
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
@@ -785,20 +799,20 @@ export default function SignInPage() {
                                     </p>
                                     <div>
                                       <div className="overflow-hidden">
-                                        {values.authLetter ? (
+                                        {values.authLetterFileLocation ? (
                                           <div className="flex items-center gap-2 ">
                                             {" "}
                                             <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
                                               <div className="flex items-center gap-2">
                                                 <Image src={pdf} alt="" />
                                                 <span className="line-clamp-2">
-                                                  {values.authLetter
-                                                    .split("-")
-                                                    .pop()}
+                                                  {values.authLetterFilename}
                                                 </span>
                                               </div>
                                               <FileViewer
-                                                url={values.authLetter}
+                                                url={
+                                                  values.authLetterFileLocation
+                                                }
                                               />
                                             </div>
                                             <Trash2
@@ -820,8 +834,14 @@ export default function SignInPage() {
                                             onChange={async (e) => {
                                               const file =
                                                 await handleFileUpload(e);
-
-                                              setFieldValue("authLetter", file);
+                                              setFieldValue(
+                                                "authLetterFilename",
+                                                file.filename
+                                              );
+                                              setFieldValue(
+                                                "authLetterFileLocation",
+                                                file.location
+                                              );
                                             }}
                                           />
                                         )}
@@ -852,16 +872,14 @@ export default function SignInPage() {
                                   disabled={
                                     !values.email ||
                                     !values.lgu ||
-                                    !values.abbr ||
                                     !values.region ||
                                     !values.joinCount ||
-                                    !values.authLetter ||
+                                    !values.authLetterFileLocation ||
                                     !!errors.email ||
                                     !!errors.lgu ||
                                     !!errors.abbr ||
                                     !!errors.region ||
-                                    !!errors.joinCount ||
-                                    !!errors.authLetter
+                                    !!errors.joinCount
                                   }
                                   type="submit"
                                   onClick={() => handleSubmit(values)}

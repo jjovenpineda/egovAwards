@@ -134,9 +134,9 @@ export default function TopBar() {
                 </div>
 
                 <div className="flex gap-2 text-[13px] items-center text-start text-nowrap">
-                  {userInfo.firstname} |
+                  {userInfo?.firstname} |
                   <p className=" text-slate-900 ">
-                    <span className="text-slate-500">{userInfo.role}</span>
+                    <span className="text-slate-500">{userInfo?.role}</span>
                   </p>
                   <ChevronDown size={12} className=" h-4 w-4 text-slate-500" />
                 </div>

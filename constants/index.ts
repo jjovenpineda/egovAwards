@@ -66,17 +66,3 @@ export const dashboardLinks = [
     ],
   },
 ];
-export const signupInitialValues = {
-  email: "",
-  firstname: "",
-  lastname: "",
-  middlename: "",
-  joinCount: "",
-  lgu: "",
-  abbr: "",
-  province: "",
-  suffix: "",
-  region: "",
-  mobile: "",
-  authLetter: "",
-};

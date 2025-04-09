@@ -8,11 +8,13 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
 import { useRouter } from "next/navigation";
-import { getUserInfo } from "@/utils/utility";
+import { deleteCookie, getUserInfo } from "@/utils/utility";
 import Image from "next/image";
-
+import { useUserStore } from "@/stores/useStores";
 import eGOVLogo from "@/public/assets/images/eGOV_Logo.webp";
 import { Label } from "../ui/label";
+import { storage } from "@/utils/useStorage";
+import { apiGet } from "@/utils/api";
 interface Info {
   email: string;
   fullname: string;
@@ -26,14 +28,27 @@ export default function SideBar() {
   const [currentPath, setCurrentPath] = useState("");
   const searchParams = useSearchParams();
   const filter = searchParams.get("filter");
-
-  const getInfo = () => {
-    const info = getUserInfo();
-    if (
-      info.authRep.isNewAccount &&
-      !window.location.pathname.includes("settings")
-    ) {
-      window.location.href = "/settings";
+  const setUserInfo = useUserStore((state: any) => state.setUserInfo);
+  const getUser = async () => {
+    try {
+      const { _id } = getUserInfo();
+      const res = await apiGet(`/api/auth/fetch/user/${_id}`);
+      const { data } = res;
+      if (!data) return;
+      setUserInfo(data);
+      if (data?.isAdminUser) {
+        deleteCookie("authToken");
+        storage.removeAll();
+        router.push("/sign-in");
+      }
+      if (
+        data.authRep.isNewAccount &&
+        !window.location.pathname.includes("settings")
+      ) {
+        window.location.href = "/settings";
+      }
+    } catch (e) {
+      console.error("Error fetching LGU list:", e);
     }
   };
 
@@ -45,7 +60,7 @@ export default function SideBar() {
 
   useEffect(() => {
     CurrentPathname();
-    getInfo();
+    getUser();
   }, []);
 
   return (

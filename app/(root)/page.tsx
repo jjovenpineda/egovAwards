@@ -14,8 +14,12 @@ export default function Page() {
   const [isApproved, setisApproved] = useState(false);
 
   useEffect(() => {
-    const { authRep } = getUserInfo();
-    setisApproved(authRep.isApproved);
+    const info = getUserInfo();
+    if (info) {
+      setisApproved(info.authRep.isApproved);
+    }
+    /*     setisApproved(authRep.isApproved);
+     */
   }, []);
 
   return (

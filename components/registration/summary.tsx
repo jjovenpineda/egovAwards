@@ -1,23 +1,25 @@
 import { Button } from "@/components/ui/button";
 import { DotIcon, Edit } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import Page1 from "./page-1";
 import ModalWrapper from "./modal-wrapper";
-import Page2, { categories } from "./page-2";
-import Page3 from "./page-3";
-import Page4 from "./page-4";
-import Page5 from "./page-5";
-import Page6 from "./page-6";
-import Page7 from "./page-7";
+import Page2, { categories } from "./AboutTheEntry";
+import Page3 from "./ProjectEvaluationForm";
+import Page4 from "./delete/page-4";
+import Page5 from "./delete/page-5";
+import Page6 from "./delete/page-6";
+import Page7 from "./delete/page-7";
 import Image from "next/image";
 import pdf from "@/public/assets/svgs/pdf.svg";
 
 import { storage } from "@/utils/useStorage";
 import FileViewer from "../shared/file-viewer";
 import { ErrorMessage, FormikValues, useFormikContext } from "formik";
-
+import ProjectEvaluationForm from "./ProjectEvaluationForm";
+import AboutTheEntry from "./AboutTheEntry";
+import { useUserStore } from "@/stores/useStores";
 export default function Summary() {
   const { values, setFieldValue, errors } = useFormikContext<FormikValues>();
+  const userInfo = useUserStore((state: any) => state.userInfo);
   /* const aboutTheLguLabels = [
     { label: "LGU Name", value: "lgu_name" },
     { label: "LGU Abbreviation", value: "lgu_abbr" },
@@ -77,15 +79,13 @@ export default function Summary() {
               changes.
             </p>
 
-            <ModalWrapper
+            {/*  <ModalWrapper
               isEdit={true}
               isOpen={page1Modal}
               onClose={() => setPage1Modal(false)}
               setFieldValue={setFieldValue}
               values={values}
-            >
-              <Page1 />
-            </ModalWrapper>
+            ></ModalWrapper> */}
           </div>
           <hr className="p-2 "></hr>
         </div>
@@ -93,67 +93,75 @@ export default function Summary() {
           {/*  */}
           <div className="">
             <h2 className="text-sm font-medium text-gray-900">
-              Calabanga, Camarines Sur
+              {userInfo?.authRep.lgu + ", " + userInfo?.authRep.province}
             </h2>
             <p className="text-slate-600 font-medium text-sm">
-              Region V - Bicol
+              {userInfo?.authRep.region}
             </p>
 
             <div className="mt-4">
               <p className="text-slate-500 text-xs">Contact Person</p>
               <h3 className="text-md font-medium text-gray-900">
-                Juan Dela Cruz
+                {userInfo?.firstname +
+                  " " +
+                  userInfo?.middlename +
+                  " " +
+                  userInfo?.lastname}
               </h3>
-              <p className="text-gray-700 text-xs">
-                juandelacruz@calabanga.com
-              </p>
-              <p className="text-gray-700 text-xs">+639876543210</p>
+              <p className="text-gray-700 text-xs">{userInfo?.email}</p>
+              <p className="text-gray-700 text-xs">{`+63${userInfo?.mobile}`}</p>
             </div>
           </div>
           {/*  */}
           <div>
             <div className="space-y-2 text-gray-900 text-xs">
               <div className="flex">
-                <p className="w-48 font-medium">Name of LCE</p>
+                <p className="min-w-48 font-medium">Name of LCE</p>
                 <p>
-                  : <span className="text-slate-700">Eugene S. Severo</span>
+                  :{" "}
+                  <span className="text-slate-700">
+                    {userInfo?.authRep.lceName}
+                  </span>
                 </p>
               </div>
               <div className="flex">
-                <p className="w-48 font-medium">Name of Office in LGU</p>
+                <p className="min-w-48 font-medium">Name of Office in LGU</p>
                 <p>
-                  : <span className="text-slate-700">IT Department</span>
+                  :{" "}
+                  <span className="text-slate-700">
+                    {userInfo?.authRep.officeName}
+                  </span>
                 </p>
               </div>
               <div className="flex py-4">
-                <p className="w-48 font-medium">Number of Times Joined</p>
-                <p>: 2</p>
+                <p className="min-w-48 font-medium">Number of Times Joined</p>
+                <p>: {userInfo?.authRep.joinCount}</p>
               </div>
               <div className="flex">
-                <p className="w-48 font-medium">Office Number</p>
-                <p>: (02) 123 456</p>
+                <p className="min-w-48 font-medium">Office Number</p>
+                <p>: {userInfo?.authRep.officeNo}</p>
               </div>
               <div className="flex">
-                <p className="w-48 font-medium">Website</p>
-                <p>
+                <p className="min-w-48 font-medium">Website</p>
+                <p className="line-clamp-1">
                   :{" "}
                   <a
                     href="https://www.calabanga.com"
-                    className="text-slate-700 hover:underline"
+                    className="text-slate-700 hover:underline "
                   >
-                    www.calabanga.com
+                    {userInfo?.authRep.website}
                   </a>
                 </p>
               </div>
               <div className="flex">
-                <p className="w-48 font-medium">Facebook Page</p>
-                <p>
+                <p className="min-w-48 font-medium">Facebook Page</p>
+                <p className="line-clamp-1">
                   :{" "}
                   <a
                     href="https://facebook.com/calabanga"
                     className="text-slate-700 hover:underline"
                   >
-                    facebook.com/calabanga
+                    {userInfo?.authRep.facebook}
                   </a>
                 </p>
               </div>
@@ -183,7 +191,7 @@ export default function Summary() {
               setFieldValue={setFieldValue}
               values={values}
             >
-              <Page2 />
+              <AboutTheEntry />
             </ModalWrapper>
           </div>
           <hr className="p-2 "></hr>
@@ -207,27 +215,23 @@ export default function Summary() {
                     <div className="flex flex-wrap gap-2 w-full ">
                       {values.supportingDoc.length > 0 &&
                         values.supportingDoc.map((item: any, index: any) => {
-                          const fileURL =
-                            item.name && URL.createObjectURL(item);
                           return (
                             <>
-                              {typeof item === "string" && (
-                                <div
-                                  key={index}
-                                  className="flex items-center gap-2 w-fit"
-                                >
-                                  {" "}
-                                  <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
-                                    <div className="flex items-center gap-2">
-                                      <Image src={pdf} alt="" />
-                                      <span className="line-clamp-2">
-                                        {item}
-                                      </span>
-                                    </div>
-                                    <FileViewer url={fileURL} />
+                              <div
+                                key={index}
+                                className="flex items-center gap-2 w-fit"
+                              >
+                                {" "}
+                                <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
+                                  <div className="flex items-center gap-2">
+                                    <Image src={pdf} alt="" />
+                                    <span className="line-clamp-2">
+                                      {item?.filename}
+                                    </span>
                                   </div>
+                                  <FileViewer url={item?.fileLocation} />
                                 </div>
-                              )}
+                              </div>
                             </>
                           );
                         })}
@@ -281,7 +285,7 @@ export default function Summary() {
               setFieldValue={setFieldValue}
               values={values}
             >
-              <Page3 />
+              <ProjectEvaluationForm category={"impact"} />
             </ModalWrapper>
           </div>
           <hr className="p-2 "></hr>
@@ -299,11 +303,9 @@ export default function Summary() {
           />
           <div className="mb-2 font-medium text-slate-500 col-span-2">
             <div className="flex flex-wrap gap-2 w-full ">
-              {!!values.impactAnswer.file &&
-                typeof values.impactAnswer.file === "string" &&
+              {!!values.impactAnswer.filename &&
                 (() => {
                   /*  const fileURL = URL.createObjectURL(values.impactAnswer.file); */
-                  const fileURL = "";
 
                   return (
                     <div className="flex items-center gap-2 w-fit">
@@ -311,10 +313,10 @@ export default function Summary() {
                         <div className="flex items-center gap-2">
                           <Image src={pdf} alt="PDF Icon" />
                           <span className="line-clamp-2">
-                            {values.impactAnswer.file}
+                            {values.impactAnswer.filename}
                           </span>
                         </div>
-                        <FileViewer url={fileURL} />
+                        <FileViewer url={values.impactAnswer.fileLocation} />
                       </div>
                     </div>
                   );
@@ -352,7 +354,7 @@ export default function Summary() {
               setFieldValue={setFieldValue}
               values={values}
             >
-              <Page4 />
+              <ProjectEvaluationForm category={"relevance"} />
             </ModalWrapper>
           </div>
           <hr className="p-2 "></hr>
@@ -377,8 +379,7 @@ export default function Summary() {
           />
           <div className="mb-2 font-medium text-slate-500 col-span-2">
             <div className="flex flex-wrap gap-2 w-full ">
-              {!!values.relevanceAnswer.file &&
-                typeof values.relevanceAnswer.file === "string" &&
+              {!!values.relevanceAnswer.filename &&
                 (() => {
                   /*  const fileURL = URL.createObjectURL(values.relevanceAnswer.file); */
                   const fileURL = "";
@@ -389,10 +390,10 @@ export default function Summary() {
                         <div className="flex items-center gap-2">
                           <Image src={pdf} alt="PDF Icon" />
                           <span className="line-clamp-2">
-                            {values.relevanceAnswer.file}
+                            {values.relevanceAnswer.filename}
                           </span>
                         </div>
-                        <FileViewer url={fileURL} />
+                        <FileViewer url={values.relevanceAnswer.fileLocation} />
                       </div>
                     </div>
                   );
@@ -431,7 +432,7 @@ export default function Summary() {
               setFieldValue={setFieldValue}
               values={values}
             >
-              <Page5 />
+              <ProjectEvaluationForm category={"sustainability"} />
             </ModalWrapper>
           </div>
           <hr className="p-2 "></hr>
@@ -458,8 +459,7 @@ export default function Summary() {
           />
           <div className="mb-2 font-medium text-slate-500 col-span-2">
             <div className="flex flex-wrap gap-2 w-full ">
-              {!!values.sustainabilityAnswer.file &&
-                typeof values.sustainabilityAnswer.file === "string" &&
+              {!!values.sustainabilityAnswer.filename &&
                 (() => {
                   /*  const fileURL = URL.createObjectURL(values.sustainabilityAnswer.file); */
                   const fileURL = "";
@@ -470,10 +470,12 @@ export default function Summary() {
                         <div className="flex items-center gap-2">
                           <Image src={pdf} alt="PDF Icon" />
                           <span className="line-clamp-2">
-                            {values.sustainabilityAnswer.file}
+                            {values.sustainabilityAnswer.filename}
                           </span>
                         </div>
-                        <FileViewer url={fileURL} />
+                        <FileViewer
+                          url={values.sustainabilityAnswer.fileLocation}
+                        />
                       </div>
                     </div>
                   );
@@ -512,7 +514,7 @@ export default function Summary() {
               setFieldValue={setFieldValue}
               values={values}
             >
-              <Page6 />
+              <ProjectEvaluationForm category={"innovation"} />
             </ModalWrapper>
           </div>
           <hr className="p-2 "></hr>
@@ -536,8 +538,7 @@ export default function Summary() {
           />
           <div className="mb-2 font-medium text-slate-500 col-span-2">
             <div className="flex flex-wrap gap-2 w-full ">
-              {!!values.innovationAnswer.file &&
-                typeof values.innovationAnswer.file === "string" &&
+              {!!values.innovationAnswer.filename &&
                 (() => {
                   /*  const fileURL = URL.createObjectURL(values.innovationAnswer.file); */
                   const fileURL = "";
@@ -548,10 +549,12 @@ export default function Summary() {
                         <div className="flex items-center gap-2">
                           <Image src={pdf} alt="PDF Icon" />
                           <span className="line-clamp-2">
-                            {values.innovationAnswer.file}
+                            {values.innovationAnswer.filename}
                           </span>
                         </div>
-                        <FileViewer url={fileURL} />
+                        <FileViewer
+                          url={values.innovationAnswer.fileLocation}
+                        />
                       </div>
                     </div>
                   );
@@ -590,7 +593,7 @@ export default function Summary() {
               setFieldValue={setFieldValue}
               values={values}
             >
-              <Page7 />
+              <ProjectEvaluationForm category={"alignment"} />
             </ModalWrapper>
           </div>
           <hr className="p-2 "></hr>
@@ -637,13 +640,12 @@ export default function Summary() {
             <p
               className="text-slate-500 text-base font-light leading-normal line-clamp-6"
               dangerouslySetInnerHTML={{
-                __html: values.alignmentSDG.text,
+                __html: values.alignmentSDG.answer.text,
               }}
             />
             <div className="mb-2 font-medium text-slate-500 col-span-2">
               <div className="flex flex-wrap gap-2 w-full ">
-                {!!values.alignmentSDG.file &&
-                  typeof values.alignmentSDG.file === "string" &&
+                {!!values.alignmentSDG.answer.filename &&
                   (() => {
                     /*  const fileURL = URL.createObjectURL(values.alignmentSDG.file); */
                     const fileURL = "";
@@ -654,10 +656,12 @@ export default function Summary() {
                           <div className="flex items-center gap-2">
                             <Image src={pdf} alt="PDF Icon" />
                             <span className="line-clamp-2">
-                              {values.alignmentSDG.file}
+                              {values.alignmentSDG.answer.filename}
                             </span>
                           </div>
-                          <FileViewer url={fileURL} />
+                          <FileViewer
+                            url={values.alignmentSDG.answer.fileLocation}
+                          />
                         </div>
                       </div>
                     );
@@ -691,11 +695,9 @@ export default function Summary() {
             />
             <div className="mb-2 font-medium text-slate-500 col-span-2">
               <div className="flex flex-wrap gap-2 w-full ">
-                {!!values.alignmentAnswerDICT.file &&
-                  typeof values.alignmentAnswerDICT.file === "string" &&
+                {!!values.alignmentAnswerDICT.filename &&
                   (() => {
                     /*  const fileURL = URL.createObjectURL(values.alignmentAnswerDICT.file); */
-                    const fileURL = "";
 
                     return (
                       <div className="flex items-center gap-2 w-fit">
@@ -703,10 +705,12 @@ export default function Summary() {
                           <div className="flex items-center gap-2">
                             <Image src={pdf} alt="PDF Icon" />
                             <span className="line-clamp-2">
-                              {values.alignmentAnswerDICT.file}
+                              {values.alignmentAnswerDICT.filename}
                             </span>
                           </div>
-                          <FileViewer url={fileURL} />
+                          <FileViewer
+                            url={values.alignmentAnswerDICT.fileLocation}
+                          />
                         </div>
                       </div>
                     );

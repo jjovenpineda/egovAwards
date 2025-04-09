@@ -22,7 +22,7 @@ export const handleFileUpload = async (event: any, setValue?: Function) => {
 
         try {
           const { data } = await apiPost("/api/entry/upload", formData);
-          return data.dir;
+          return data;
         } catch (e) {
           console.error("File upload failed:", e);
         }
@@ -30,25 +30,3 @@ export const handleFileUpload = async (event: any, setValue?: Function) => {
     }
   }
 };
-/* export const handleFileChange = (
-  event: React.ChangeEvent<HTMLInputElement>,
-  setValue: Function
-) => {
-  const files = event.target.files;
-  const size = event.target.files?.[0]?.size;
-  if (size) {
-    if (size > 3 * 1024 * 1024) {
-      toast({
-        title: "File too large!",
-        description: "Please upload a file smaller than 3MB.",
-        variant: "destructive",
-        duration: 2500,
-      });
-      return;
-    } else {
-      if (files && files.length > 0) {
-        setValue();
-      }
-    }
-  }
-}; */

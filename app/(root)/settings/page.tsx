@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { use, useEffect, useRef, useState } from "react";
 import pdf from "@/public/assets/svgs/pdf.svg";
 
 import Image from "next/image";
@@ -19,6 +19,7 @@ import {
   Mail,
   MinusCircle,
   Phone,
+  Repeat,
   Save,
   Search,
   Trash2,
@@ -38,6 +39,7 @@ import { handleFileUpload } from "@/utils/file-upload";
 import FileViewer from "@/components/shared/file-viewer";
 import Loaders from "@/components/ui/loaders";
 import { m } from "motion/react";
+import { useUserStore } from "@/stores/useStores";
 import { getUserInfo } from "@/utils/utility";
 interface ILGU {
   lgu: string;
@@ -45,7 +47,7 @@ interface ILGU {
   region: string;
   tenDigitCode: string;
 }
-export default function Page1() {
+export default function Page() {
   const [page, setPage] = useState(1);
   const [isLinkSent, setIsLinkSent] = useState(false);
   const [active, setActive] = useState(false);
@@ -55,7 +57,8 @@ export default function Page1() {
   const [lguPopover, setLguPopover] = useState(false);
   const [selectedPage, setSelectedPage] = useState("lgu");
   const [pwdBtnLoading, setPwdBtnLoading] = useState(false);
-  const [userInfo, setUserInfo] = useState<any>({});
+  const setUserInfo = useUserStore((state: any) => state.setUserInfo);
+  const userInfo = useUserStore((state: any) => state.userInfo);
   const getLGUList = async () => {
     try {
       const res = await apiGet("/api/lgu/list");
@@ -74,12 +77,11 @@ export default function Page1() {
       if (!data) return;
       setUserInfo(data);
     } catch (e) {
-      console.error("Error fetching LGU list:", e);
+      console.error("Error fetching User info:", e);
     }
   };
   useEffect(() => {
     getLGUList();
-    getUser();
     setIsLoaded(true);
   }, []);
 
@@ -142,6 +144,7 @@ export default function Page1() {
         });
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const AuthRef = useRef<HTMLInputElement>(null);
   const handleImageUpload = async (event: any, setValue?: Function) => {
     if (!event) return;
     const file = event.target.files[0];
@@ -163,7 +166,7 @@ export default function Page1() {
 
           try {
             const { data } = await apiPost("/api/entry/upload", formData);
-            return data.dir;
+            return data;
           } catch (e) {
             console.error("File upload failed:", e);
           }
@@ -219,8 +222,11 @@ export default function Page1() {
                 website: userInfo?.authRep?.website || "",
                 facebook: userInfo?.authRep?.facebook || "",
                 mobile: userInfo?.mobile || "",
-                logo: userInfo?.authRep?.logo || "",
-                authLetter: userInfo?.authRep?.authLetter || "",
+                logoFilename: userInfo?.authRep?.logoFilename || "",
+                logoFileLocation: userInfo?.authRep?.logoFileLocation || "",
+                authLetterFilename: userInfo?.authRep?.authLetterFilename || "",
+                authLetterFileLocation:
+                  userInfo?.authRep?.authLetterFileLocation || "",
               }
             : {
                 firstname: userInfo?.firstname || "",
@@ -240,6 +246,11 @@ export default function Page1() {
           isValid,
           errors,
         }) => {
+          useEffect(() => {
+            setSearchQuery(values.lgu);
+            console.log(" :");
+          }, [values.lgu]);
+
           return (
             <Form>
               {isloaded && (
@@ -269,10 +280,10 @@ export default function Page1() {
                     <section className="flex gap-8 items-center">
                       <div className="flex flex-col items-center gap-4">
                         <div className="relative flex flex-col  overflow-hidden items-center border-[8px] border-slate-200 justify-center size-[88px] bg-gray-100 rounded-full   transition-all">
-                          {values.logo ? (
+                          {values.logoFileLocation ? (
                             <>
                               <img
-                                src={values.logo}
+                                src={values.logoFileLocation}
                                 alt="Profile"
                                 className="rounded-full object-cover "
                               />
@@ -327,24 +338,28 @@ export default function Page1() {
                         <input
                           type="file"
                           className="hidden "
-                          accept=".png, .jpg, .jpeg, .webp"
+                          accept=".png, .jpg, .jpeg"
                           ref={fileInputRef}
                           onChange={async (e) => {
                             const file = await handleImageUpload(e);
-
-                            console.log("eeee :", e);
-                            setFieldValue("logo", file);
+                            setFieldValue("logoFilename", file.filename);
+                            setFieldValue("logoFileLocation", file.location);
                             e.target.value = "";
                           }}
                         />
                         <Button
+                          type="button"
                           onClick={() => fileInputRef.current?.click()}
                           className="bg-slate-500 hover:bg-slate-600 font-semibold transition-colors"
                         >
                           <ArrowLeftRightIcon /> Change Picture
                         </Button>
                         <Button
-                          onClick={() => setFieldValue("logo", "")}
+                          type="button"
+                          onClick={() => {
+                            setFieldValue("logoFilename", ""),
+                              setFieldValue("logoFileLocation", "");
+                          }}
                           variant="ghost"
                           className="outline outline-1 text-slate-800 hover:bg-slate-200 font-semibold transition-colors"
                         >
@@ -373,8 +388,7 @@ export default function Page1() {
                             <PopoverTrigger asChild>
                               <div
                                 onClick={() => {
-                                  setSearchQuery(""),
-                                    setFieldTouched("lgu", true);
+                                  setFieldTouched("lgu", true);
                                 }}
                                 id="popover-trigger"
                                 className="flex items-center justify-between h-9 cursor-pointer border w-full rounded-md p-2  shadow-sm px-3 text-sm"
@@ -397,6 +411,7 @@ export default function Page1() {
                                   type="text"
                                   autoComplete="off"
                                   name="website"
+                                  defaultValue={searchQuery}
                                   placeholder="Search LGU"
                                   onChange={(e) => {
                                     setSearchQuery(e.target.value);
@@ -798,13 +813,13 @@ export default function Page1() {
                               type="text"
                               disabled
                               value={
-                                userInfo.firstname +
+                                userInfo?.firstname +
                                 " " +
-                                userInfo.middlename +
+                                userInfo?.middlename +
                                 " " +
-                                userInfo.lastname +
+                                userInfo?.lastname +
                                 " " +
-                                userInfo.suffix
+                                userInfo?.suffix
                               }
                               autoComplete="off"
                               as={Input}
@@ -837,7 +852,7 @@ export default function Page1() {
                               disabled
                               autoComplete="off"
                               name="email"
-                              value={userInfo.email}
+                              value={userInfo?.email}
                               as={Input}
                               className=" space-y-8 rounded-md bg-white pl-9"
                             />
@@ -848,26 +863,31 @@ export default function Page1() {
                           </div>
                         </div>
                         <div className="">
-                          <div className="flex flex-col flex-wrap gap-2 my-4">
-                            <div className="overflow-hidden">
-                              {values.authLetter ? (
-                                <div className="flex items-center gap-2 ">
-                                  {" "}
-                                  <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
-                                    <div className="flex items-center gap-2">
-                                      <Image src={pdf} alt="" />
-                                      <span className="line-clamp-2">
-                                        {values.authLetter
-                                          ?.split("/")
-                                          .pop()
-                                          ?.split("-")
-                                          .slice(1)
-                                          .join("-")}
-                                      </span>
+                          {!userInfo?.authRep?.isApproved && (
+                            <div className="flex flex-col flex-wrap gap-2 my-4">
+                              <div className="overflow-hidden">
+                                {values.authLetterFileLocation ? (
+                                  <div className="flex items-center gap-2 ">
+                                    {" "}
+                                    <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
+                                      <div className="flex items-center gap-2">
+                                        <Image src={pdf} alt="" />
+                                        <span className="line-clamp-2">
+                                          {values.authLetterFilename}
+                                        </span>
+                                      </div>
+                                      <FileViewer
+                                        url={
+                                          values.authLetterFileLocation ?? ""
+                                        }
+                                      />
                                     </div>
-                                    <FileViewer url={values.authLetter ?? ""} />
-                                  </div>
-                                  {/*   <Trash2
+                                    <Repeat
+                                      size={18}
+                                      className="text-slate-400 hover:text-slate-600 cursor-pointer transition-color"
+                                      onClick={() => AuthRef.current?.click()}
+                                    />
+                                    {/*   <Trash2
                                     size={18}
                                     color="red"
                                     className="shrink-0"
@@ -875,37 +895,65 @@ export default function Page1() {
                                       setFieldValue("authLetter", "")
                                     }
                                   /> */}
-                                </div>
-                              ) : (
-                                <div className="space-y-1">
-                                  <p className="text-sm text-slate-700">
-                                    Please upload an official letter as proof of
-                                    your authorization.{" "}
-                                  </p>
-                                  <Input
-                                    value={""}
-                                    type="file"
-                                    accept="application/pdf"
-                                    placeholder="Enter Project/Program Name"
-                                    className="w-full"
-                                    onChange={async (e) => {
-                                      const file = await handleFileUpload(e);
+                                  </div>
+                                ) : (
+                                  <div className="space-y-1">
+                                    <p className="text-sm text-slate-700">
+                                      Please upload an official letter as proof
+                                      of your authorization.{" "}
+                                    </p>
+                                    <Input
+                                      ref={AuthRef}
+                                      value={""}
+                                      type="file"
+                                      accept="application/pdf"
+                                      placeholder="Enter Project/Program Name"
+                                      className="w-full"
+                                      onChange={async (e) => {
+                                        const file = await handleFileUpload(e);
+                                        setFieldValue(
+                                          "authLetterFilename",
+                                          file.filename
+                                        );
+                                        setFieldValue(
+                                          "authLetterFileLocation",
+                                          file.location
+                                        );
+                                      }}
+                                    />
 
-                                      setFieldValue("authLetter", file);
-                                    }}
-                                  />
-                                  <ErrorMessage
-                                    name="innovationAnswer_file"
-                                    component="div"
-                                    className=" text-sm text-red-500 font-semibold"
-                                  />
-                                  <p className="text-slate-500 text-sm">
-                                    Accepted format: PDF (Max file size: 3MB).{" "}
-                                  </p>
-                                </div>
-                              )}
+                                    <ErrorMessage
+                                      name="innovationAnswer_file"
+                                      component="div"
+                                      className=" text-sm text-red-500 font-semibold"
+                                    />
+                                    <p className="text-slate-500 text-sm">
+                                      Accepted format: PDF (Max file size: 3MB).{" "}
+                                    </p>
+                                  </div>
+                                )}
+                                <Input
+                                  ref={AuthRef}
+                                  value={""}
+                                  type="file"
+                                  accept="application/pdf"
+                                  placeholder="Enter Project/Program Name"
+                                  className="w-full invisible"
+                                  onChange={async (e) => {
+                                    const file = await handleFileUpload(e);
+                                    setFieldValue(
+                                      "authLetterFilename",
+                                      file.filename
+                                    );
+                                    setFieldValue(
+                                      "authLetterFileLocation",
+                                      file.location
+                                    );
+                                  }}
+                                />
+                              </div>
                             </div>
-                          </div>
+                          )}
                         </div>
                       </section>
                       {/*  <div className="lg:w-1/2 lg:pr-4">
@@ -989,7 +1037,7 @@ export default function Page1() {
                                     setPwdBtnLoading(false);
                                     setTimeout(
                                       () => setIsLinkSent(false),
-                                      5000
+                                      10000
                                     );
                                   }
                                 } catch (e) {
@@ -1025,11 +1073,10 @@ export default function Page1() {
                             <m.p
                               initial={{ opacity: 0 }}
                               animate={{ opacity: 1 }}
-                              className="text-xs text-emerald-500 pt-1 max-w-[70%] relative col-span-2 "
+                              className="text-xs text-emerald-500 pt-1 max-w-[75%]  relative col-span-2 "
                             >
-                              Please check your email for the password reset
-                              link. If you haven’t received it, ensure that you
-                              have entered the correct email address.{" "}
+                              Password reset link sent. Please check your email
+                              for the password reset link.
                             </m.p>
                           )}
                         </div>

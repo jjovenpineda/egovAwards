@@ -34,29 +34,9 @@ export default function ModalWrapper({
 }: ModalProps) {
   const loadCachedData = () => {
     const cachedData = storage.getItem("formData");
-    if (cachedData && typeof cachedData === "object") {
-      Object.entries(cachedData).forEach(([key, value]: any) => {
-        if (key === "documents" && Array.isArray(value)) {
-          return null;
-        } else if (
-          typeof value === "object" &&
-          value !== null &&
-          key != "goals"
-        ) {
-          const filteredObject = Object.fromEntries(
-            Object.entries(value).map(([subKey, subValue]) => [
-              subKey,
-              subValue,
-            ])
-          );
-          console.log(key);
-
-          console.log(filteredObject.text);
-
-          setFieldValue(`${key}.text`, filteredObject.text);
-        } else if (!(value instanceof File)) {
-          setFieldValue(key, value);
-        }
+    if (cachedData) {
+      Object.entries(cachedData).forEach(([key, value]) => {
+        setFieldValue(key, value);
       });
     }
   };
