@@ -46,6 +46,7 @@ interface ILGU {
   province: string;
   region: string;
   tenDigitCode: string;
+  cityClass: string;
 }
 export default function Page() {
   const [page, setPage] = useState(1);
@@ -213,6 +214,7 @@ export default function Page() {
           selectedPage === "lgu"
             ? {
                 lgu: userInfo?.authRep?.lgu || "",
+                cityClass: userInfo?.authRep?.cityClass || "",
                 province: userInfo?.authRep?.province || "",
                 region: userInfo?.authRep?.region || "",
                 abbr: userInfo?.authRep?.abbr || "",
@@ -248,7 +250,6 @@ export default function Page() {
         }) => {
           useEffect(() => {
             setSearchQuery(values.lgu);
-            console.log(" :");
           }, [values.lgu]);
 
           return (
@@ -454,6 +455,10 @@ export default function Page() {
                                                   "region",
                                                   item.region
                                                 );
+                                                setFieldValue(
+                                                  "cityClass",
+                                                  item.cityClass
+                                                );
                                                 setTimeout(() => {}, 500);
 
                                                 setLguPopover(false);
@@ -499,6 +504,10 @@ export default function Page() {
                                               setFieldValue(
                                                 "region",
                                                 item.region
+                                              );
+                                              setFieldValue(
+                                                "cityClass",
+                                                item.cityClass
                                               );
                                               setTimeout(() => {}, 500);
 

@@ -20,6 +20,7 @@ import Loading from "@/components/shared/loading";
 import { storage } from "@/utils/useStorage";
 import FloatingIcons from "@/components/shared/floating-icons";
 import Loaders from "@/components/ui/loaders";
+import { useDraftIDStore } from "@/stores/useStores";
 
 export default function SignInPage() {
   const [index, setIndex] = useState(0);
@@ -30,7 +31,7 @@ export default function SignInPage() {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [timer, setTimer] = useState(0);
   const [isSubmitted, setIsSubmitted] = useState(false);
-
+  const setDraftID = useDraftIDStore((state: any) => state.setDraftID);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showLoading, setShowLoading] = useState(false);
   const [action, setAction] = useState("login");
@@ -54,6 +55,9 @@ export default function SignInPage() {
         const { success, message, data } = res;
         if (success) {
           setItem("account_data", encrypt(JSON.stringify(data)));
+          if (data?.authRep?.draftEntry?._id) {
+            setDraftID(data?.authRep?.draftEntry?._id);
+          }
 
           setTimeout(() => {
             setShowLoading(true);

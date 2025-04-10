@@ -186,18 +186,33 @@ export default function ProjectEvaluationForm({ category }: any) {
   const { values, setFieldValue, setFieldTouched, validateField, errors } =
     useFormikContext<FormikValues>();
   const [count, setCount] = useState(0);
+  const [count1, setCount1] = useState(0);
+  const [count2, setCount2] = useState(0);
+
   const pageDetails = infos.find((info) => info.fieldName?.includes(category));
+
   const [fieldName, setFieldName] = useState<any>("");
 
   useEffect(() => {
     setFieldName(pageDetails?.fieldName);
   }, [pageDetails]);
   useEffect(() => {
-    WordCounter(values.fieldName?.text, setCount, () => {
+    WordCounter(values[fieldName]?.text, setCount, () => {
       setFieldValue(`${fieldName}.text`, "");
     });
-  }, [values.fieldName?.text]);
+  }, [values[fieldName]?.text]);
 
+  useEffect(() => {
+    WordCounter(values?.alignmentAnswerDICT.text, setCount1, () => {
+      setFieldValue(`alignmentAnswerDICT.text`, "");
+    });
+  }, [values.alignmentAnswerDICT.text]);
+
+  useEffect(() => {
+    WordCounter(values?.alignmentSDG.answer.text, setCount2, () => {
+      setFieldValue("alignmentSDG.answer.text", "");
+    });
+  }, [values.alignmentSDG.answer.text]);
   return (
     <div>
       <section className="space-y-2 pt-6 lg:pt-0">
@@ -238,17 +253,12 @@ export default function ProjectEvaluationForm({ category }: any) {
                 <Editor
                   defaultValue={values[fieldName]?.text}
                   onChange={(e) => {
-                    const isEmpty =
-                      e
-                        .replace(/<[^>]*>/g, "")
-                        .replace(/&nbsp;|\\s+/g, "")
-                        .trim().length === 0;
-
-                    setFieldValue(`${fieldName}.text`, isEmpty ? "" : e);
+                    setFieldValue(`${fieldName}.text`, e);
                     setFieldTouched(`${fieldName}.text`, true);
                   }}
                 />
               </div>
+
               <ErrorMessage
                 name={`${fieldName}.text`}
                 component="div"
@@ -331,18 +341,18 @@ export default function ProjectEvaluationForm({ category }: any) {
                   <ErrorMessage
                     name={`${fieldName}.file`}
                     component="div"
-                    className=" text-sm text-red-500 font-semibold"
+                    className=" text-xs text-red-500 font-semibold"
                   />
                   <p className="text-slate-500 text-sm">
                     File size must not exceed 3MB.{" "}
                   </p>
                 </div>
               </div>
-              {errors.fieldName && typeof errors.fieldName === "string" && (
+              {typeof errors[fieldName] === "string" && (
                 <ErrorMessage
                   name={`${fieldName}`}
                   component="div"
-                  className=" text-sm text-red-500 font-semibold"
+                  className=" text-xs text-red-500 font-semibold "
                 />
               )}
             </div>
@@ -439,7 +449,7 @@ export default function ProjectEvaluationForm({ category }: any) {
                       <div
                         onFocus={() => {
                           setFieldTouched(`${fieldName}.text`, true),
-                            validateField(`${fieldName}`);
+                            validateField(`${fieldName}.text`);
                         }}
                         onBlur={() => {
                           validateField(`${fieldName}`);
@@ -447,18 +457,13 @@ export default function ProjectEvaluationForm({ category }: any) {
                         className="h-min"
                       >
                         <Editor
-                          defaultValue={values[fieldName]?.text}
+                          defaultValue={
+                            item.fieldName == "alignmentSDG"
+                              ? values.alignmentSDG.answer.text
+                              : values[fieldName]?.text
+                          }
                           onChange={(e) => {
-                            const isEmpty =
-                              e
-                                .replace(/<[^>]*>/g, "")
-                                .replace(/&nbsp;|\\s+/g, "")
-                                .trim().length === 0;
-
-                            setFieldValue(
-                              `${fieldName}.text`,
-                              isEmpty ? "" : e
-                            );
+                            setFieldValue(`${fieldName}.text`, e);
                             setFieldTouched(`${fieldName}.text`, true);
                           }}
                         />
@@ -471,13 +476,17 @@ export default function ProjectEvaluationForm({ category }: any) {
                       <div className="flex justify-end">
                         <div
                           className={` text-sm ${
-                            count > 1000 ? "text-red-500" : "text-gray-500"
+                            (item.fieldName == "alignmentSDG"
+                              ? count2
+                              : count1) > 1000
+                              ? "text-red-500"
+                              : "text-gray-500"
                           }`}
                         >
-                          {count}/1000
+                          {item.fieldName == "alignmentSDG" ? count2 : count1}
+                          /1000
                         </div>
                       </div>
-
                       <div className="flex flex-wrap gap-2 items-center my-4">
                         <p>or Upload File </p>
                         <div>
@@ -567,19 +576,27 @@ export default function ProjectEvaluationForm({ category }: any) {
                           <ErrorMessage
                             name={`${fieldName}.file`}
                             component="div"
-                            className=" text-sm text-red-500 font-semibold"
+                            className=" text-xs text-red-500 font-semibold"
                           />
                           <p className="text-slate-500 text-sm">
                             File size must not exceed 3MB.{" "}
                           </p>
                         </div>
                       </div>
-                      {errors.fieldName &&
-                        typeof errors.fieldName === "string" && (
+                      {typeof errors[fieldName] === "string" && (
+                        <ErrorMessage
+                          name={`${fieldName}`}
+                          component="div"
+                          className=" text-xs text-red-500 font-semibold "
+                        />
+                      )}
+                      {item.fieldName == "alignmentSDG" &&
+                        typeof (errors?.alignmentSDG as any)?.answer ===
+                          "string" && (
                           <ErrorMessage
-                            name={`${fieldName}`}
+                            name={"alignmentSDG.answer"}
                             component="div"
-                            className=" text-sm text-red-500 font-semibold border-4"
+                            className="text-xs text-red-500 font-semibold"
                           />
                         )}
                     </div>

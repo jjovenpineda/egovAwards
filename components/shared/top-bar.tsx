@@ -152,11 +152,6 @@ export default function TopBar() {
           </PopoverTrigger>
           <PopoverContent side="bottom" className="mb-4  ">
             <div className="space-y-1">
-              <button className="animate-click flex w-full gap-2 items-center p-2 rounded-md hover:bg-slate-100">
-                <Settings size={15} className=" h-4 w-4 object-contain " />{" "}
-                <div className="text-sm ">Settings</div>
-              </button>
-
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button

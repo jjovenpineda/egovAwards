@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight, Send } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import bg from "@/public/assets/images/bg-gradient.webp";
 
 import dynamic from "next/dynamic";
@@ -24,10 +24,15 @@ import * as Yup from "yup";
 import { Form, Formik } from "formik";
 import { storage } from "@/utils/useStorage";
 import { toast } from "@/hooks/use-toast";
-import { m } from "motion/react";
-import { apiPost } from "@/utils/api";
+import { AnimatePresence, m } from "motion/react";
+import { apiGet, apiPost } from "@/utils/api";
 import AboutTheEntry from "@/components/registration/AboutTheEntry";
 import ProjectEvaluationForm from "@/components/registration/ProjectEvaluationForm";
+import {
+  useDraftIDStore,
+  useDraftStore,
+  useUserStore,
+} from "@/stores/useStores";
 
 const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
 
@@ -49,19 +54,28 @@ const validationSchema = Yup.object().shape({
     .required("This field is required")
     .max(200, "Limit: 200 characters"),
   projectURL: Yup.array()
-    .required("This field is required") // Ensures the array itself is not empty
-    .min(1, "At least one URL is required") // Ensures there is at least one URL
-    .test("no-empty-strings", "This field is required", (urls) => {
-      // Ensure no empty strings or invalid values inside the array
-      return urls.every((url) => typeof url === "string" && url.trim() !== "");
+    .required("This field is required")
+    .min(1, "At least one URL is required")
+    .test("no-empty-strings", "This field is required", function (urls) {
+      if (urls[0] && typeof urls[0] === "string" && urls[0].trim() === "") {
+        return false;
+      }
+      return urls
+        .map((url, index) => {
+          if (index === 0 && (typeof url !== "string" || url.trim() === "")) {
+            return false;
+          }
+          return true;
+        })
+        .every(Boolean);
     })
     .of(
       Yup.string()
         .matches(
           /^(https?:\/\/)?([\w.-]+)\.([a-z]{2,})(\/.*)?$/i,
-          "Must be a valid website URL" // Child error message for invalid format
+          "Must be a valid website URL"
         )
-        .max(200, "Each URL must be less than or equal to 200 characters") // Child error message for max length
+        .max(200, "Each URL must be less than or equal to 200 characters")
     ),
 
   supportingDoc: Yup.mixed().test("fileCount", "Max 5 files", (value) => {
@@ -180,10 +194,10 @@ export const WordCounter = (
     .split(/\s+/)
     .filter((word) => word.length > 0).length;
 
-  setCount(words);
   if (words <= 0) {
     reset();
   }
+  setCount(words);
 };
 export const handleFileChange = (
   event: React.ChangeEvent<HTMLInputElement>,
@@ -209,28 +223,59 @@ export const handleFileChange = (
 };
 
 export default function Registration() {
+  const userInfo = useUserStore((state: any) => state.userInfo);
+  const draftInfo = useDraftStore((state: any) => state.draftInfo);
+  const setDraftInfo = useDraftStore((state: any) => state.setDraftInfo);
+  const draftID = useDraftIDStore((state: any) => state.draftID);
+  console.log("draftID :", draftID);
   const [submitDialog, setSubmitDialog] = useState(false);
   const [refNumber, setRefNumber] = useState("");
   const [successDialog, setSuccessDialog] = useState(false);
   const [page, setPage] = useState(1);
+
+  const saveAsDraft = async (values: any) => {
+    const newVal = { ...values /* _id: draftID */ };
+    try {
+      const res = await apiPost("/api/entry/save", newVal);
+      const { success, message, data } = res;
+    } catch (e) {
+      console.error("Error saving entry as draft:", e);
+    }
+  };
+
+  const getDraft = async () => {
+    try {
+      const res = await apiGet(`/api/entry/view/${draftID}`);
+      const { data } = res;
+      if (!data) return;
+      setDraftInfo(data);
+    } catch (e) {
+      console.error("Error fetching entry list:", e);
+    }
+  };
+
+  useEffect(() => {
+    getDraft();
+  }, [page]);
+
   const handleSubmit = async (values: any) => {
-    setSubmitDialog(false);
+    console.log(" userInfo._id:", userInfo);
     const filteredValues = {
       ...values,
       supportingDoc: values.supportingDoc.filter(
         (key: any) => key.fileLocation != ""
       ),
+      authRep: userInfo._id,
     };
 
     console.log("filteredValues :", filteredValues);
 
-    /*  await apiPost("/api/entry/create", filteredValues)
+    await apiPost("/api/entry/create", filteredValues)
       .then((res) => {
         const { success, message, data } = res;
         if (success) {
           setRefNumber(data.referenceNumber);
           setSuccessDialog(true);
-         
         }
       })
       .catch((e) => {
@@ -241,30 +286,7 @@ export default function Registration() {
           variant: "destructive",
           duration: 2000,
         });
-      }); */
-  };
-  const fields: Record<number, string[]> = {
-    1: ["lgu", "email", "website"],
-    2: ["projectName"],
-  };
-  const validateFields = async (
-    setFieldTouched: any,
-    validateField: any,
-    errors: any,
-    page: number
-  ) => {
-    const fieldsToValidate = fields[page] || [];
-
-    await Promise.all(
-      fieldsToValidate.map(async (field) => {
-        await setFieldTouched(field, true, false);
-        await validateField(field);
-      })
-    );
-
-    const hasError = fieldsToValidate.some((field) => errors[field]);
-
-    return hasError;
+      });
   };
 
   return (
@@ -273,16 +295,9 @@ export default function Registration() {
       validationSchema={validationSchema}
       validateOnBlur={true}
       validateOnSubmit={true}
-      onSubmit={handleSubmit}
+      onSubmit={() => undefined}
     >
-      {({
-        validateForm,
-        values,
-        validateField,
-
-        setFieldTouched,
-        resetForm,
-      }) => {
+      {({ validateForm, values, errors, resetForm }) => {
         const [hasError, setHasError] = useState(false);
 
         useEffect(() => {
@@ -312,8 +327,14 @@ export default function Registration() {
                 </p>
               )}
             </div>
-            <section>
-              <>
+            <AnimatePresence mode="wait">
+              <m.section
+                key={page}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.1 }}
+              >
                 {
                   [
                     <AboutTheEntry />,
@@ -326,14 +347,11 @@ export default function Registration() {
                     ].map((item, index) => (
                       <ProjectEvaluationForm key={index} category={item} />
                     )),
-
                     <Summary />,
                   ][page - 1]
                 }
-              </>
-              <Button type="submit">test</Button>
-            </section>
-
+              </m.section>
+            </AnimatePresence>
             {page < 9 && page != 0 && (
               <section className="flex justify-between items-center">
                 <Button
@@ -358,49 +376,25 @@ export default function Registration() {
                   <Button
                     type="button"
                     onClick={() => {
+                      /* saveAsDraft(values); */
                       storage.setItem("isPaused", false), setPage(page + 1);
-                      window.scrollTo({ top: 200, behavior: "smooth" });
+                      window.scrollTo({ top: 60, behavior: "smooth" });
                     }}
-                    /*  onClick={() => {
-                      validateFields(
-                        setFieldTouched,
-                        validateField,
-                        errors,
-                        page
-                      ).then((hasErrors) => {
-                        if (!hasErrors) {
-                          router.push(
-                            `/registration?action=register&page=${page + 1}`
-                          );
-                        }
-                      });
-                    }} */
-                    /*  href={{
-                      pathname: "/registration",
-                      query: { action: "register", page: page + 1 },
-                    }} */
-                    /*                     type="button"
-                     */
-                    className={`bg-[#1F2937] flex gap-2 text-xs items-center transition-colors duration-300  hover:bg-slate-700 text-white p-2.5 px-6 rounded-md ${
+                    className={`bg-[#1F2937] flex gap-2 text-xs items-center font-semibold transition-colors duration-300  hover:bg-slate-700 text-white p-2.5 px-6 rounded-md ${
                       hasError &&
                       "opacity-50 cursor-not-allowed pointer-events-none"
                     }`}
                   >
                     <ArrowRight size={15} />
-                    Next
+                    Save and Continue
                   </Button>
                 ) : (
                   <Button
-                    type="button"
+                    type="submit"
                     onClick={async (e) => {
-                      e.preventDefault();
-                      Object.keys(validationSchema.fields).forEach((field) => {
-                        setFieldTouched(field, true);
-                        validateField(field);
-                      });
-                      const validationErrors = await validateForm(); // Validates the form
+                      const formErrors = await validateForm();
 
-                      if (Object.keys(validationErrors).length === 0) {
+                      if (Object.keys(formErrors).length === 0) {
                         setSubmitDialog(true);
                       } else {
                         toast({
@@ -446,12 +440,13 @@ export default function Registration() {
                   </DialogClose>
                   <div className="size-full group bg-[#2563EB] hover:bg-[#3674fa]">
                     <Button
-                      type="submit"
+                      type="button"
                       /* href={{
                        pathname: "/registration",
                        query: { action: "register", page: page + 1 },
                      }} */
                       onClick={() => {
+                        setSubmitDialog(false);
                         handleSubmit(values);
                       }}
                       className="w-full size-full flex items-center justify-center rounded-0 bg-[#2563EB] p-3 text-base text-white font-semibold group-hover:bg-[#3674fa] transition-colos duration-300"
@@ -476,7 +471,7 @@ export default function Registration() {
                       <h2 className="font-bold  text-2xl text-center lg:text-3xl text-blue-900">
                         Submission Successful!{" "}
                       </h2>
-                      <div className="text-blue-500">
+                      <div className="text-blue-500 text-center">
                         <h3 className="text-sm font-medium">
                           REFERENCE NUMBER{" "}
                         </h3>

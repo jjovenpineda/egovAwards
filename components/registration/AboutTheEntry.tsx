@@ -72,10 +72,21 @@ export default function AboutTheEntry() {
       period += `${month} Month${month === "1" ? "" : "s"}`;
     }
     setFieldValue("projectPeriod", period);
-    console.log("period :", period);
   }, [years, month]);
 
-  const { values, setFieldValue, setFieldTouched, errors } =
+  useEffect(() => {
+    const normalized = values.projectPeriod.toLowerCase();
+
+    const yearMatch = normalized.match(/(\d+)\s*year/);
+    const monthMatch = normalized.match(/(\d+)\s*month/);
+
+    const years = yearMatch ? parseInt(yearMatch[1], 10) : null;
+    const months = monthMatch ? parseInt(monthMatch[1], 10) : null;
+
+    setYears(years);
+    setMonth(months);
+  }, []);
+  const { values, setFieldValue, setFieldTouched, errors, touched } =
     useFormikContext<FormikValues>();
   const handleFileChange = async (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -255,13 +266,20 @@ export default function AboutTheEntry() {
                         Project URL{" "}
                         <span className="text-red-500 text-base">*</span>
                       </Label>
-                      {Array.isArray(errors.projectURL) ? null : (
+                      {typeof errors?.projectURL == "string" && (
+                        <ErrorMessage
+                          name={"projectURL"}
+                          component="div"
+                          className={`text-xs text-red-500 font-semibold ${errors?.projectURL}`}
+                        />
+                      )}
+                      {/*  {Array.isArray(errors.projectURL) ? null : (
                         <div className="text-xs text-red-500 font-semibold">
                           {typeof errors.projectURL === "string"
                             ? errors.projectURL
                             : null}
                         </div>
-                      )}
+                      )} */}
                     </div>
                     <p className="text-sm text-slate-900 ">
                       Please provide at least one (1) link for virtual access to

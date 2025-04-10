@@ -52,6 +52,7 @@ export interface ILGU {
   province: string;
   region: string;
   tenDigitCode: string;
+  cityClass: string;
 }
 
 const terms = [
@@ -226,6 +227,7 @@ export default function SignInPage() {
       <div className="z-30 flex size-full  relative items-center justify-center">
         <Formik
           initialValues={{
+            cityClass: "",
             email: "",
             firstname: "",
             lastname: "",
@@ -268,6 +270,9 @@ export default function SignInPage() {
                 ease: "easeInOut",
               },
             };
+            useEffect(() => {
+              setSearchQuery(values.lgu);
+            }, [values.lgu]);
             return (
               <Form className="max-w-[380px]  mx-auto lg:mx-0 max-h-screen  w-full">
                 {" "}
@@ -519,8 +524,7 @@ export default function SignInPage() {
                                       <PopoverTrigger asChild>
                                         <div
                                           onClick={() => {
-                                            setSearchQuery(""),
-                                              setFieldTouched("lgu", true);
+                                            setFieldTouched("lgu", true);
                                           }}
                                           id="popover-trigger"
                                           className="flex items-center justify-between  cursor-pointer border w-full rounded-md p-2 my-2 shadow-sm px-3 text-sm"
@@ -544,7 +548,8 @@ export default function SignInPage() {
                                           <Input
                                             type="text"
                                             autoComplete="off"
-                                            name="lgu_website"
+                                            name="website"
+                                            defaultValue={searchQuery}
                                             placeholder="Search LGU"
                                             onChange={(e) => {
                                               setSearchQuery(e.target.value);
@@ -594,6 +599,10 @@ export default function SignInPage() {
                                                           setFieldValue(
                                                             "region",
                                                             item.region
+                                                          );
+                                                          setFieldValue(
+                                                            "cityClass",
+                                                            item.cityClass
                                                           );
                                                           setTimeout(() => {},
                                                           500);
@@ -652,6 +661,10 @@ export default function SignInPage() {
                                                           setFieldValue(
                                                             "region",
                                                             item.region
+                                                          );
+                                                          setFieldValue(
+                                                            "cityClass",
+                                                            item.cityClass
                                                           );
                                                           setTimeout(() => {},
                                                           500);

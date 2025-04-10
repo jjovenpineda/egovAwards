@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { DotIcon, Edit } from "lucide-react";
+import { Copy, DotIcon, Edit } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import ModalWrapper from "./modal-wrapper";
 import Page2, { categories } from "./AboutTheEntry";
@@ -17,6 +17,8 @@ import { ErrorMessage, FormikValues, useFormikContext } from "formik";
 import ProjectEvaluationForm from "./ProjectEvaluationForm";
 import AboutTheEntry from "./AboutTheEntry";
 import { useUserStore } from "@/stores/useStores";
+import ExpandableText from "../shared/expandable-text";
+import { CopyText } from "../shared/copy-text";
 export default function Summary() {
   const { values, setFieldValue, errors } = useFormikContext<FormikValues>();
   const userInfo = useUserStore((state: any) => state.userInfo);
@@ -93,10 +95,10 @@ export default function Summary() {
           {/*  */}
           <div className="">
             <h2 className="text-sm font-medium text-gray-900">
-              {userInfo?.authRep.lgu + ", " + userInfo?.authRep.province}
+              {userInfo?.authRep?.lgu + ", " + userInfo?.authRep?.province}
             </h2>
             <p className="text-slate-600 font-medium text-sm">
-              {userInfo?.authRep.region}
+              {userInfo?.authRep?.region}
             </p>
 
             <div className="mt-4">
@@ -120,7 +122,7 @@ export default function Summary() {
                 <p>
                   :{" "}
                   <span className="text-slate-700">
-                    {userInfo?.authRep.lceName}
+                    {userInfo?.authRep?.lceName}
                   </span>
                 </p>
               </div>
@@ -129,17 +131,17 @@ export default function Summary() {
                 <p>
                   :{" "}
                   <span className="text-slate-700">
-                    {userInfo?.authRep.officeName}
+                    {userInfo?.authRep?.officeName}
                   </span>
                 </p>
               </div>
               <div className="flex py-4">
                 <p className="min-w-48 font-medium">Number of Times Joined</p>
-                <p>: {userInfo?.authRep.joinCount}</p>
+                <p>: {userInfo?.authRep?.joinCount}</p>
               </div>
               <div className="flex">
                 <p className="min-w-48 font-medium">Office Number</p>
-                <p>: {userInfo?.authRep.officeNo}</p>
+                <p>: {userInfo?.authRep?.officeNo}</p>
               </div>
               <div className="flex">
                 <p className="min-w-48 font-medium">Website</p>
@@ -149,7 +151,7 @@ export default function Summary() {
                     href="https://www.calabanga.com"
                     className="text-slate-700 hover:underline "
                   >
-                    {userInfo?.authRep.website}
+                    {userInfo?.authRep?.website}
                   </a>
                 </p>
               </div>
@@ -161,7 +163,7 @@ export default function Summary() {
                     href="https://facebook.com/calabanga"
                     className="text-slate-700 hover:underline"
                   >
-                    {userInfo?.authRep.facebook}
+                    {userInfo?.authRep?.facebook}
                   </a>
                 </p>
               </div>
@@ -204,10 +206,18 @@ export default function Summary() {
             return (
               <React.Fragment key={index}>
                 <div className="flex justify-between">
-                  {item.label}{" "}
-                  {item.value != "supportingDoc" && (
-                    <span className="mr-4">:</span>
-                  )}
+                  <span
+                    className={`${
+                      ["supportingDoc", "projectURL"].includes(item.value) &&
+                      "mt-4"
+                    }`}
+                  >
+                    {item.label}
+                  </span>{" "}
+                  {item.value != "supportingDoc" &&
+                    item.value != "projectURL" && (
+                      <span className="mr-4">:</span>
+                    )}
                 </div>
 
                 {item.value == "supportingDoc" ? (
@@ -217,21 +227,23 @@ export default function Summary() {
                         values.supportingDoc.map((item: any, index: any) => {
                           return (
                             <>
-                              <div
-                                key={index}
-                                className="flex items-center gap-2 w-fit"
-                              >
-                                {" "}
-                                <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
-                                  <div className="flex items-center gap-2">
-                                    <Image src={pdf} alt="" />
-                                    <span className="line-clamp-2">
-                                      {item?.filename}
-                                    </span>
+                              {item.filename && (
+                                <div
+                                  key={index}
+                                  className="flex items-center gap-2 w-fit"
+                                >
+                                  {" "}
+                                  <div className="flex justify-between w-full gap-2 items-center bg-slate-500 p-2 rounded-md text-sm text-white font-semibold">
+                                    <div className="flex items-center gap-2">
+                                      <Image src={pdf} alt="" />
+                                      <span className="line-clamp-2">
+                                        {item?.filename}
+                                      </span>
+                                    </div>
+                                    <FileViewer url={item?.fileLocation} />
                                   </div>
-                                  <FileViewer url={item?.fileLocation} />
                                 </div>
-                              </div>
+                              )}
                             </>
                           );
                         })}
@@ -246,6 +258,21 @@ export default function Summary() {
                       className=" text-base text-red-500 italic "
                     />
                   </div>
+                ) : item.value == "projectURL" ? (
+                  <>
+                    <ErrorMessage
+                      name={item.value}
+                      component="div"
+                      className=" text-base text-red-500 italic "
+                    />
+                    <div className="flex gap-4 col-span-2 font-medium text-slate-500">
+                      {values[item.value].map((item: any, index: any) => (
+                        <div key={index} className="max-w-xs ">
+                          <CopyText key={index} text={item} />
+                        </div>
+                      ))}
+                    </div>
+                  </>
                 ) : (
                   <div className="mb-2 font-medium text-slate-500">
                     {values[item.value]}
@@ -297,10 +324,9 @@ export default function Summary() {
             accountability in local governance? (You may cite several major
             impacts)
           </h2>
-          <p
-            className="text-slate-500 text-base font-light leading-normal line-clamp-6"
-            dangerouslySetInnerHTML={{ __html: values.impactAnswer.text }}
-          />
+
+          <ExpandableText text={values.impactAnswer.text} lines={5} />
+
           <div className="mb-2 font-medium text-slate-500 col-span-2">
             <div className="flex flex-wrap gap-2 w-full ">
               {!!values.impactAnswer.filename &&
@@ -373,10 +399,9 @@ export default function Summary() {
             the implementation of the project in relation to the problem it aims
             to solve?
           </h2>
-          <p
-            className="text-slate-500 text-base font-light leading-normal line-clamp-6"
-            dangerouslySetInnerHTML={{ __html: values.relevanceAnswer.text }}
-          />
+
+          <ExpandableText text={values.relevanceAnswer.text} lines={5} />
+
           <div className="mb-2 font-medium text-slate-500 col-span-2">
             <div className="flex flex-wrap gap-2 w-full ">
               {!!values.relevanceAnswer.filename &&
@@ -451,12 +476,9 @@ export default function Summary() {
             the implementation of the project in relation to the problem it aims
             to solve?
           </h2>
-          <p
-            className="text-slate-500 text-base font-light leading-normal line-clamp-6"
-            dangerouslySetInnerHTML={{
-              __html: values.sustainabilityAnswer.text,
-            }}
-          />
+
+          <ExpandableText text={values.sustainabilityAnswer.text} lines={5} />
+
           <div className="mb-2 font-medium text-slate-500 col-span-2">
             <div className="flex flex-wrap gap-2 w-full ">
               {!!values.sustainabilityAnswer.filename &&
@@ -530,12 +552,8 @@ export default function Summary() {
             addressing the problems?
           </h2>
 
-          <p
-            className="text-slate-500 text-base font-light leading-normal line-clamp-6"
-            dangerouslySetInnerHTML={{
-              __html: values.innovationAnswer.text,
-            }}
-          />
+          <ExpandableText text={values.innovationAnswer.text} lines={5} />
+
           <div className="mb-2 font-medium text-slate-500 col-span-2">
             <div className="flex flex-wrap gap-2 w-full ">
               {!!values.innovationAnswer.filename &&
@@ -637,12 +655,8 @@ export default function Summary() {
               economic, social, or environmental aspects of the chosen SDGs?){" "}
             </h2>
 
-            <p
-              className="text-slate-500 text-base font-light leading-normal line-clamp-6"
-              dangerouslySetInnerHTML={{
-                __html: values.alignmentSDG.answer.text,
-              }}
-            />
+            <ExpandableText text={values.alignmentSDG.answer.text} lines={5} />
+
             <div className="mb-2 font-medium text-slate-500 col-span-2">
               <div className="flex flex-wrap gap-2 w-full ">
                 {!!values.alignmentSDG.answer.filename &&
@@ -687,12 +701,8 @@ export default function Summary() {
               Technology (DICT).
             </h2>
 
-            <p
-              className="text-slate-500 text-base font-light leading-normal line-clamp-6"
-              dangerouslySetInnerHTML={{
-                __html: values.alignmentAnswerDICT.text,
-              }}
-            />
+            <ExpandableText text={values.alignmentAnswerDICT.text} lines={5} />
+
             <div className="mb-2 font-medium text-slate-500 col-span-2">
               <div className="flex flex-wrap gap-2 w-full ">
                 {!!values.alignmentAnswerDICT.filename &&
