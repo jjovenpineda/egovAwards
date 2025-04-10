@@ -12,7 +12,7 @@ interface IPagination {
   page: number;
   setPage: (page: number) => void;
   data: any;
-}
+} /*  */
 export default function CustomPagination({ page, setPage, data }: IPagination) {
   if (data?.pages < 2) return null; // Hide pagination if only one page exists
 
