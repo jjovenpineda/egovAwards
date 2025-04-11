@@ -10,12 +10,13 @@ export default function CustomSkeleton({ variant }: IVariants) {
         <div className="w-full overflow-x-auto ">
           <div className="flex justify-between gap-4">
             <div className="flex gap-2 w-[300px] mb-4">
-              <Skeleton className="h-10 w-full flex-1" />{" "}
+              {/*               <Skeleton className="h-10 w-full flex-1" />{" "}
+               */}{" "}
               <Skeleton className="h-10 w-full flex-[2]" />
             </div>{" "}
-            <div>
+            {/*  <div>
               <Skeleton className="h-10 w-32 flex-1" />{" "}
-            </div>
+            </div> */}
           </div>
           <div className="w-full border border-gray-200 animate-pulse rounded-lg overflow-hidden">
             <div className="bg-slate-200 flex border-b">

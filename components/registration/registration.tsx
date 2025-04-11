@@ -227,7 +227,6 @@ export default function Registration() {
   const draftInfo = useDraftStore((state: any) => state.draftInfo);
   const setDraftInfo = useDraftStore((state: any) => state.setDraftInfo);
   const draftID = useDraftIDStore((state: any) => state.draftID);
-  console.log("draftID :", draftID);
   const [submitDialog, setSubmitDialog] = useState(false);
   const [refNumber, setRefNumber] = useState("");
   const [successDialog, setSuccessDialog] = useState(false);

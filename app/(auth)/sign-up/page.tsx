@@ -129,11 +129,9 @@ export default function SignInPage() {
 
   const verifyEmail = async (values: any) => {
     try {
-      const res = await apiGet(
-        `/api/auth/forgot-password/verify/${values.email}`
-      );
+      const res = await apiGet(`/api/auth/verify/${values.email}`);
       const { success, message, data } = res;
-      if (!success) {
+      if (data?.isPassed) {
         setIsLoading(false);
         setPage("info");
       } else if (success) {
